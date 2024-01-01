@@ -199,7 +199,7 @@ export default function ListSuratPage() {
           Daftar Surat
         </h1>
         <Link
-          href="#"
+          href="/surat/upload"
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
