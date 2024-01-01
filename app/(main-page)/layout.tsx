@@ -12,7 +12,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    setLoading(false);
   }, []);
 
   return (

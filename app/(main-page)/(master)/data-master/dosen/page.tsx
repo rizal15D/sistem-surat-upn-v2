@@ -1,3 +1,6 @@
+"use client";
+import { useQuery } from "@tanstack/react-query";
+
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Payment, columns } from "./columns";
 import { DataTable } from "./data-table";
@@ -134,8 +137,19 @@ async function getData(): Promise<Payment[]> {
   ];
 }
 
-export default async function DosenDataMasterPage() {
-  const data = await getData();
+export default function DosenDataMasterPage() {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["dosen"],
+    queryFn: getData,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <>

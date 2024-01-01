@@ -35,13 +35,6 @@ export const columns: ColumnDef<Letter>[] = [
     ),
   },
   {
-    accessorKey: "tanggal",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
-    ),
-  },
-
-  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
@@ -54,14 +47,33 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
+    accessorKey: "tanggal",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.tanggal);
+      const options = {
+        weekday: "long" as "long",
+        day: "numeric" as "numeric",
+        month: "long" as "long",
+        year: "numeric" as "numeric",
+      };
+      const formattedDate = new Intl.DateTimeFormat("id-ID", options).format(
+        date
+      );
+      return formattedDate;
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const letter = row.original as Letter;
 
       return (
         // Edit and Delete buttons
         <div className="flex items-center space-x-2">
-          <Link href={`/data-master/dosen/${payment.id}`}>
+          <Link href={`/surat/${letter.id}`}>
             <Button variant="default" size="sm">
               Edit
             </Button>

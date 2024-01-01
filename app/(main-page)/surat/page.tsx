@@ -1,7 +1,11 @@
+"use client";
+
 import { PlusIcon } from "@radix-ui/react-icons";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+
 import { Letter, columns } from "./columns";
 import { DataTable } from "./data-table";
-import Link from "next/link";
 
 async function getData(): Promise<Letter[]> {
   // Fetch data from your API here.
@@ -174,8 +178,19 @@ async function getData(): Promise<Letter[]> {
   ];
 }
 
-export default async function ListSuratPage() {
-  const data = await getData();
+export default function ListSuratPage() {
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["surat"],
+    queryFn: getData,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+      </div>
+    );
+  }
 
   return (
     <>
