@@ -1,10 +1,9 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Payment, columns } from "./columns";
 import { DataTable } from "./data-table";
-import Link from "next/link";
-import { PlusIcon } from "@radix-ui/react-icons";
 
 async function getData(): Promise<Payment[]> {
   // Fetch data from your API here.
@@ -138,9 +137,9 @@ async function getData(): Promise<Payment[]> {
   ];
 }
 
-export default function DataMasterDosenPage() {
+export default function ManajemenUserPage() {
   const { data = [], isLoading } = useQuery({
-    queryKey: ["dosen"],
+    queryKey: ["users"],
     queryFn: getData,
   });
 
@@ -154,18 +153,7 @@ export default function DataMasterDosenPage() {
 
   return (
     <>
-      <div className="w-full flex justify-between items-center pb-4">
-        <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Dosen
-        </h1>
-        <Link
-          href="/surat/upload"
-          className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Dosen
-        </Link>
-      </div>
+      <Breadcrumb title="Manajemen User" />
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
