@@ -1,5 +1,6 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import { Users, columns } from "./columns";
@@ -7,57 +8,9 @@ import { DataTable } from "./data-table";
 
 async function getData(): Promise<Users[]> {
   // Fetch data from your API here.
-  return [
-    {
-      id: "1",
-      name: "Ardi",
-      email: "ardi@gmail.com",
-      role: "Admin",
-      aktif: true,
-    },
-    {
-      id: "2",
-      name: "Bayu",
-      email: "bayu@gmail.com",
-      role: "TU",
-      aktif: true,
-    },
-    {
-      id: "3",
-      name: "Candra",
-      email: "candra@gmail.com",
-      role: "Dekan",
-      aktif: false,
-    },
-    {
-      id: "4",
-      name: "Dian",
-      email: "dian@gmail.com",
-      role: "Dosen",
-      aktif: true,
-    },
-    {
-      id: "5",
-      name: "Eka",
-      email: "eka@gmail.com",
-      role: "Mahasiswa",
-      aktif: false,
-    },
-    {
-      id: "6",
-      name: "Fajar",
-      email: "fajar@gmail.com",
-      role: "Mahasiswa",
-      aktif: true,
-    },
-    {
-      id: "7",
-      name: "Gita",
-      email: "gita@gmail.com",
-      role: "Admin",
-      aktif: false,
-    },
-  ];
+  const url = "https://backend-surat-upn-v2.vercel.app";
+  const { data } = await axios.get(`${url}/user`);
+  return data;
 }
 
 export default function ManajemenUserPage() {

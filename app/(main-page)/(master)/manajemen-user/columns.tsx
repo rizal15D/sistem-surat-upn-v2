@@ -12,8 +12,8 @@ export type Users = {
   id: string;
   name: string;
   email: string;
-  role: "Admin" | "TU" | "Dekan" | "Dosen" | "Mahasiswa";
-  aktif: boolean;
+  role: number;
+  // aktif: boolean;
 };
 
 export const columns: ColumnDef<Users>[] = [
@@ -46,24 +46,24 @@ export const columns: ColumnDef<Users>[] = [
       );
     },
   },
-  {
-    accessorKey: "aktif",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => {
-      const aktif = row.getValue("aktif");
-      return (
-        <div className="flex items-center space-x-2">
-          {aktif ? (
-            <Badge className="bg-success">Aktif</Badge>
-          ) : (
-            <Badge className="bg-danger">Tidak Aktif</Badge>
-          )}
-        </div>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "aktif",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Status" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const aktif = row.getValue("aktif");
+  //     return (
+  //       <div className="flex items-center space-x-2">
+  //         {aktif ? (
+  //           <Badge className="bg-success">Aktif</Badge>
+  //         ) : (
+  //           <Badge className="bg-danger">Tidak Aktif</Badge>
+  //         )}
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     id: "actions",
     cell: ({ row }) => {
