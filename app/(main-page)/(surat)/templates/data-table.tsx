@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/DataTableComponents/DataTablePagination";
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
-import filterData from "./data";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -66,7 +65,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <DataTableToolbar table={table} filterInput="judul" data={filterData} />
+      <DataTableToolbar table={table} filterInput="judul" />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -93,11 +92,6 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={
-                    (row.original as { dibaca: boolean }).dibaca
-                      ? ""
-                      : "font-bold bg-gray-100 dark:bg-boxdark-2"
-                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

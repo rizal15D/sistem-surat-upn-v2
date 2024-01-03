@@ -60,6 +60,10 @@ export default function UploadSuratPage() {
                 className="border-dashed bg-transparent font-medium focus:outline-none flex items-center"
                 onClick={() => {
                   setSelectedFile("");
+                  const input = document.querySelector(
+                    "input[type=file]"
+                  ) as HTMLInputElement;
+                  input.value = "";
                 }}
               >
                 Reset

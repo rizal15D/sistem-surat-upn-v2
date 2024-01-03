@@ -20,7 +20,9 @@ export const columns: ColumnDef<Payment>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
     },
   },
   {

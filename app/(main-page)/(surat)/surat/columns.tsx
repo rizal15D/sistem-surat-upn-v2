@@ -26,7 +26,9 @@ export const columns: ColumnDef<Letter>[] = [
       <DataTableColumnHeader column={column} title="Judul" />
     ),
     filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
     },
   },
   {
@@ -78,18 +80,11 @@ export const columns: ColumnDef<Letter>[] = [
             <Button
               variant="default"
               size="sm"
-              className="bg-primary hover:bg-opacity-90"
+              className="bg-primary hover:bg-opacity-90 text-white"
             >
               <InfoCircledIcon className="h-5 w-5" />
             </Button>
           </Link>
-          <Button
-            variant="destructive"
-            size="sm"
-            className="bg-danger hover:bg-opacity-90"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </Button>
         </div>
       );
     },

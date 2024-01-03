@@ -20,7 +20,9 @@ export const columns: ColumnDef<Payment>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
     },
   },
   {
@@ -54,7 +56,7 @@ export const columns: ColumnDef<Payment>[] = [
 
       return (
         // Edit and Delete buttons
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 text-white">
           <Link href={`/data-master/dosen/${payment.id}`}>
             <Button variant="default" size="sm">
               Edit

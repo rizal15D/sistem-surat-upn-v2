@@ -1,31 +1,38 @@
-import {
-  CheckCircledIcon,
-  CircleIcon,
-  CrossCircledIcon,
-  StopwatchIcon,
-} from "@radix-ui/react-icons";
-
 export default {
   status: [
     {
-      value: "processing",
-      label: "Processing",
-      icon: CircleIcon,
+      value: ["Diterima"],
+      label: "Diterima",
     },
     {
-      value: "pending",
-      label: "Pending",
-      icon: StopwatchIcon,
+      value: ["Ditolak"],
+      label: "Ditolak",
     },
     {
-      value: "success",
-      label: "Success",
-      icon: CheckCircledIcon,
+      value: ["Diproses", "Dibaca"],
+      label: "Diproses",
+    },
+  ],
+  role: [
+    {
+      value: ["Admin"],
+      label: "Admin",
     },
     {
-      value: "failed",
-      label: "Failed",
-      icon: CrossCircledIcon,
+      value: ["TU"],
+      label: "TU",
+    },
+    {
+      value: ["Dekan"],
+      label: "Dekan",
+    },
+    {
+      value: ["Dosen"],
+      label: "Dosen",
+    },
+    {
+      value: ["Mahasiswa"],
+      label: "Mahasiswa",
     },
   ],
 };

@@ -5,22 +5,27 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
 import Link from "next/link";
+import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { Badge } from "@/components/ui/badge";
 
-export type Payment = {
+export type Users = {
   id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
+  name: string;
   email: string;
+  role: "Admin" | "TU" | "Dekan" | "Dosen" | "Mahasiswa";
+  aktif: boolean;
 };
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<Users>[] = [
   {
-    accessorKey: "status",
+    accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Nama" />
     ),
     filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
     },
   },
   {
@@ -28,40 +33,60 @@ export const columns: ColumnDef<Payment>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
     ),
+  },
+  {
+    accessorKey: "role",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Role" />
+    ),
     filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
+      const rowValue = (row.getValue(id) as string).split(" ");
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.includes(v))
+      );
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "aktif",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
+      <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"));
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount);
-
-      return <div className="font-medium">{formatted}</div>;
+      const aktif = row.getValue("aktif");
+      return (
+        <div className="flex items-center space-x-2">
+          {aktif ? (
+            <Badge className="bg-success">Aktif</Badge>
+          ) : (
+            <Badge className="bg-danger">Tidak Aktif</Badge>
+          )}
+        </div>
+      );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const payment = row.original;
+      const user = row.original as Users;
 
       return (
         // Edit and Delete buttons
-        <div className="flex items-center space-x-2">
-          <Link href={`/data-master/dosen/${payment.id}`}>
-            <Button variant="default" size="sm">
-              Edit
+        <div className="flex items-center space-x-2 text-white">
+          <Link href={`/manajemen-user/${user.id}`}>
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-primary hover:bg-opacity-90"
+            >
+              <InfoCircledIcon className="h-5 w-5" />
             </Button>
           </Link>
-          <Button variant="destructive" size="sm">
-            Delete
+          <Button
+            variant="destructive"
+            size="sm"
+            className="bg-danger hover:bg-opacity-90"
+          >
+            <TrashIcon className="h-5 w-5" />
           </Button>
         </div>
       );
