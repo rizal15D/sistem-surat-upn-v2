@@ -10,7 +10,7 @@ import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTabl
 export type Template = {
   id: number;
   judul: string;
-  deskripsi: Text;
+  deskripsi: string;
   lokasi: string;
 };
 
