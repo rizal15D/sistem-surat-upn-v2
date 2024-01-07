@@ -12,8 +12,10 @@ export type Users = {
   id: string;
   name: string;
   email: string;
-  role: number;
-  // aktif: boolean;
+  role: { id: string; name: string };
+  prodi: { id: string; name: string };
+  fakultas: { id: string; name: string };
+  aktif: boolean;
 };
 
 export const columns: ColumnDef<Users>[] = [
@@ -39,31 +41,67 @@ export const columns: ColumnDef<Users>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Role" />
     ),
+    cell: ({ row }) => {
+      const role = row.getValue("role") as { name: string };
+      return (
+        <div className="flex items-center space-x-2">
+          <span>{role.name}</span>
+        </div>
+      );
+    },
     filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as string).split(" ");
+      const rowValue = (row.getValue(id) as { name: string }).name;
       return value.some((val: string[]) =>
         val.some((v) => rowValue.includes(v))
       );
     },
   },
-  // {
-  //   accessorKey: "aktif",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Status" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const aktif = row.getValue("aktif");
-  //     return (
-  //       <div className="flex items-center space-x-2">
-  //         {aktif ? (
-  //           <Badge className="bg-success">Aktif</Badge>
-  //         ) : (
-  //           <Badge className="bg-danger">Tidak Aktif</Badge>
-  //         )}
-  //       </div>
-  //     );
-  //   },
-  // },
+  {
+    accessorKey: "prodi",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Prodi" />
+    ),
+    cell: ({ row }) => {
+      const prodi = row.getValue("prodi") as { name: string };
+      return (
+        <div className="flex items-center space-x-2">
+          <span>{prodi.name}</span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "fakultas",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Fakultas" />
+    ),
+    cell: ({ row }) => {
+      const fakultas = row.getValue("fakultas") as { name: string };
+      return (
+        <div className="flex items-center space-x-2">
+          <span>{fakultas.name}</span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "aktif",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const aktif = row.getValue("aktif");
+      return (
+        <div className="flex items-center space-x-2 text-white">
+          {aktif ? (
+            <Badge className="bg-success">Aktif</Badge>
+          ) : (
+            <Badge className="bg-danger">Tidak Aktif</Badge>
+          )}
+        </div>
+      );
+    },
+  },
   {
     id: "actions",
     cell: ({ row }) => {

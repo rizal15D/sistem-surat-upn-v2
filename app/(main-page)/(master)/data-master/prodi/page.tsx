@@ -1,20 +1,21 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
-import { Users, columns } from "./columns";
+import { Prodi, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Link from "next/link";
 import { PlusIcon } from "@radix-ui/react-icons";
+import axios from "axios";
 
-async function getData(): Promise<Users[]> {
-  const { data } = await axios.get("/api/users");
-  return data;
+async function getData(): Promise<Prodi[]> {
+  // Fetch data from your API here.
+  const response = await axios.get("/api/prodi");
+  return response.data;
 }
 
-export default function ManajemenUserPage() {
+export default function DataMasterTemplatePage() {
   const { data = [], isLoading } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["template"],
     queryFn: getData,
   });
 
@@ -30,14 +31,14 @@ export default function ManajemenUserPage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Manajemen User
+          Data Master Template
         </h1>
         <Link
-          href="/manajemen-user/tambah"
+          href="/surat/upload"
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah User
+          Tambah Template
         </Link>
       </div>
 

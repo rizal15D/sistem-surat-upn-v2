@@ -15,11 +15,13 @@ export default async function Layout({
   return (
     <TanstackQueryProvider>
       <ReactQueryDevtools initialIsOpen={false} />
-      <ClientBody>
+      <ClientBody session={session}>
         {session && (
           <>
             <div className="p-4">
-              <span className="text-black">${JSON.stringify(session)}</span>
+              <span className="text-black">
+                ${JSON.stringify(session.user)}
+              </span>
             </div>
           </>
         )}

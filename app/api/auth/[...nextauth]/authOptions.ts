@@ -2,14 +2,20 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { NextAuthOptions } from "next-auth";
 
+import { User as NextAuthUser } from "next-auth";
+
+export interface User extends NextAuthUser {
+  accessToken?: string;
+}
+
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "admin" },
-        password: { label: "Password", type: "password" },
+        username: {},
+        password: {},
       },
       async authorize(credentials, req) {
         const response = await axios.post(
@@ -32,14 +38,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        // token.accessToken = user.accessToken;
         token.user = user;
       }
 
       return token;
     },
     async session({ session, token, user }) {
-      // session.accessToken = token.accessToken;
       session.user = token.user as {
         name?: string | null | undefined;
         email?: string | null | undefined;

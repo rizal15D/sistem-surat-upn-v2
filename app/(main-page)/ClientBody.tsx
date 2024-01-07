@@ -6,8 +6,10 @@ import Loader from "@/components/common/Loader";
 import { useEffect, useState } from "react";
 
 export default function ClientBody({
+  session,
   children,
 }: {
+  session: any;
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,7 +27,11 @@ export default function ClientBody({
       ) : (
         <div className="flex h-screen overflow-hidden">
           {/* <!-- ===== Sidebar Start ===== --> */}
-          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+          <Sidebar
+            session={session}
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+          />
           {/* <!-- ===== Sidebar End ===== --> */}
 
           {/* <!-- ===== Content Area Start ===== --> */}
