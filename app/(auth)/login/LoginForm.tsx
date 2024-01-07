@@ -1,27 +1,28 @@
 "use client";
 
-import axios from "axios";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+  const router = useRouter();
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const email = e.currentTarget.email.value;
     const password = e.currentTarget.password.value;
 
-    const response = await axios
-      .post("https://backend-surat-upn-v2.vercel.app/auth/login", {
-        email,
-        password,
-      })
-      .then((res) => {
-        console.log(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const response = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-    console.log(response);
+    if (response?.error) {
+      alert(response.error);
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (

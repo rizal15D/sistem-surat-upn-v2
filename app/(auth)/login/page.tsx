@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   // other metadata
 };
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC = async () => {
   return (
     <>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
