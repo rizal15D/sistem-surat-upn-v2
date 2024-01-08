@@ -17,13 +17,12 @@ async function getData(): Promise<Role[]> {
 
 export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["role"],
     queryFn: getData,
   });
-
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: async (data: { name: string }) => {
