@@ -1,12 +1,11 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { Prodi, columns } from "./columns";
-import { DataTable } from "./data-table";
-import Link from "next/link";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { useState } from "react";
+
+import { Prodi, columns } from "./columns";
+import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 
 async function getData(): Promise<Prodi[]> {
