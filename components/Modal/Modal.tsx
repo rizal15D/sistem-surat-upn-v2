@@ -1,13 +1,11 @@
 "use client";
 import { Cross2Icon } from "@radix-ui/react-icons";
 
-export default function InputFormModal({
+export default function Modal({
   children,
-  modalOpen,
   setModalOpen,
 }: {
   children: React.ReactNode;
-  modalOpen: boolean;
   setModalOpen: (value: boolean) => void;
 }) {
   return (

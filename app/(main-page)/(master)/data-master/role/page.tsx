@@ -5,7 +5,7 @@ import axios from "axios";
 
 import { Role, columns } from "./columns";
 import { DataTable } from "./data-table";
-import InputFormModal from "@/components/Modal/InputFormModal";
+import Modal from "@/components/Modal/Modal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -23,7 +23,7 @@ export default function DataMasterRolePage() {
     queryFn: getData,
   });
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
 
   const { mutate } = useMutation({
     mutationFn: async (data: { name: string }) => {
@@ -32,7 +32,7 @@ export default function DataMasterRolePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["role"] });
-      setModalOpen(false);
+      setModalCreateOpen(false);
     },
   });
 
@@ -60,7 +60,7 @@ export default function DataMasterRolePage() {
           Data Master Role
         </h1>
         <Button
-          onClick={() => setModalOpen(true)}
+          onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
@@ -73,8 +73,8 @@ export default function DataMasterRolePage() {
           <DataTable columns={columns} data={data} />
         </div>
       </div>
-      {modalOpen && (
-        <InputFormModal modalOpen setModalOpen={setModalOpen}>
+      {modalCreateOpen && (
+        <Modal setModalOpen={setModalCreateOpen}>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
@@ -101,7 +101,7 @@ export default function DataMasterRolePage() {
               </div>
             </form>
           </div>
-        </InputFormModal>
+        </Modal>
       )}
     </>
   );
