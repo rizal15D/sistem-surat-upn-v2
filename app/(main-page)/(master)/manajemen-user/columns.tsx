@@ -1,12 +1,15 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
-import Link from "next/link";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
+import Modal from "@/components/Modal/Modal";
 
 export type Users = {
   id: string;
@@ -105,28 +108,70 @@ export const columns: ColumnDef<Users>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const user = row.original as Users;
+      const users = row.original;
+      const queryClient = useQueryClient();
+      const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+
+      const { mutate: mutateDelete } = useMutation({
+        mutationFn: async () => {
+          const { data } = await axios.delete(`/api/users`, {
+            data: { id: users.id },
+          });
+          return data;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["users"],
+          });
+          setModalDeleteOpen(false);
+        },
+      });
 
       return (
-        // Edit and Delete buttons
-        <div className="flex items-center space-x-2 text-white">
-          <Link href={`/manajemen-user/${user.id}`}>
+        <>
+          <div className="flex items-center space-x-2 text-white">
             <Button
-              variant="default"
+              variant="destructive"
               size="sm"
-              className="bg-primary hover:bg-opacity-90"
+              className="bg-danger hover:bg-opacity-90"
+              onClick={() => setModalDeleteOpen(true)}
             >
-              <InfoCircledIcon className="h-5 w-5" />
+              <TrashIcon className="h-5 w-5" />
             </Button>
-          </Link>
-          <Button
-            variant="destructive"
-            size="sm"
-            className="bg-danger hover:bg-opacity-90"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </Button>
-        </div>
+          </div>
+          {modalDeleteOpen && (
+            <Modal setModalOpen={setModalDeleteOpen}>
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Hapus User
+                  </h3>
+                </div>
+                <div className="p-6.5">
+                  <p className="text-black dark:text-white">
+                    Apakah anda yakin ingin menghapus user ini?
+                  </p>
+                  <div className="flex justify-end space-x-2 mt-6">
+                    <Button
+                      variant="destructive"
+                      className="bg-danger hover:bg-opacity-90"
+                      onClick={() => mutateDelete()}
+                    >
+                      Ya
+                    </Button>
+                    <Button
+                      variant="default"
+                      className="bg-primary hover:bg-opacity-90"
+                      onClick={() => setModalDeleteOpen(false)}
+                    >
+                      Tidak
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Modal>
+          )}
+        </>
       );
     },
   },

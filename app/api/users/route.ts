@@ -28,10 +28,43 @@ export async function POST(req: NextRequest) {
     user: User;
   } | null;
 
+  const { name, email, role_id, prodi_id, fakultas_id } = await req.json();
+
   if (session) {
     const { data } = await axios.post(
       `${process.env.API_URL}/auth/register`,
-      req.body,
+      {
+        name,
+        email,
+        role_id,
+        prodi_id,
+        fakultas_id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+      }
+    );
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  const { id } = await req.json();
+
+  if (session) {
+    const { data } = await axios.delete(
+      `${process.env.API_URL}/user?id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
