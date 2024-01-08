@@ -1,20 +1,22 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import Link from "next/link";
+import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
-import Link from "next/link";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import axios from "axios";
 
-export type Fakultas = {
-  id: string;
+export type Role = {
+  id: number;
   name: string;
-  jenjang: string;
-  kode_fakultas: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export const columns: ColumnDef<Fakultas>[] = [
+export const columns: ColumnDef<Role>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -22,26 +24,29 @@ export const columns: ColumnDef<Fakultas>[] = [
     ),
   },
   {
-    accessorKey: "jenjang",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Jenjang" />
-    ),
-  },
-  {
-    accessorKey: "kode_fakultas",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kode Fakultas" />
-    ),
-  },
-  {
     id: "actions",
     cell: ({ row }) => {
-      const fakultas = row.original;
+      const role = row.original;
+      const queryClient = useQueryClient();
+
+      const { mutate } = useMutation({
+        mutationFn: async () => {
+          const { data } = await axios.delete(`/api/role`, {
+            data: { id: role.id },
+          });
+          return data;
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["role"],
+          });
+        },
+      });
 
       return (
         // Edit and Delete buttons
         <div className="flex items-center space-x-2 text-white">
-          <Link href={`/data-master/${fakultas.id}`}>
+          <Link href={`/data-master/role/${role.id}`}>
             <Button
               variant="default"
               size="sm"
@@ -54,6 +59,7 @@ export const columns: ColumnDef<Fakultas>[] = [
             variant="destructive"
             size="sm"
             className="bg-danger hover:bg-opacity-90"
+            onClick={() => mutate()}
           >
             <TrashIcon className="h-5 w-5" />
           </Button>

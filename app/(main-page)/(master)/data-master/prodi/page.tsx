@@ -13,9 +13,9 @@ async function getData(): Promise<Prodi[]> {
   return response.data;
 }
 
-export default function DataMasterTemplatePage() {
+export default function DataMasterProdiPage() {
   const { data = [], isLoading } = useQuery({
-    queryKey: ["template"],
+    queryKey: ["prodi"],
     queryFn: getData,
   });
 
@@ -31,14 +31,14 @@ export default function DataMasterTemplatePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Template
+          Data Master Prodi
         </h1>
         <Link
-          href="/surat/upload"
+          href="/data-master/prodi/add"
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Template
+          Tambah Prodi
         </Link>
       </div>
 

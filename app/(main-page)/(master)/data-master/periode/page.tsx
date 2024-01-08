@@ -31,14 +31,14 @@ export default function DataMasterFakultasPage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Template
+          Data Master Periode
         </h1>
         <Link
-          href="/surat/upload"
+          href="/data-master/periode/add"
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Template
+          Tambah Periode
         </Link>
       </div>
 
