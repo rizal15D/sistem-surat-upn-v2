@@ -31,6 +31,7 @@ export const columns: ColumnDef<Role>[] = [
       const role = row.original;
       const queryClient = useQueryClient();
       const [modalEditOpen, setModalEditOpen] = useState(false);
+      const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
@@ -87,7 +88,7 @@ export const columns: ColumnDef<Role>[] = [
               variant="destructive"
               size="sm"
               className="bg-danger hover:bg-opacity-90"
-              onClick={() => mutateDelete()}
+              onClick={() => setModalDeleteOpen(true)}
             >
               <TrashIcon className="h-5 w-5" />
             </Button>
@@ -119,6 +120,38 @@ export const columns: ColumnDef<Role>[] = [
                     </button>
                   </div>
                 </form>
+              </div>
+            </Modal>
+          )}
+          {modalDeleteOpen && (
+            <Modal setModalOpen={setModalDeleteOpen}>
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Hapus Role
+                  </h3>
+                </div>
+                <div className="p-6.5">
+                  <p className="text-black dark:text-white">
+                    Apakah anda yakin ingin menghapus role ini?
+                  </p>
+                  <div className="flex justify-end space-x-2 mt-6">
+                    <Button
+                      variant="destructive"
+                      className="bg-danger hover:bg-opacity-90"
+                      onClick={() => mutateDelete()}
+                    >
+                      Ya
+                    </Button>
+                    <Button
+                      variant="default"
+                      className="bg-primary hover:bg-opacity-90"
+                      onClick={() => setModalDeleteOpen(false)}
+                    >
+                      Tidak
+                    </Button>
+                  </div>
+                </div>
               </div>
             </Modal>
           )}

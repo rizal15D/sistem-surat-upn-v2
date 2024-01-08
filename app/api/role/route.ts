@@ -28,9 +28,9 @@ export async function POST(req: NextRequest) {
     user: User;
   } | null;
 
-  if (session) {
-    const { name } = await req.json();
+  const { name } = await req.json();
 
+  if (session) {
     const { data } = await axios.post(
       `${process.env.API_URL}/role-user`,
       {
