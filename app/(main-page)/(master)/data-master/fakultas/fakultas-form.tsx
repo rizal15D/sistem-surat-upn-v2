@@ -1,34 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-
-export default function ProdiForm({
+export default function FakultasForm({
   onSubmit,
   values,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
 }) {
-  const { data: fakultasData, isLoading } = useQuery({
-    queryKey: ["fakultas"],
-    queryFn: async () => {
-      const { data } = await axios.get(`/api/fakultas`);
-      return data;
-    },
-  });
-
-  if (isLoading) {
-    return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
         <h3 className="font-medium text-black dark:text-white">
-          {values ? "Edit Prodi" : "Tambah Prodi"}
+          {values ? "Edit Fakultas" : "Tambah Fakultas"}
         </h3>
       </div>
       <form onSubmit={onSubmit}>
@@ -41,39 +22,24 @@ export default function ProdiForm({
               name="nama"
               type="text"
               defaultValue={values?.name}
-              placeholder={values ? values.name : "Masukkan nama prodi"}
-              className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-            />
-          </div>
-
-          <div className="mb-4.5">
-            <label className="mb-2.5 block text-black dark:text-white">
-              Kode <span className="text-meta-1">*</span>
-            </label>
-            <input
-              name="kode_prodi"
-              type="text"
-              defaultValue={values?.kode_prodi}
-              placeholder={values ? values.kode_prodi : "Masukkan kode prodi"}
+              placeholder={values ? values.name : "Masukkan nama fakultas"}
               className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
             />
           </div>
 
           <div>
             <label className="mb-3 block text-black dark:text-white">
-              Fakultas
+              Jenjang
             </label>
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select
-                name="fakultas_id"
-                defaultValue={values?.fakultas_id}
+                name="jenjang"
+                defaultValue={values?.jenjang}
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
               >
-                {fakultasData.map((fakultas: any) => (
-                  <option key={fakultas.id} value={fakultas.id}>
-                    {fakultas.name}
-                  </option>
-                ))}
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
               </select>
               <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                 <svg
@@ -94,6 +60,21 @@ export default function ProdiForm({
                 </svg>
               </span>
             </div>
+          </div>
+
+          <div className="mb-4.5">
+            <label className="mb-2.5 block text-black dark:text-white">
+              Kode Fakultas <span className="text-meta-1">*</span>
+            </label>
+            <input
+              name="kode_fakultas"
+              type="text"
+              defaultValue={values?.kode_fakultas}
+              placeholder={
+                values ? values.kode_fakultas : "Masukkan kode fakultas"
+              }
+              className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            />
           </div>
 
           <button className="mt-6 flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
