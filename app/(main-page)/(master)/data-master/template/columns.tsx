@@ -1,15 +1,14 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-
-import { Button } from "@/components/ui/button";
-import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
-import Link from "next/link";
 import { Cross2Icon, InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
-import Modal from "@/components/Modal/Modal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
+import Modal from "@/components/Modal/Modal";
 import TemplateForm from "./template-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
@@ -150,16 +149,7 @@ export const columns: ColumnDef<Template>[] = [
           )}
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <TemplateForm
-                onSubmit={handleEdit}
-                values={{
-                  judul: template.judul,
-                  jenis: template.jenis,
-                  deskripsi: template.deskripsi,
-                  thumbnail: template.thumbnail,
-                  surat: template.surat,
-                }}
-              />
+              <TemplateForm onSubmit={handleEdit} values={template} />
             </Modal>
           )}
         </>
