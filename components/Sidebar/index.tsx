@@ -20,7 +20,7 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
 
-  const isAdmin = session?.user?.user?.role_id == "1";
+  const isAdmin = session?.user?.user?.role.id == 1;
 
   // close on click outside
   useEffect(() => {

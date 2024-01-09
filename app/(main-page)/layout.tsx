@@ -15,19 +15,7 @@ export default async function Layout({
   return (
     <TanstackQueryProvider>
       <ReactQueryDevtools initialIsOpen={false} />
-      <ClientBody session={session}>
-        {session && (
-          <>
-            <div className="p-4">
-              <span className="text-black">
-                ${JSON.stringify(session.user)}
-              </span>
-            </div>
-          </>
-        )}
-        {!session && <>kys</>}
-        {children}
-      </ClientBody>
+      <ClientBody session={session}>{children}</ClientBody>
     </TanstackQueryProvider>
   );
 }

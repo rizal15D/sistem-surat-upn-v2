@@ -1,148 +1,73 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
-
-import { Payment, columns } from "./columns";
-import { DataTable } from "./data-table";
-import Link from "next/link";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
+import axios from "axios";
+import { useState } from "react";
 
-async function getData(): Promise<Payment[]> {
+import { Template, columns } from "./columns";
+import { DataTable } from "./data-table";
+import TemplateForm from "./template-form";
+import Modal from "@/components/Modal/Modal";
+
+async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      amount: 100,
-      status: "pending",
-      email: "m@example.com",
-    },
-    {
-      id: "728ed52g",
-      amount: 200,
-      status: "processing",
-      email: "",
-    },
-    {
-      id: "728ed52h",
-      amount: 300,
-      status: "success",
-      email: "",
-    },
-    {
-      id: "728ed52i",
-      amount: 400,
-      status: "failed",
-      email: "",
-    },
-    {
-      id: "728ed52j",
-      amount: 500,
-      status: "pending",
-      email: "",
-    },
-    {
-      id: "728ed52k",
-      amount: 600,
-      status: "processing",
-      email: "",
-    },
-    {
-      id: "728ed52l",
-      amount: 700,
-      status: "success",
-      email: "",
-    },
-    {
-      id: "728ed52m",
-      amount: 800,
-      status: "failed",
-      email: "",
-    },
-    {
-      id: "728ed52n",
-      amount: 900,
-      status: "pending",
-      email: "",
-    },
-    {
-      id: "728ed52o",
-      amount: 1000,
-      status: "processing",
-      email: "",
-    },
-    {
-      id: "728ed52p",
-      amount: 1100,
-      status: "success",
-      email: "",
-    },
-    {
-      id: "728ed52q",
-      amount: 1200,
-      status: "failed",
-      email: "",
-    },
-    {
-      id: "728ed52r",
-      amount: 1300,
-      status: "pending",
-      email: "",
-    },
-    {
-      id: "728ed52s",
-      amount: 1400,
-      status: "processing",
-      email: "",
-    },
-    {
-      id: "728ed52t",
-      amount: 1500,
-      status: "success",
-      email: "",
-    },
-    {
-      id: "728ed52u",
-      amount: 1600,
-      status: "failed",
-      email: "",
-    },
-    {
-      id: "728ed52v",
-      amount: 1700,
-      status: "pending",
-      email: "",
-    },
-    {
-      id: "728ed52w",
-      amount: 1800,
-      status: "processing",
-      email: "",
-    },
-    {
-      id: "728ed52x",
-      amount: 1900,
-      status: "success",
-      email: "",
-    },
-    {
-      id: "728ed52y",
-      amount: 2000,
-      status: "failed",
-      email: "",
-    },
-    {
-      id: "728ed52z",
-      amount: 2100,
-      status: "pending",
-      email: "",
-    },
-  ];
+  const response = await axios.get("/api/template");
+  return response.data;
 }
 
 export default function DataMasterTemplatePage() {
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { data = [], isLoading } = useQuery({
     queryKey: ["template"],
     queryFn: getData,
   });
+
+  const queryClient = useQueryClient();
+
+  const { mutate } = useMutation({
+    mutationFn: async (input: {
+      judul: any;
+      deskripsi: any;
+      jenis: any;
+      surat: File;
+      thumbnail: File;
+    }) => {
+      const response = await axios.post(
+        `/api/template`,
+        {
+          judul: input.judul,
+          deskripsi: input.deskripsi,
+          jenis: input.jenis,
+          surat: input.surat,
+          thumbnail: input.thumbnail,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["template"] });
+      setModalCreateOpen(false);
+    },
+  });
+
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    mutate({
+      judul: formData.get("judul"),
+      deskripsi: formData.get("deskripsi"),
+      jenis: formData.get("jenis"),
+      surat: formData.get("file") as File,
+      thumbnail: formData.get("file") as File,
+    });
+  };
 
   if (isLoading) {
     return (
@@ -158,13 +83,13 @@ export default function DataMasterTemplatePage() {
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Data Master Template
         </h1>
-        <Link
-          href="/surat/upload"
+        <button
+          onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
           Tambah Template
-        </Link>
+        </button>
       </div>
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -172,6 +97,11 @@ export default function DataMasterTemplatePage() {
           <DataTable columns={columns} data={data} />
         </div>
       </div>
+      {modalCreateOpen && (
+        <Modal setModalOpen={setModalCreateOpen}>
+          <TemplateForm onSubmit={handleCreate} />
+        </Modal>
+      )}
     </>
   );
 }

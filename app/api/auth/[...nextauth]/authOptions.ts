@@ -24,9 +24,9 @@ export const authOptions: NextAuthOptions = {
         );
 
         return {
-          id: response.data.user.id,
+          id: response.data.user_response.id,
           accessToken: response.data.token,
-          user: response.data.user,
+          user: response.data.user_response,
         };
       },
     }),
