@@ -33,11 +33,16 @@ export const columns: ColumnDef<Template>[] = [
         .includes(value.toLowerCase());
     },
     cell: ({ row }) => {
-      // currently, judul is "x.doc" / "x.docx", How to remove the extension?
       const judul = row.original.judul;
       const judulWithoutExtension = judul.split(".")[0];
       return <div>{judulWithoutExtension}</div>;
     },
+  },
+  {
+    accessorKey: "deskripsi",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Deskrispi" />
+    ),
   },
   {
     accessorKey: "jenis",

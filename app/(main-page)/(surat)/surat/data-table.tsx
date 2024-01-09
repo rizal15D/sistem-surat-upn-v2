@@ -93,11 +93,11 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={
-                    (row.original as { dibaca: boolean }).dibaca
-                      ? ""
-                      : "font-bold bg-gray-100 dark:bg-boxdark-2"
-                  }
+                  // className={
+                  //   (row.original as { dibaca: boolean }).dibaca
+                  //     ? ""
+                  //     : "font-bold bg-gray-100 dark:bg-boxdark-2"
+                  // }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

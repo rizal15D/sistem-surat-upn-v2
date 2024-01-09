@@ -30,6 +30,11 @@ export const columns: ColumnDef<Letter>[] = [
         .toLowerCase()
         .includes(value.toLowerCase());
     },
+    cell: ({ row }) => {
+      const judul = row.original.judul;
+      const judulWithoutExtension = judul.split(".")[0];
+      return <div>{judulWithoutExtension}</div>;
+    },
   },
   {
     accessorKey: "user_id",
