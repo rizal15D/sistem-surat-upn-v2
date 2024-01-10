@@ -51,6 +51,14 @@ export default function SuratSinglePage() {
     link.remove();
   };
 
+  const handleSetuju = () => {
+    if (user?.user.role.name == "TU") {
+      mutate({ status: "disetujui TU", persetujuan: "disetujui TU" });
+    } else if (user?.user.role.name == "Dekan") {
+      mutate({ status: "disetujui Dekan", persetujuan: "disetujui Dekan" });
+    }
+  };
+
   return (
     <div className="grid sm:grid-cols-1 lg:grid-cols-5 gap-10 w-full">
       <div className="lg:col-span-2 sm:col-span-1 row-span-1 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -122,13 +130,12 @@ export default function SuratSinglePage() {
                 </span>
               </div>
             )}
-            {(user?.user.role.name == "TU" ||
-              user?.user.role.name == "Dekan") && (
+            {((user?.user.role.name == "TU" &&
+              singleData?.status == "didaftar tunggu tu") ||
+              (user?.user.role.name == "Dekan" &&
+                singleData?.status == "disetujui TU")) && (
               <div className="pt-12 flex gap-4 text-white">
-                <Button
-                  className="bg-success w-full"
-                  // onClick={handleSetuju}
-                >
+                <Button className="bg-success w-full" onClick={handleSetuju}>
                   <CheckIcon className="w-6 h-6" />
                 </Button>
                 <Button className="bg-danger w-full">
