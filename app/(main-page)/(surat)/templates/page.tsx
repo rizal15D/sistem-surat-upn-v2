@@ -4,59 +4,12 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Template, columns } from "./columns";
 import { DataTable } from "./data-table";
+import axios from "axios";
 
 async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
-  return [
-    {
-      id: 1,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 2,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 3,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 4,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 5,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 6,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 7,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-    {
-      id: 8,
-      judul: "Surat Keterangan",
-      deskripsi: "Surat keterangan ini digunakan untuk keperluan tertentu",
-      lokasi: "/surat/keterangan",
-    },
-  ];
+  const response = await axios.get("/api/template");
+  return response.data;
 }
 
 export default function ListSuratPage() {

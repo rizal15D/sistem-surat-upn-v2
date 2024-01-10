@@ -1,8 +1,12 @@
 export default {
   role: [
     {
-      value: ["Admin"],
+      value: ["Super Admin"],
       label: "Admin",
+    },
+    {
+      value: ["Prodi"],
+      label: "Prodi",
     },
     {
       value: ["TU"],
@@ -13,12 +17,8 @@ export default {
       label: "Dekan",
     },
     {
-      value: ["Dosen"],
-      label: "Dosen",
-    },
-    {
-      value: ["Mahasiswa"],
-      label: "Mahasiswa",
+      value: ["Admin Dekan"],
+      label: "Admin Dekan",
     },
   ],
 };

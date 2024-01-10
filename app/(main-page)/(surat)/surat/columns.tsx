@@ -6,6 +6,8 @@ import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export type Letter = {
   id: number;
@@ -29,6 +31,11 @@ export const columns: ColumnDef<Letter>[] = [
       return (row.getValue(id) as string)
         .toLowerCase()
         .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const judul = row.original.judul;
+      const judulWithoutExtension = judul.split(".")[0];
+      return <div>{judulWithoutExtension}</div>;
     },
   },
   {
@@ -74,7 +81,6 @@ export const columns: ColumnDef<Letter>[] = [
       const letter = row.original as Letter;
 
       return (
-        // Edit and Delete buttons
         <div className="flex items-center space-x-2">
           <Link href={`/surat/${letter.id}`}>
             <Button

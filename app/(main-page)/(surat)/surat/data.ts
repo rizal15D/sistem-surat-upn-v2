@@ -9,7 +9,7 @@ export default {
       label: "Ditolak",
     },
     {
-      value: ["Diproses", "Dibaca"],
+      value: ["Diproses", "didaftar", "Dibaca", "dibaca", "Didaftar"],
       label: "Diproses",
     },
   ],

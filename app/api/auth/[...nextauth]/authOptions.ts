@@ -2,14 +2,37 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { NextAuthOptions } from "next-auth";
 
+import { User as NextAuthUser } from "next-auth";
+
+export interface User extends NextAuthUser {
+  accessToken?: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    fakultas: {
+      id: number;
+      name: string;
+    };
+    role: {
+      id: number;
+      name: string;
+    };
+    prodi: {
+      id: number;
+      name: string;
+    };
+  };
+}
+
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "admin" },
-        password: { label: "Password", type: "password" },
+        username: {},
+        password: {},
       },
       async authorize(credentials, req) {
         const response = await axios.post(
@@ -18,9 +41,9 @@ export const authOptions: NextAuthOptions = {
         );
 
         return {
-          id: response.data.user.id,
+          id: response.data.user_response.id,
           accessToken: response.data.token,
-          user: response.data.user,
+          user: response.data.user_response,
         };
       },
     }),
@@ -32,14 +55,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        // token.accessToken = user.accessToken;
         token.user = user;
       }
 
       return token;
     },
     async session({ session, token, user }) {
-      // session.accessToken = token.accessToken;
       session.user = token.user as {
         name?: string | null | undefined;
         email?: string | null | undefined;

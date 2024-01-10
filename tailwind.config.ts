@@ -63,6 +63,7 @@ module.exports = {
       success: "#219653",
       danger: "#D34053",
       warning: "#FFA70B",
+      disabled: "#E2E8F0",
     },
     screens: {
       "2xsm": "375px",

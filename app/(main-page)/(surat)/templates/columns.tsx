@@ -2,10 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DownloadIcon,
+  InfoCircledIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
+import axios from "axios";
 
 export type Template = {
   id: number;
@@ -25,6 +30,12 @@ export const columns: ColumnDef<Template>[] = [
         .toLowerCase()
         .includes(value.toLowerCase());
     },
+    cell: ({ row }) => {
+      const template = row.original as Template;
+      const judulWithoutExtension = template.judul.split(".")[0];
+
+      return <div>{judulWithoutExtension}</div>;
+    },
   },
   {
     accessorKey: "deskripsi",
@@ -40,18 +51,38 @@ export const columns: ColumnDef<Template>[] = [
     cell: ({ row }) => {
       const template = row.original as Template;
 
+      const handleDownload = async () => {
+        const response = await axios.get("/api/template/download", {
+          responseType: "blob",
+          params: {
+            id: template.id,
+          },
+        });
+
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: response.headers["content-type"],
+          })
+        );
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", template.judul + ".docx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
-        // Edit and Delete buttons
         <div className="flex items-center space-x-2 text-white">
-          <Link href={`/templates/${template.id}`}>
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-primary hover:bg-opacity-90"
-            >
-              <InfoCircledIcon className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            variant="default"
+            size="sm"
+            className="bg-primary hover:bg-opacity-90"
+            onClick={handleDownload}
+          >
+            <DownloadIcon className="w-4 h-4" />
+          </Button>
         </div>
       );
     },
