@@ -172,8 +172,6 @@ export const columns: ColumnDef<Template>[] = [
             >
               <TrashIcon className="h-5 w-5" />
             </Button>
-          </div>
-          <div className="flex items-center space-x-2 text-white">
             <Button
               variant="default"
               size="sm"
