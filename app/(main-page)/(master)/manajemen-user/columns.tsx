@@ -151,7 +151,7 @@ export const columns: ColumnDef<Users>[] = [
                   <p className="text-black dark:text-white">
                     Apakah anda yakin ingin menghapus user ini?
                   </p>
-                  <div className="flex justify-end space-x-2 mt-6">
+                  <div className="flex justify-end space-x-2 mt-6 text-white">
                     <Button
                       variant="destructive"
                       className="bg-danger hover:bg-opacity-90"

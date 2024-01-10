@@ -1,7 +1,12 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Cross2Icon, InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  Cross2Icon,
+  DownloadIcon,
+  InfoCircledIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
@@ -126,6 +131,28 @@ export const columns: ColumnDef<Template>[] = [
         });
       };
 
+      const handleDownload = async () => {
+        const response = await axios.get("/api/template/download", {
+          responseType: "blob",
+          params: {
+            id: template.id,
+          },
+        });
+
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: response.headers["content-type"],
+          })
+        );
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", template.judul + ".docx");
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
         <>
           <div className="flex items-center space-x-2 text-white">
@@ -144,6 +171,16 @@ export const columns: ColumnDef<Template>[] = [
               onClick={() => setModalDeleteOpen(true)}
             >
               <TrashIcon className="h-5 w-5" />
+            </Button>
+          </div>
+          <div className="flex items-center space-x-2 text-white">
+            <Button
+              variant="default"
+              size="sm"
+              className="bg-primary hover:bg-opacity-90"
+              onClick={handleDownload}
+            >
+              <DownloadIcon className="w-4 h-4" />
             </Button>
           </div>
           {modalDeleteOpen && (

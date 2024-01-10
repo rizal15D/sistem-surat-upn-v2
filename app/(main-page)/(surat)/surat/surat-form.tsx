@@ -1,3 +1,4 @@
+import "@react-pdf-viewer/core/lib/styles/index.css";
 import { useState } from "react";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
@@ -14,11 +15,12 @@ export default function SuratForm({
     event.preventDefault();
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      if (!file.name.endsWith(".doc") && !file.name.endsWith(".docx")) {
-        setWarningMessage("Tolong upload file .doc / .docx .");
+      if (!file.name.endsWith(".doc") && !file.name.endsWith(".pdf")) {
+        setWarningMessage("Tolong upload file .pdf .");
       } else if (file.size > 1024 * 1024) {
         setWarningMessage("Ukuran file tidak boleh lebih dari 1MB.");
       } else {
+        setSelectedFile(URL.createObjectURL(file));
         setWarningMessage("");
       }
     }
@@ -37,7 +39,7 @@ export default function SuratForm({
             </label>
             {selectedFile && (
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-                <div className="h-96">
+                <div className="h-96 mb-4">
                   <Viewer
                     fileUrl={selectedFile}
                     defaultScale={SpecialZoomLevel.PageFit}
@@ -47,6 +49,7 @@ export default function SuratForm({
             )}
             <input
               type="file"
+              name="file"
               accept=".pdf"
               onChange={handleFileChange}
               className="w-full rounded-md border border-stroke p-3 outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-[#EEEEEE] file:py-1 file:px-2.5 file:text-sm file:font-medium focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:file:border-strokedark dark:file:bg-white/30 dark:file:text-white"
@@ -86,21 +89,23 @@ export default function SuratForm({
                 </label>
                 <input
                   type="text"
+                  name="judul"
                   placeholder="Masukkan judul surat"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                 />
               </div>
 
-              <div className="mb-6">
+              {/* <div className="mb-4.5">
                 <label className="mb-2.5 block text-black dark:text-white">
-                  Deskripsi
+                  Jenis Surat<span className="text-meta-1">*</span>
                 </label>
-                <textarea
-                  rows={6}
-                  placeholder="Tuliskan deskripsi"
+                <input
+                  type="text"
+                  name="jenis"
+                  placeholder="Masukkan jenis surat"
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                 />
-              </div>
+              </div> */}
 
               <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
                 Kirim Surat

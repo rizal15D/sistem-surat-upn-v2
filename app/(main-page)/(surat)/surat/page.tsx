@@ -12,6 +12,10 @@ import { useState } from "react";
 async function getData(): Promise<Letter[]> {
   // Fetch data from your API here.
   const { data } = await axios.get("/api/surat");
+  // sort data based on creationDate (descending)
+  data.sort((a: any, b: any) => {
+    return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
+  });
   return data;
 }
 

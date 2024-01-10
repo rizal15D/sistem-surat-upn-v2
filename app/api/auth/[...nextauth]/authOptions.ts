@@ -6,6 +6,23 @@ import { User as NextAuthUser } from "next-auth";
 
 export interface User extends NextAuthUser {
   accessToken?: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    fakultas: {
+      id: number;
+      name: string;
+    };
+    role: {
+      id: number;
+      name: string;
+    };
+    prodi: {
+      id: number;
+      name: string;
+    };
+  };
 }
 
 export const authOptions: NextAuthOptions = {

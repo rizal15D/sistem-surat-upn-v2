@@ -1,10 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { KeyIcon } from "lucide-react";
+import Modal from "../Modal/Modal";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 const DropdownUser = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const session = useSession();
+  const user = session.data?.user as User;
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -35,6 +43,37 @@ const DropdownUser = () => {
     return () => document.removeEventListener("keydown", keyHandler);
   });
 
+  const onChangePassword = async (e: any) => {
+    e.preventDefault();
+
+    if (
+      e.currentTarget.password.value !==
+      e.currentTarget.password_confirmation.value
+    ) {
+      alert("Password tidak sama");
+      return;
+    }
+
+    const input = {
+      // old_password: e.currentTarget.old_password.value,
+      password: e.currentTarget.password.value,
+    };
+
+    mutate(input);
+  };
+
+  const { mutate } = useMutation({
+    mutationKey: ["changePassword"],
+    mutationFn: async (input: any) => {
+      const response = await axios.put(`/api/users`, { input });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      alert(data.message);
+      setChangePasswordModalOpen(false);
+    },
+  });
+
   return (
     <div className="relative">
       <Link
@@ -45,9 +84,9 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Thomas Anree
+            {user.user.name}
           </span>
-          <span className="block text-xs">UX Designer</span>
+          <span className="block text-xs">{user.user.role.name}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full">
@@ -85,6 +124,16 @@ const DropdownUser = () => {
           dropdownOpen === true ? "block" : "hidden"
         }`}
       >
+        {/* Change Password */}
+        <button
+          onClick={() => setChangePasswordModalOpen(true)}
+          className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        >
+          <KeyIcon className="h-5 w-5" />
+          Change Password
+        </button>
+
+        {/* Sign Out */}
         <button
           onClick={() => signOut()}
           className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
@@ -110,6 +159,58 @@ const DropdownUser = () => {
         </button>
       </div>
       {/* <!-- Dropdown End --> */}
+      {changePasswordModalOpen && (
+        <Modal setModalOpen={setChangePasswordModalOpen}>
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">
+                Ubah Password
+              </h3>
+            </div>
+            <form onSubmit={onChangePassword}>
+              <div className="p-6.5">
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Password Lama <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="old_password"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Password Baru <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Konfirmasi Password Baru{" "}
+                    <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="password_confirmation"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+                  Ubah
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

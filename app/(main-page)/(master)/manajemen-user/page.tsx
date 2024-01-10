@@ -49,6 +49,8 @@ export default function ManajemenUserPage() {
       fakultas_id: e.currentTarget.fakultas_id.value,
     };
 
+    console.log(data);
+
     mutate(data);
   };
 

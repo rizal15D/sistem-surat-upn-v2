@@ -55,6 +55,34 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PUT(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  if (session) {
+    const { input } = await req.json();
+    console.log(input);
+
+    const { data } = await axios.put(
+      `${process.env.API_URL}/user/password`,
+      {
+        password: input.password,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+      }
+    );
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
