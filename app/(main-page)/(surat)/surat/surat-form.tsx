@@ -5,10 +5,13 @@ import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
 
 export default function SuratForm({
   onSubmit,
+  warningMessage,
+  setWarningMessage,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  warningMessage: string;
+  setWarningMessage: (message: string) => void;
 }) {
-  const [warningMessage, setWarningMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -10,9 +10,11 @@ import { CheckIcon, Cross2Icon, DownloadIcon } from "@radix-ui/react-icons";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { id } = useParams();
   const session = useSession();
   const user = session.data?.user as User;
@@ -31,6 +33,10 @@ export default function SuratSinglePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["surat"] });
       router.push("/surat");
+      toast({
+        title: "Berhasil",
+        className: "bg-success text-white",
+      });
     },
   });
 
