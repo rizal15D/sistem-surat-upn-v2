@@ -17,6 +17,7 @@ export type Template = {
   judul: string;
   deskripsi: string;
   lokasi: string;
+  jenis: string;
 };
 
 export const columns: ColumnDef<Template>[] = [
@@ -52,22 +53,19 @@ export const columns: ColumnDef<Template>[] = [
       const template = row.original as Template;
 
       const handleDownload = async () => {
-        const response = await axios.get("/api/template/download", {
+        const response = await axios.get(`${template.lokasi}`, {
           responseType: "blob",
-          params: {
-            id: template.id,
-          },
         });
 
         const url = window.URL.createObjectURL(
           new Blob([response.data], {
-            type: response.headers["content-type"],
+            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           })
         );
 
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", template.judul + ".docx");
+        link.setAttribute("download", template.judul);
         document.body.appendChild(link);
         link.click();
         link.remove();
