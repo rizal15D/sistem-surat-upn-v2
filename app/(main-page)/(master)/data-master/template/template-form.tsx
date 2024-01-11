@@ -4,11 +4,14 @@ import { useState } from "react";
 export default function TemplateForm({
   onSubmit,
   values,
+  warningMessage,
+  setWarningMessage,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
+  warningMessage?: string;
+  setWarningMessage?: any;
 }) {
-  const [warningMessage, setWarningMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

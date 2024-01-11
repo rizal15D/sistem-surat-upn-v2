@@ -9,6 +9,7 @@ import { DataTable } from "./data-table";
 import { Button } from "@/components/ui/button";
 import Modal from "@/components/Modal/Modal";
 import UserForm from "./user-form";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Users[]> {
   const { data } = await axios.get("/api/users");
@@ -17,6 +18,8 @@ async function getData(): Promise<Users[]> {
 
 export default function ManajemenUserPage() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
   const [password, setPassword] = useState("");
@@ -36,6 +39,16 @@ export default function ManajemenUserPage() {
       setModalCreateOpen(false);
       setPassword(data.password);
       setModalPasswordOpen(true);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambah data",
+        description: error.message,
+      });
     },
   });
 
@@ -48,6 +61,14 @@ export default function ManajemenUserPage() {
       prodi_id: e.currentTarget.prodi_id.value,
       fakultas_id: e.currentTarget.fakultas_id.value,
     };
+
+    if (!data.name || !data.email || !data.role_id) {
+      toast({
+        title: "Gagal menambah data",
+        description: "Data tidak boleh kosong",
+      });
+      return;
+    }
 
     mutate(data);
   };

@@ -20,58 +20,10 @@ async function getData(): Promise<Letter[]> {
 }
 
 export default function ListSuratPage() {
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { data = [], isLoading } = useQuery({
     queryKey: ["surat"],
     queryFn: getData,
   });
-
-  const queryClient = useQueryClient();
-
-  const { mutate } = useMutation({
-    mutationFn: async (input: {
-      judul: any;
-      deskripsi: any;
-      jenis: any;
-      surat: File;
-      thumbnail: File;
-    }) => {
-      const response = await axios.post(
-        `/api/template`,
-        {
-          judul: input.judul,
-          deskripsi: input.deskripsi,
-          jenis: input.jenis,
-          surat: input.surat,
-          thumbnail: input.thumbnail,
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["template"] });
-      setModalCreateOpen(false);
-    },
-  });
-
-  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-
-    mutate({
-      judul: formData.get("judul"),
-      deskripsi: formData.get("deskripsi"),
-      jenis: formData.get("jenis"),
-      surat: formData.get("surat") as File,
-      thumbnail: formData.get("thumbnail") as File,
-    });
-  };
 
   if (isLoading) {
     return (

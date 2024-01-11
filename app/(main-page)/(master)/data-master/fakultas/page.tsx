@@ -8,6 +8,7 @@ import { Fakultas, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import FakultasForm from "./fakultas-form";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Fakultas[]> {
   // Fetch data from your API here.
@@ -17,6 +18,7 @@ async function getData(): Promise<Fakultas[]> {
 
 export default function DataMasterFakultasPage() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
 
   const { data = [], isLoading } = useQuery({
@@ -36,6 +38,16 @@ export default function DataMasterFakultasPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["fakultas"] });
       setModalCreateOpen(false);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambah data",
+        description: error.message,
+      });
     },
   });
 
@@ -46,6 +58,14 @@ export default function DataMasterFakultasPage() {
       jenjang: e.currentTarget.jenjang.value,
       kode_fakultas: e.currentTarget.kode_fakultas.value,
     };
+
+    if (!data.name || !data.jenjang || !data.kode_fakultas) {
+      toast({
+        title: "Gagal menambah data",
+        description: "Data tidak boleh kosong",
+      });
+      return;
+    }
 
     mutate(data);
   };

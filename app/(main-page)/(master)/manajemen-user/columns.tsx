@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import Modal from "@/components/Modal/Modal";
 import { KeyIcon } from "lucide-react";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { useToast } from "@/components/ui/use-toast";
 
 export type Users = {
   id: string;
@@ -112,26 +113,12 @@ export const columns: ColumnDef<Users>[] = [
     cell: ({ row }) => {
       const users = row.original;
       const queryClient = useQueryClient();
-      // const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+      const { toast } = useToast();
+
       const [password, setPassword] = useState("");
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
         useState(false);
       const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
-
-      // const { mutate: mutateDelete } = useMutation({
-      //   mutationFn: async () => {
-      //     const { data } = await axios.delete(`/api/users`, {
-      //       data: { id: users.id },
-      //     });
-      //     return data;
-      //   },
-      //   onSuccess: () => {
-      //     queryClient.invalidateQueries({
-      //       queryKey: ["users"],
-      //     });
-      //     setModalDeleteOpen(false);
-      //   },
-      // });
 
       const { mutate: mutateChangePassword } = useMutation({
         mutationFn: async () => {
@@ -147,6 +134,16 @@ export const columns: ColumnDef<Users>[] = [
           setModalResetPasswordOpen(false);
           setPassword(data.password);
           setModalPasswordOpen(true);
+          toast({
+            title: "Berhasil mereset password",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal mereset password",
+            description: error.message,
+          });
         },
       });
 
@@ -160,21 +157,7 @@ export const columns: ColumnDef<Users>[] = [
             >
               <KeyIcon className="h-5 w-5" />
             </Button>
-            {/* <Button
-              variant="destructive"
-              size="sm"
-              className="bg-danger hover:bg-opacity-90"
-              onClick={() => setModalDeleteOpen(true)}
-            >
-              <TrashIcon className="h-5 w-5" />
-            </Button> */}
           </div>
-          {/* {modalDeleteOpen && (
-            <ConfirmationModal
-              setModalOpen={setModalDeleteOpen}
-              onClick={mutateDelete}
-            />
-          )} */}
           {modalResetPasswordOpen && (
             <ConfirmationModal
               setModalOpen={setModalResetPasswordOpen}

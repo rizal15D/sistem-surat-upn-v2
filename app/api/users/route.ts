@@ -62,12 +62,12 @@ export async function PUT(req: NextRequest) {
 
   if (session) {
     const { input } = await req.json();
-    console.log(input);
 
     const { data } = await axios.put(
       `${process.env.API_URL}/user/password`,
       {
-        password: input.password,
+        oldPassword: input.oldPassword,
+        newPassword: input.newPassword,
       },
       {
         headers: {

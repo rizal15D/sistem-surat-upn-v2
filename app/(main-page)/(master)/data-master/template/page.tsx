@@ -8,6 +8,7 @@ import { Template, columns } from "./columns";
 import { DataTable } from "./data-table";
 import TemplateForm from "./template-form";
 import Modal from "@/components/Modal/Modal";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
@@ -16,13 +17,16 @@ async function getData(): Promise<Template[]> {
 }
 
 export default function DataMasterTemplatePage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
+
   const { data = [], isLoading } = useQuery({
     queryKey: ["template"],
     queryFn: getData,
   });
-
-  const queryClient = useQueryClient();
 
   const { mutate } = useMutation({
     mutationFn: async (input: {
@@ -52,6 +56,17 @@ export default function DataMasterTemplatePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["template"] });
       setModalCreateOpen(false);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal",
+        description: error.message,
+        className: "bg-danger text-white",
+      });
     },
   });
 
@@ -60,13 +75,39 @@ export default function DataMasterTemplatePage() {
 
     const formData = new FormData(e.currentTarget);
 
-    mutate({
+    const data = {
       judul: formData.get("judul"),
       deskripsi: formData.get("deskripsi"),
       jenis: formData.get("jenis"),
       surat: formData.get("file") as File,
       thumbnail: formData.get("file") as File,
-    });
+    };
+
+    if (
+      !data.judul ||
+      !data.deskripsi ||
+      !data.jenis ||
+      !data.surat ||
+      !data.thumbnail
+    ) {
+      toast({
+        title: "Gagal menambahkan data",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    if (warningMessage) {
+      toast({
+        title: "Gagal menambahkan data",
+        description: warningMessage,
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    mutate(data);
   };
 
   if (isLoading) {
@@ -99,7 +140,11 @@ export default function DataMasterTemplatePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <TemplateForm onSubmit={handleCreate} />
+          <TemplateForm
+            onSubmit={handleCreate}
+            warningMessage={warningMessage}
+            setWarningMessage={setWarningMessage}
+          />
         </Modal>
       )}
     </>
