@@ -45,7 +45,7 @@ export default function SuratSinglePage() {
     );
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "file.pdf");
+    link.setAttribute("download", `${singleData?.judul.split(".")[0]}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();
