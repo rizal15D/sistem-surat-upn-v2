@@ -6,8 +6,6 @@ import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
-import { useSession } from "next-auth/react";
-import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export type Letter = {
   id: number;

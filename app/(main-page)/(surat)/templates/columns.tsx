@@ -48,6 +48,18 @@ export const columns: ColumnDef<Template>[] = [
     },
   },
   {
+    accessorKey: "jenis",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Jenis" />
+    ),
+    filterFn: (row, id, value) => {
+      const rowValue = (row.getValue(id) as string).split(" ");
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.includes(v))
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const template = row.original as Template;

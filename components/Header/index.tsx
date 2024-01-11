@@ -1,62 +1,113 @@
-import Link from "next/link";
-import DarkModeSwitcher from "./DarkModeSwitcher";
-import DropdownMessage from "./DropdownMessage";
-import DropdownNotification from "./DropdownNotification";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+
 import DropdownUser from "./DropdownUser";
-import Image from "next/image";
+import Modal from "../Modal/Modal";
+import { useToast } from "../ui/use-toast";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
-  return (
-    <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
-      <div className="flex flex-grow items-center justify-between lg:justify-end px-4 py-4 shadow-2 md:px-6 2xl:px-11">
-        <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
-          {/* <!-- Hamburger Toggle BTN --> */}
-          <button
-            aria-controls="sidebar"
-            onClick={(e) => {
-              e.stopPropagation();
-              props.setSidebarOpen(!props.sidebarOpen);
-            }}
-            className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
-          >
-            <span className="relative block h-5.5 w-5.5 cursor-pointer">
-              <span className="du-block absolute right-0 h-full w-full">
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!w-full delay-300"
-                  }`}
-                ></span>
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "delay-400 !w-full"
-                  }`}
-                ></span>
-                <span
-                  className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!w-full delay-500"
-                  }`}
-                ></span>
-              </span>
-              <span className="absolute right-0 h-full w-full rotate-45">
-                <span
-                  className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!h-0 !delay-[0]"
-                  }`}
-                ></span>
-                <span
-                  className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${
-                    !props.sidebarOpen && "!h-0 !delay-200"
-                  }`}
-                ></span>
-              </span>
-            </span>
-          </button>
-          {/* <!-- Hamburger Toggle BTN --> */}
+  const { toast } = useToast();
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
 
-          {/* <Link className="block flex-shrink-0 lg:hidden" href="/">
+  const handleChangePassword = async (e: any) => {
+    e.preventDefault();
+
+    if (
+      e.currentTarget.password.value !==
+      e.currentTarget.password_confirmation.value
+    ) {
+      toast({
+        title: "Gagal mengubah password",
+        description: "Password baru dan konfirmasi password baru tidak sama",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    const input = {
+      oldPassword: e.currentTarget.old_password.value,
+      newPassword: e.currentTarget.password.value,
+    };
+
+    mutate(input);
+  };
+
+  const { mutate } = useMutation({
+    mutationKey: ["changePassword"],
+    mutationFn: async (input: any) => {
+      const response = await axios.put(`/api/users`, { input });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Berhasil mengubah password",
+        description: "Password berhasil diubah",
+        className: "bg-success text-white",
+      });
+      setChangePasswordModalOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal mengubah password",
+        description: "Password lama salah",
+        className: "bg-danger text-white",
+      });
+    },
+  });
+
+  return (
+    <>
+      <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
+        <div className="flex flex-grow items-center justify-between lg:justify-end px-4 py-4 shadow-2 md:px-6 2xl:px-11">
+          <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
+            {/* <!-- Hamburger Toggle BTN --> */}
+            <button
+              aria-controls="sidebar"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.setSidebarOpen(!props.sidebarOpen);
+              }}
+              className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
+            >
+              <span className="relative block h-5.5 w-5.5 cursor-pointer">
+                <span className="du-block absolute right-0 h-full w-full">
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-[0] duration-200 ease-in-out dark:bg-white ${
+                      !props.sidebarOpen && "!w-full delay-300"
+                    }`}
+                  ></span>
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-150 duration-200 ease-in-out dark:bg-white ${
+                      !props.sidebarOpen && "delay-400 !w-full"
+                    }`}
+                  ></span>
+                  <span
+                    className={`relative left-0 top-0 my-1 block h-0.5 w-0 rounded-sm bg-black delay-200 duration-200 ease-in-out dark:bg-white ${
+                      !props.sidebarOpen && "!w-full delay-500"
+                    }`}
+                  ></span>
+                </span>
+                <span className="absolute right-0 h-full w-full rotate-45">
+                  <span
+                    className={`absolute left-2.5 top-0 block h-full w-0.5 rounded-sm bg-black delay-300 duration-200 ease-in-out dark:bg-white ${
+                      !props.sidebarOpen && "!h-0 !delay-[0]"
+                    }`}
+                  ></span>
+                  <span
+                    className={`delay-400 absolute left-0 top-2.5 block h-0.5 w-full rounded-sm bg-black duration-200 ease-in-out dark:bg-white ${
+                      !props.sidebarOpen && "!h-0 !delay-200"
+                    }`}
+                  ></span>
+                </span>
+              </span>
+            </button>
+            {/* <!-- Hamburger Toggle BTN --> */}
+
+            {/* <Link className="block flex-shrink-0 lg:hidden" href="/">
             <Image
               width={32}
               height={32}
@@ -64,9 +115,9 @@ const Header = (props: {
               alt="Logo"
             />
           </Link> */}
-        </div>
+          </div>
 
-        {/* <div className="hidden sm:block">
+          {/* <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="relative">
               <button className="absolute left-0 top-1/2 -translate-y-1/2">
@@ -102,27 +153,83 @@ const Header = (props: {
           </form>
         </div> */}
 
-        <div className="flex items-center gap-3 2xsm:gap-7">
-          <ul className="flex items-center gap-2 2xsm:gap-4">
-            {/* <!-- Dark Mode Toggler --> */}
-            {/* <DarkModeSwitcher /> */}
-            {/* <!-- Dark Mode Toggler --> */}
+          <div className="flex items-center gap-3 2xsm:gap-7">
+            <ul className="flex items-center gap-2 2xsm:gap-4">
+              {/* <!-- Dark Mode Toggler --> */}
+              {/* <DarkModeSwitcher /> */}
+              {/* <!-- Dark Mode Toggler --> */}
 
-            {/* <!-- Notification Menu Area --> */}
-            {/* <DropdownNotification /> */}
-            {/* <!-- Notification Menu Area --> */}
+              {/* <!-- Notification Menu Area --> */}
+              {/* <DropdownNotification /> */}
+              {/* <!-- Notification Menu Area --> */}
 
-            {/* <!-- Chat Notification Area --> */}
-            {/* <DropdownMessage /> */}
-            {/* <!-- Chat Notification Area --> */}
-          </ul>
+              {/* <!-- Chat Notification Area --> */}
+              {/* <DropdownMessage /> */}
+              {/* <!-- Chat Notification Area --> */}
+            </ul>
 
-          {/* <!-- User Area --> */}
-          <DropdownUser />
-          {/* <!-- User Area --> */}
+            {/* <!-- User Area --> */}
+            <DropdownUser
+              setChangePasswordModalOpen={setChangePasswordModalOpen}
+            />
+            {/* <!-- User Area --> */}
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {changePasswordModalOpen && (
+        <Modal setModalOpen={setChangePasswordModalOpen}>
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">
+                Ubah Password
+              </h3>
+            </div>
+            <form onSubmit={handleChangePassword}>
+              <div className="p-6.5">
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Password Lama <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="old_password"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Password Baru <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="password"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Konfirmasi Password Baru{" "}
+                    <span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    name="password_confirmation"
+                    type="password"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+                  Ubah
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 };
 
