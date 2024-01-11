@@ -1,7 +1,7 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { InfoCircledIcon, SwitchIcon, TrashIcon } from "@radix-ui/react-icons";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { FormEvent, useState } from "react";
@@ -100,9 +100,9 @@ export const columns: ColumnDef<Users>[] = [
       return (
         <div className="flex items-center space-x-2 text-white">
           {aktif ? (
-            <Badge className="bg-success">Aktif</Badge>
+            <Badge className="bg-success sm:text-xs">Aktif</Badge>
           ) : (
-            <Badge className="bg-danger">Tidak Aktif</Badge>
+            <Badge className="bg-danger">Nonaktif</Badge>
           )}
         </div>
       );
@@ -119,6 +119,34 @@ export const columns: ColumnDef<Users>[] = [
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
         useState(false);
       const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
+
+      const { mutate: activation } = useMutation({
+        mutationFn: async () => {
+          const { data } = await axios.put(`/api/users/aktivasi`, {
+            id: users.id,
+            input: {
+              aktif: !users.aktif,
+            },
+          });
+          return data;
+        },
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["users"],
+          });
+          toast({
+            title: "Berhasil mengubah status",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal mengubah status",
+            description: error.message,
+            className: "bg-error text-white",
+          });
+        },
+      });
 
       const { mutate: mutateChangePassword } = useMutation({
         mutationFn: async () => {
@@ -156,6 +184,19 @@ export const columns: ColumnDef<Users>[] = [
               onClick={() => setModalResetPasswordOpen(true)}
             >
               <KeyIcon className="h-5 w-5" />
+            </Button>
+            <Button
+              size="sm"
+              className={`{
+                ${
+                  users.aktif
+                    ? "bg-danger hover:bg-opacity-90"
+                    : "bg-success hover:bg-opacity-90"
+                } hover:bg-opacity-90 text-white transition-colors duration-200
+              }`}
+              onClick={() => activation()}
+            >
+              <SwitchIcon className="h-5 w-5" />
             </Button>
           </div>
           {modalResetPasswordOpen && (
