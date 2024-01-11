@@ -11,6 +11,7 @@ import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTabl
 import Modal from "@/components/Modal/Modal";
 import ProdiForm from "./prodi-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { useToast } from "@/components/ui/use-toast";
 
 export type Prodi = {
   id: string;
@@ -37,6 +38,7 @@ export const columns: ColumnDef<Prodi>[] = [
     cell: ({ row }) => {
       const prodi = row.original;
       const queryClient = useQueryClient();
+      const { toast } = useToast();
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
@@ -52,6 +54,16 @@ export const columns: ColumnDef<Prodi>[] = [
             queryKey: ["prodi"],
           });
           setModalDeleteOpen(false);
+          toast({
+            title: "Berhasil menghapus data",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal",
+            description: error.message,
+          });
         },
       });
 
@@ -72,6 +84,16 @@ export const columns: ColumnDef<Prodi>[] = [
             queryKey: ["prodi"],
           });
           setModalEditOpen(false);
+          toast({
+            title: "Berhasil mengubah data",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal",
+            description: error.message,
+          });
         },
       });
 
@@ -82,6 +104,15 @@ export const columns: ColumnDef<Prodi>[] = [
           kode_prodi: e.currentTarget.kode_prodi.value,
           fakultas_id: e.currentTarget.fakultas_id.value,
         };
+
+        if (!input.name || !input.kode_prodi || !input.fakultas_id) {
+          toast({
+            title: "Gagal mengubah data",
+            description: "Data tidak boleh kosong",
+            className: "bg-danger text-white",
+          });
+          return;
+        }
 
         mutatePut(input);
       };

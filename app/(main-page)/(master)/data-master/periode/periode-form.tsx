@@ -40,9 +40,13 @@ export default function PeriodeForm({
             <input
               name="tahun"
               type="text"
-              defaultValue={new Intl.DateTimeFormat("id-ID", {
-                year: "numeric",
-              }).format(new Date(values.tahun.toString()))}
+              defaultValue={
+                values
+                  ? new Intl.DateTimeFormat("id-ID", {
+                      year: "numeric",
+                    }).format(new Date(values.tahun.toString()))
+                  : ""
+              }
               placeholder={
                 values
                   ? new Intl.DateTimeFormat("id-ID", {

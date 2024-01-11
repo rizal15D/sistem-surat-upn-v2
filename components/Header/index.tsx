@@ -28,6 +28,15 @@ const Header = (props: {
       return;
     }
 
+    if (e.currentTarget.password.value.length < 8) {
+      toast({
+        title: "Gagal mengubah password",
+        description: "Password baru minimal 8 karakter",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
     const input = {
       oldPassword: e.currentTarget.old_password.value,
       newPassword: e.currentTarget.password.value,

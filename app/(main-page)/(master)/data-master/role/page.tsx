@@ -9,6 +9,7 @@ import Modal from "@/components/Modal/Modal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import RoleForm from "./role-form";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Role[]> {
   // Fetch data from your API here.
@@ -19,6 +20,7 @@ async function getData(): Promise<Role[]> {
 export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const { toast } = useToast();
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["role"],
@@ -33,6 +35,16 @@ export default function DataMasterRolePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["role"] });
       setModalCreateOpen(false);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambah data",
+        description: error.message,
+      });
     },
   });
 
@@ -41,6 +53,14 @@ export default function DataMasterRolePage() {
     const data = {
       name: e.currentTarget.nama.value,
     };
+
+    if (!data.name) {
+      toast({
+        title: "Gagal menambah data",
+        description: "Nama tidak boleh kosong",
+      });
+      return;
+    }
 
     mutate(data);
   };

@@ -11,6 +11,7 @@ import { useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import RoleForm from "./role-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { useToast } from "@/components/ui/use-toast";
 
 export type Role = {
   id: number;
@@ -31,6 +32,8 @@ export const columns: ColumnDef<Role>[] = [
     cell: ({ row }) => {
       const role = row.original;
       const queryClient = useQueryClient();
+      const { toast } = useToast();
+
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
@@ -44,6 +47,17 @@ export const columns: ColumnDef<Role>[] = [
         onSuccess: () => {
           queryClient.invalidateQueries({
             queryKey: ["role"],
+          });
+          setModalDeleteOpen(false);
+          toast({
+            title: "Berhasil menghapus data",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal menghapus data",
+            description: error.message,
           });
         },
       });
@@ -61,6 +75,16 @@ export const columns: ColumnDef<Role>[] = [
             queryKey: ["role"],
           });
           setModalEditOpen(false);
+          toast({
+            title: "Berhasil mengubah data",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal mengubah data",
+            description: error.message,
+          });
         },
       });
 
@@ -70,6 +94,14 @@ export const columns: ColumnDef<Role>[] = [
           id: role.id,
           name: e.currentTarget.nama.value,
         };
+
+        if (!input.name) {
+          toast({
+            title: "Gagal mengubah data",
+            description: "Nama tidak boleh kosong",
+          });
+          return;
+        }
 
         mutatePut(input);
       };

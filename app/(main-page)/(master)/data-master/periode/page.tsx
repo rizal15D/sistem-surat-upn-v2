@@ -9,6 +9,7 @@ import axios from "axios";
 import { useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import PeriodeForm from "./periode-form";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Periode[]> {
   // Fetch data from your API here.
@@ -19,6 +20,7 @@ async function getData(): Promise<Periode[]> {
 export default function DataMasterPeriodePage() {
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["periode"],
@@ -37,6 +39,10 @@ export default function DataMasterPeriodePage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["prodi"] });
       setModalCreateOpen(false);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
     },
   });
 
@@ -47,6 +53,15 @@ export default function DataMasterPeriodePage() {
       semester: e.currentTarget.semester.value,
       prodi_id: e.currentTarget.prodi_id.value,
     };
+
+    if (!data.tahun || !data.semester || !data.prodi_id) {
+      toast({
+        title: "Gagal menambahkan data",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
 
     mutate(data);
   };

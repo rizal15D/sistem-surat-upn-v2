@@ -8,6 +8,7 @@ import { Prodi, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import ProdiForm from "./prodi-form";
+import { useToast } from "@/components/ui/use-toast";
 
 async function getData(): Promise<Prodi[]> {
   // Fetch data from your API here.
@@ -18,6 +19,7 @@ async function getData(): Promise<Prodi[]> {
 export default function DataMasterProdiPage() {
   const queryClient = useQueryClient();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const { toast } = useToast();
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["prodi"],
@@ -36,6 +38,10 @@ export default function DataMasterProdiPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["prodi"] });
       setModalCreateOpen(false);
+      toast({
+        title: "Berhasil menambahkan data",
+        className: "bg-success text-white",
+      });
     },
   });
 
@@ -46,6 +52,15 @@ export default function DataMasterProdiPage() {
       kode_prodi: e.currentTarget.kode_prodi.value,
       fakultas_id: e.currentTarget.fakultas_id.value,
     };
+
+    if (!data.name || !data.kode_prodi || !data.fakultas_id) {
+      toast({
+        title: "Gagal menambahkan data",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
 
     mutate(data);
   };
