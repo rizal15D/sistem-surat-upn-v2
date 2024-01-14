@@ -114,6 +114,7 @@ export const columns: ColumnDef<Users>[] = [
       const users = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+      const [isLoading, setIsLoading] = useState(false);
 
       const [password, setPassword] = useState("");
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
@@ -122,12 +123,14 @@ export const columns: ColumnDef<Users>[] = [
 
       const { mutate: activation } = useMutation({
         mutationFn: async () => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/users/aktivasi`, {
             id: users.id,
             input: {
               aktif: !users.aktif,
             },
           });
+          setIsLoading(false);
           return data;
         },
         onSuccess: (data) => {
@@ -148,7 +151,7 @@ export const columns: ColumnDef<Users>[] = [
         },
       });
 
-      const { mutate: mutateChangePassword } = useMutation({
+      const { mutate: mutateResetPassword } = useMutation({
         mutationFn: async () => {
           const { data } = await axios.put(`/api/users/reset-password`, {
             id: users.id,
@@ -196,13 +199,19 @@ export const columns: ColumnDef<Users>[] = [
               }`}
               onClick={() => activation()}
             >
-              <SwitchIcon className="h-5 w-5" />
+              {isLoading ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+              ) : (
+                <SwitchIcon className="h-5 w-5" />
+              )}
             </Button>
           </div>
           {modalResetPasswordOpen && (
             <ConfirmationModal
               setModalOpen={setModalResetPasswordOpen}
-              onClick={mutateChangePassword}
+              onClick={mutateResetPassword}
+              title="Reset Password"
+              message={`Apakah anda yakin ingin mereset password user ${users.name} ?`}
             />
           )}
           {modalPasswordOpen && (

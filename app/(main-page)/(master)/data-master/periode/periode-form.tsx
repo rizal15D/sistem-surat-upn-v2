@@ -4,11 +4,13 @@ import axios from "axios";
 export default function PeriodeForm({
   onSubmit,
   values,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
+  isLoading?: boolean;
 }) {
-  const { data: prodiData, isLoading } = useQuery({
+  const { data: prodiData, isLoading: isProdiLoading } = useQuery({
     queryKey: ["prodi"],
     queryFn: async () => {
       const { data } = await axios.get(`/api/prodi`);
@@ -16,7 +18,7 @@ export default function PeriodeForm({
     },
   });
 
-  if (isLoading) {
+  if (isProdiLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -109,7 +111,13 @@ export default function PeriodeForm({
           </div>
 
           <button className="mt-6 flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-            {values ? "Edit" : "Tambah"}
+            {isLoading ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            ) : values ? (
+              "Edit Periode"
+            ) : (
+              "Tambah Periode"
+            )}
           </button>
         </div>
       </form>

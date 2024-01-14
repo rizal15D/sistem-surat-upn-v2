@@ -20,8 +20,9 @@ export default function DataMasterProdiPage() {
   const queryClient = useQueryClient();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isProdiLoading } = useQuery({
     queryKey: ["prodi"],
     queryFn: getData,
   });
@@ -32,6 +33,7 @@ export default function DataMasterProdiPage() {
       kode_prodi: string;
       fakultas_id: string;
     }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/prodi/`, { input });
       return response.data;
     },
@@ -42,6 +44,15 @@ export default function DataMasterProdiPage() {
         title: "Berhasil menambahkan data",
         className: "bg-success text-white",
       });
+    },
+    onError: () => {
+      toast({
+        title: "Gagal menambahkan data",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -65,7 +76,7 @@ export default function DataMasterProdiPage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isProdiLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -96,7 +107,7 @@ export default function DataMasterProdiPage() {
 
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <ProdiForm onSubmit={handleCreate} />
+          <ProdiForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

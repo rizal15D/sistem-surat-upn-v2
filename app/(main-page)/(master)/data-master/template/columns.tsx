@@ -16,14 +16,14 @@ import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTabl
 import Modal from "@/components/Modal/Modal";
 import TemplateForm from "./template-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { useToast } from "@/components/ui/use-toast";
 
 export type Template = {
   id: string;
   judul: string;
-  jenis: string;
   deskripsi: string;
-  surat: File;
-  thumbnail: File;
+  lokasi: string;
+  jenis: string;
 };
 
 export const columns: ColumnDef<Template>[] = [
@@ -68,6 +68,9 @@ export const columns: ColumnDef<Template>[] = [
       const queryClient = useQueryClient();
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+      const [isLoading, setIsLoading] = useState(false);
+      const [warningMessage, setWarningMessage] = useState("");
+      const { toast } = useToast();
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
@@ -91,6 +94,7 @@ export const columns: ColumnDef<Template>[] = [
           jenis: any;
           deskripsi: any;
         }) => {
+          setIsLoading(true);
           const response = await axios.put(
             `/api/template`,
             {
@@ -113,7 +117,22 @@ export const columns: ColumnDef<Template>[] = [
           queryClient.invalidateQueries({
             queryKey: ["template"],
           });
+          toast({
+            title: "Berhasil mengubah data",
+            description: "Data berhasil diubah",
+            className: "bg-success text-white",
+          });
           setModalEditOpen(false);
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal mengubah data",
+            description: error.message,
+            className: "bg-danger text-white",
+          });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       });
 
@@ -121,6 +140,29 @@ export const columns: ColumnDef<Template>[] = [
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
+
+        if (
+          !formData.get("judul") ||
+          !formData.get("file") ||
+          !formData.get("jenis") ||
+          !formData.get("deskripsi")
+        ) {
+          toast({
+            title: "Gagal menambahkan data",
+            description: "Data tidak boleh kosong",
+            className: "bg-danger text-white",
+          });
+          return;
+        }
+
+        if (warningMessage) {
+          toast({
+            title: "Gagal menambahkan data",
+            description: warningMessage,
+            className: "bg-danger text-white",
+          });
+          return;
+        }
 
         mutatePut({
           judul: formData.get("judul"),
@@ -132,22 +174,19 @@ export const columns: ColumnDef<Template>[] = [
       };
 
       const handleDownload = async () => {
-        const response = await axios.get("/api/template/download", {
+        const response = await axios.get(`${template.lokasi}`, {
           responseType: "blob",
-          params: {
-            id: template.id,
-          },
         });
 
         const url = window.URL.createObjectURL(
           new Blob([response.data], {
-            type: response.headers["content-type"],
+            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           })
         );
 
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", template.judul + ".docx");
+        link.setAttribute("download", template.judul);
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -185,11 +224,21 @@ export const columns: ColumnDef<Template>[] = [
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
               onClick={() => mutateDelete()}
+              title="Hapus Template"
+              message={`Apakah anda yakin ingin menghapus template ${
+                template.judul || "ini"
+              }?`}
             />
           )}
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <TemplateForm onSubmit={handleEdit} values={template} />
+              <TemplateForm
+                onSubmit={handleEdit}
+                values={template}
+                isLoading={isLoading}
+                warningMessage={warningMessage}
+                setWarningMessage={setWarningMessage}
+              />
             </Modal>
           )}
         </>

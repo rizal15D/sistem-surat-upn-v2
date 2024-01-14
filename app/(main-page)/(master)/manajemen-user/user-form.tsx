@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 
 export default function UserForm({
   onSubmit,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  isLoading: boolean;
 }) {
   const [isProdi, setIsProdi] = useState(false);
 
@@ -192,7 +194,11 @@ export default function UserForm({
           </div>
 
           <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-            Buat User
+            {isLoading ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            ) : (
+              "Tambah"
+            )}
           </button>
         </div>
       </form>

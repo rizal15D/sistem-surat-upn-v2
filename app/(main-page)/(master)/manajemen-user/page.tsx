@@ -19,18 +19,20 @@ async function getData(): Promise<Users[]> {
 export default function ManajemenUserPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
   const [password, setPassword] = useState("");
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isUsersLoading } = useQuery({
     queryKey: ["users"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
     mutationFn: async (data: { name: string }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/users/`, data);
       return response.data;
     },
@@ -50,6 +52,9 @@ export default function ManajemenUserPage() {
         description: error.message,
         className: "bg-error text-white",
       });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -75,7 +80,7 @@ export default function ManajemenUserPage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isUsersLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -105,7 +110,7 @@ export default function ManajemenUserPage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <UserForm onSubmit={handleCreate} />
+          <UserForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
       {modalPasswordOpen && (

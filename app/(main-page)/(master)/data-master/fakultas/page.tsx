@@ -20,8 +20,9 @@ export default function DataMasterFakultasPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isFakultasLoading } = useQuery({
     queryKey: ["fakultas"],
     queryFn: getData,
   });
@@ -32,6 +33,7 @@ export default function DataMasterFakultasPage() {
       jenjang: string;
       kode_fakultas: string;
     }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/fakultas/`, { input });
       return response.data;
     },
@@ -48,6 +50,9 @@ export default function DataMasterFakultasPage() {
         title: "Gagal menambah data",
         description: error.message,
       });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -70,7 +75,7 @@ export default function DataMasterFakultasPage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isFakultasLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -100,7 +105,7 @@ export default function DataMasterFakultasPage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <FakultasForm onSubmit={handleCreate} />
+          <FakultasForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

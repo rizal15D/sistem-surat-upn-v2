@@ -19,10 +19,11 @@ async function getData(): Promise<Periode[]> {
 
 export default function DataMasterPeriodePage() {
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isPeriodeLoading } = useQuery({
     queryKey: ["periode"],
     queryFn: getData,
   });
@@ -33,6 +34,7 @@ export default function DataMasterPeriodePage() {
       semester: string;
       prodi_id: string;
     }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/periode/`, { input });
       return response.data;
     },
@@ -43,6 +45,16 @@ export default function DataMasterPeriodePage() {
         title: "Berhasil menambahkan data",
         className: "bg-success text-white",
       });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambahkan data",
+        description: error.message,
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -66,7 +78,7 @@ export default function DataMasterPeriodePage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isPeriodeLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -96,7 +108,7 @@ export default function DataMasterPeriodePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <PeriodeForm onSubmit={handleCreate} />
+          <PeriodeForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

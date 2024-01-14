@@ -21,14 +21,16 @@ export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isRoleLoading } = useQuery({
     queryKey: ["role"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
     mutationFn: async (data: { name: string }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/role/`, data);
       return response.data;
     },
@@ -45,6 +47,9 @@ export default function DataMasterRolePage() {
         title: "Gagal menambah data",
         description: error.message,
       });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -65,7 +70,7 @@ export default function DataMasterRolePage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isRoleLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -95,7 +100,7 @@ export default function DataMasterRolePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <RoleForm onSubmit={handleCreate} />
+          <RoleForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

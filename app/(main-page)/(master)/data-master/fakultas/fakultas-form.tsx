@@ -1,9 +1,11 @@
 export default function FakultasForm({
   onSubmit,
   values,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
+  isLoading?: boolean;
 }) {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -78,7 +80,13 @@ export default function FakultasForm({
           </div>
 
           <button className="mt-6 flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-            {values ? "Edit" : "Tambah"}
+            {isLoading ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            ) : values ? (
+              "Edit Fakultas"
+            ) : (
+              "Tambah Fakultas"
+            )}
           </button>
         </div>
       </form>

@@ -74,10 +74,11 @@ export const columns: ColumnDef<Periode>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
+      const periode = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+      const [isLoading, setIsLoading] = useState(false);
 
-      const periode = row.original;
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
@@ -113,6 +114,7 @@ export const columns: ColumnDef<Periode>[] = [
           prodi_id: string;
           status: boolean;
         }) => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/periode`, {
             id: periode.id,
             input,
@@ -134,6 +136,9 @@ export const columns: ColumnDef<Periode>[] = [
             title: "Gagal",
             description: error.message,
           });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       });
 
@@ -185,11 +190,19 @@ export const columns: ColumnDef<Periode>[] = [
               onClick={() => {
                 mutateDelete();
               }}
+              title="Hapus Periode"
+              message={`Apakah Anda yakin ingin menghapus periode ${
+                periode.tahun || "ini"
+              }?`}
             />
           )}
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <PeriodeForm onSubmit={handleEdit} values={periode} />
+              <PeriodeForm
+                onSubmit={handleEdit}
+                values={periode}
+                isLoading={isLoading}
+              />
             </Modal>
           )}
         </>

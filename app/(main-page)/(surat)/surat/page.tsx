@@ -2,12 +2,11 @@
 
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { Letter, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
-import { useState } from "react";
 
 async function getData(): Promise<Letter[]> {
   // Fetch data from your API here.

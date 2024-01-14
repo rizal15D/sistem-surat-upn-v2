@@ -5,6 +5,8 @@ import axios from "axios";
 import DropdownUser from "./DropdownUser";
 import Modal from "../Modal/Modal";
 import { useToast } from "../ui/use-toast";
+import ConfirmationModal from "../Modal/ConfirmationModal";
+import { signOut } from "next-auth/react";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -12,6 +14,7 @@ const Header = (props: {
 }) => {
   const { toast } = useToast();
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
   const handleChangePassword = async (e: any) => {
     e.preventDefault();
@@ -180,6 +183,7 @@ const Header = (props: {
             {/* <!-- User Area --> */}
             <DropdownUser
               setChangePasswordModalOpen={setChangePasswordModalOpen}
+              setLogoutModalOpen={setLogoutModalOpen}
             />
             {/* <!-- User Area --> */}
           </div>
@@ -237,6 +241,16 @@ const Header = (props: {
             </form>
           </div>
         </Modal>
+      )}
+      {logoutModalOpen && (
+        <ConfirmationModal
+          setModalOpen={setLogoutModalOpen}
+          onClick={() => {
+            signOut();
+          }}
+          title="Logout"
+          message="Apakah anda yakin ingin logout?"
+        />
       )}
     </>
   );

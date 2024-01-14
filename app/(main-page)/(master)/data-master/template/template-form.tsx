@@ -6,11 +6,13 @@ export default function TemplateForm({
   values,
   warningMessage,
   setWarningMessage,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
-  warningMessage?: string;
-  setWarningMessage?: any;
+  warningMessage: string;
+  setWarningMessage: (message: string) => void;
+  isLoading?: boolean;
 }) {
   const [selectedFile, setSelectedFile] = useState("");
 
@@ -118,7 +120,13 @@ export default function TemplateForm({
           </div>
 
           <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-            Upload Template
+            {isLoading ? (
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            ) : values ? (
+              "Simpan"
+            ) : (
+              "Tambah"
+            )}
           </button>
         </div>
       </div>

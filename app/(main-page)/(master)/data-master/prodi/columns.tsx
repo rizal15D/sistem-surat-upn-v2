@@ -39,6 +39,8 @@ export const columns: ColumnDef<Prodi>[] = [
       const prodi = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+      const [isLoading, setIsLoading] = useState(false);
+
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
@@ -73,6 +75,7 @@ export const columns: ColumnDef<Prodi>[] = [
           kode_prodi: string;
           fakultas_id: string;
         }) => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/prodi`, {
             id: prodi.id,
             input,
@@ -94,6 +97,9 @@ export const columns: ColumnDef<Prodi>[] = [
             title: "Gagal",
             description: error.message,
           });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       });
 
@@ -143,11 +149,19 @@ export const columns: ColumnDef<Prodi>[] = [
               onClick={() => {
                 mutateDelete();
               }}
+              title="Hapus Prodi"
+              message={`Apakah anda yakin ingin menghapus prodi ${
+                prodi.name || "ini"
+              }?`}
             />
           )}
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <ProdiForm onSubmit={handleEdit} values={prodi} />
+              <ProdiForm
+                onSubmit={handleEdit}
+                values={prodi}
+                isLoading={isLoading}
+              />
             </Modal>
           )}
         </>

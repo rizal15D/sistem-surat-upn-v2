@@ -11,6 +11,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -19,6 +20,7 @@ export default function SuratSinglePage() {
   const session = useSession();
   const user = session.data?.user as User;
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const allData = queryClient.getQueryData<Letter[]>(["surat"]);
   const singleData = allData
@@ -27,6 +29,7 @@ export default function SuratSinglePage() {
 
   const { mutate } = useMutation({
     mutationFn: async (input: { status: string; persetujuan: string }) => {
+      setIsLoading(true);
       const response = await axios.put(`/api/surat/persetujuan`, { id, input });
       return response.data;
     },
@@ -37,6 +40,15 @@ export default function SuratSinglePage() {
         title: "Berhasil",
         className: "bg-success text-white",
       });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -150,10 +162,18 @@ export default function SuratSinglePage() {
                 singleData?.status == "disetujui TU")) && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button className="bg-success w-full" onClick={handleSetuju}>
-                  <CheckIcon className="w-6 h-6" />
+                  {isLoading ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    <CheckIcon className="w-6 h-6" />
+                  )}
                 </Button>
                 <Button onClick={handleMenolak} className="bg-danger w-full">
-                  <Cross2Icon className="w-6 h-6" />
+                  {isLoading ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    <Cross2Icon className="w-6 h-6" />
+                  )}
                 </Button>
               </div>
             )}

@@ -33,6 +33,7 @@ export const columns: ColumnDef<Role>[] = [
       const role = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+      const [isLoading, setIsLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
@@ -64,6 +65,7 @@ export const columns: ColumnDef<Role>[] = [
 
       const { mutate: mutatePut } = useMutation({
         mutationFn: async (input: { id: number; name: any }) => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/role`, {
             id: role.id,
             input,
@@ -85,6 +87,9 @@ export const columns: ColumnDef<Role>[] = [
             title: "Gagal mengubah data",
             description: error.message,
           });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       });
 
@@ -128,7 +133,11 @@ export const columns: ColumnDef<Role>[] = [
           </div>
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <RoleForm onSubmit={handleEdit} values={role} />
+              <RoleForm
+                onSubmit={handleEdit}
+                values={role}
+                isLoading={isLoading}
+              />
             </Modal>
           )}
           {modalDeleteOpen && (
@@ -137,6 +146,10 @@ export const columns: ColumnDef<Role>[] = [
               onClick={() => {
                 mutateDelete();
               }}
+              title="Hapus role"
+              message={`Apakah anda yakin ingin menghapus role ${
+                role.name || "ini"
+              }?`}
             />
           )}
         </>

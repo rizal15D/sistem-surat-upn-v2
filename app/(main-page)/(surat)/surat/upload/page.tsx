@@ -11,10 +11,12 @@ export default function UploadSuratPage() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [warningMessage, setWarningMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const { mutate } = useMutation({
     mutationFn: async (input: { judul: any; surat: File }) => {
+      setIsLoading(true);
       const response = await axios.post(
         `/api/surat`,
         {
@@ -42,6 +44,9 @@ export default function UploadSuratPage() {
         title: "Gagal menambah data",
         description: error.message,
       });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -81,6 +86,7 @@ export default function UploadSuratPage() {
       onSubmit={handleSubmit}
       warningMessage={warningMessage}
       setWarningMessage={setWarningMessage}
+      isLoading={isLoading}
     />
   );
 }

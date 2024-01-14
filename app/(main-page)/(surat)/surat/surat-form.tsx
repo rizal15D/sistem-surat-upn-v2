@@ -7,10 +7,12 @@ export default function SuratForm({
   onSubmit,
   warningMessage,
   setWarningMessage,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   warningMessage: string;
   setWarningMessage: (message: string) => void;
+  isLoading?: boolean;
 }) {
   const [selectedFile, setSelectedFile] = useState("");
 
@@ -111,7 +113,11 @@ export default function SuratForm({
               </div> */}
 
               <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-                Kirim Surat
+                {isLoading ? (
+                  <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                ) : (
+                  "Kirim Surat"
+                )}
               </button>
             </div>
           </div>

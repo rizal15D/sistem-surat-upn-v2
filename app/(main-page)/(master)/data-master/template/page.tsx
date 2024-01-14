@@ -22,8 +22,9 @@ export default function DataMasterTemplatePage() {
 
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isTemplateLoading } = useQuery({
     queryKey: ["template"],
     queryFn: getData,
   });
@@ -36,6 +37,7 @@ export default function DataMasterTemplatePage() {
       surat: File;
       thumbnail: File;
     }) => {
+      setIsLoading(true);
       const response = await axios.post(
         `/api/template`,
         {
@@ -67,6 +69,9 @@ export default function DataMasterTemplatePage() {
         description: error.message,
         className: "bg-danger text-white",
       });
+    },
+    onSettled: () => {
+      setIsLoading(false);
     },
   });
 
@@ -110,7 +115,7 @@ export default function DataMasterTemplatePage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isTemplateLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -144,6 +149,7 @@ export default function DataMasterTemplatePage() {
             onSubmit={handleCreate}
             warningMessage={warningMessage}
             setWarningMessage={setWarningMessage}
+            isLoading={isLoading}
           />
         </Modal>
       )}

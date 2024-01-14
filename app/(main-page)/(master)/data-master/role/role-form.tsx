@@ -1,9 +1,11 @@
 export default function RoleForm({
   onSubmit,
   values,
+  isLoading,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   values?: any;
+  isLoading?: boolean;
 }) {
   return (
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -28,7 +30,13 @@ export default function RoleForm({
           </div>
 
           <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
-            {values ? "Edit" : "Tambah"}
+            {isLoading ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            ) : values ? (
+              "Edit Role"
+            ) : (
+              "Tambah Role"
+            )}
           </button>
         </div>
       </form>

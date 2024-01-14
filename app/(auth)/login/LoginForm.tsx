@@ -1,10 +1,15 @@
 "use client";
 
 import { signIn } from "next-auth/react";
+import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Loader from "@/components/common/Loader";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -12,16 +17,27 @@ export default function LoginForm() {
     const email = e.currentTarget.email.value;
     const password = e.currentTarget.password.value;
 
+    setIsLoading(true);
+
     const response = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
 
+    setIsLoading(false);
+
     if (response?.error) {
-      alert(response.error);
+      toast({
+        title: "Login gagal",
+        className: "bg-danger text-white",
+      });
     } else {
-      router.push("/dashboard");
+      toast({
+        title: "Login berhasil",
+        className: "bg-success text-white",
+      });
+      router.push("/surat");
     }
   };
 
@@ -96,11 +112,18 @@ export default function LoginForm() {
       </div>
 
       <div className="mb-5">
-        <input
+        <button
           type="submit"
-          value="Masuk"
           className="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 text-white transition hover:bg-opacity-90"
-        />
+        >
+          {isLoading ? (
+            <div className="flex justify-center">
+              <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+            </div>
+          ) : (
+            <span className="font-medium">Masuk</span>
+          )}
+        </button>
       </div>
     </form>
   );
