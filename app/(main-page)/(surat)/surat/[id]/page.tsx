@@ -104,7 +104,7 @@ export default function SuratSinglePage() {
       <div className="lg:col-span-3 sm:col-span-1 row-span-2 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
-            Detail Surat {singleData?.lokasi_surat}
+            Detail Surat
           </h1>
 
           <div className="flex flex-col space-y-2 gap-2">
