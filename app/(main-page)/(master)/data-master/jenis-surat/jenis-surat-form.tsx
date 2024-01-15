@@ -1,4 +1,4 @@
-export default function RoleForm({
+export default function JenisForm({
   onSubmit,
   values,
   isLoading,
@@ -18,13 +18,13 @@ export default function RoleForm({
         <div className="p-6.5">
           <div className="mb-4.5">
             <label className="mb-2.5 block text-black dark:text-white">
-              Nama <span className="text-meta-1">*</span>
+              Nama Jenis <span className="text-meta-1">*</span>
             </label>
             <input
-              name="nama"
+              name="jenis"
               type="text"
-              defaultValue={values?.name}
-              placeholder={values ? values.name : "Masukkan nama role"}
+              defaultValue={values?.jenis}
+              placeholder={values ? values.jenis : "Masukkan nama jenis"}
               className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
             />
           </div>
@@ -33,9 +33,9 @@ export default function RoleForm({
             {isLoading ? (
               <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
             ) : values ? (
-              "Edit Role"
+              "Edit Jenis"
             ) : (
-              "Tambah Role"
+              "Tambah Jenis"
             )}
           </button>
         </div>

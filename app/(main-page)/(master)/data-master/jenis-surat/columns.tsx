@@ -13,16 +13,16 @@ import RoleForm from "./jenis-surat-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { useToast } from "@/components/ui/use-toast";
 
-export type Role = {
+export type Jenis = {
   id: number;
-  name: string;
+  jenis: string;
   createdAt: string;
   updatedAt: string;
 };
 
-export const columns: ColumnDef<Role>[] = [
+export const columns: ColumnDef<Jenis>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "jenis",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nama" />
     ),
@@ -30,7 +30,7 @@ export const columns: ColumnDef<Role>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const role = row.original;
+      const jenis = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
@@ -40,14 +40,14 @@ export const columns: ColumnDef<Role>[] = [
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
-          const { data } = await axios.delete(`/api/role`, {
-            data: { id: role.id },
+          const { data } = await axios.delete(`/api/jenis-surat`, {
+            data: { id: jenis.id },
           });
           return data;
         },
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ["role"],
+            queryKey: ["jenis-surat"],
           });
           setModalDeleteOpen(false);
           toast({
@@ -64,17 +64,17 @@ export const columns: ColumnDef<Role>[] = [
       });
 
       const { mutate: mutatePut } = useMutation({
-        mutationFn: async (input: { id: number; name: any }) => {
+        mutationFn: async (input: { id: number; jenis: any }) => {
           setIsLoading(true);
-          const { data } = await axios.put(`/api/role`, {
-            id: role.id,
+          const { data } = await axios.put(`/api/jenis-surat`, {
+            id: jenis.id,
             input,
           });
           return data;
         },
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ["role"],
+            queryKey: ["jenis-surat"],
           });
           setModalEditOpen(false);
           toast({
@@ -96,14 +96,14 @@ export const columns: ColumnDef<Role>[] = [
       const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const input = {
-          id: role.id,
-          name: e.currentTarget.nama.value,
+          id: jenis.id,
+          jenis: e.currentTarget.jenis.value,
         };
 
-        if (!input.name) {
+        if (!input.jenis) {
           toast({
             title: "Gagal mengubah data",
-            description: "Nama tidak boleh kosong",
+            description: "Data tidak boleh kosong",
           });
           return;
         }
@@ -135,7 +135,7 @@ export const columns: ColumnDef<Role>[] = [
             <Modal setModalOpen={setModalEditOpen}>
               <RoleForm
                 onSubmit={handleEdit}
-                values={role}
+                values={jenis}
                 isLoading={isLoading}
               />
             </Modal>
@@ -146,9 +146,9 @@ export const columns: ColumnDef<Role>[] = [
               onClick={() => {
                 mutateDelete();
               }}
-              title="Hapus role"
-              message={`Apakah anda yakin ingin menghapus role ${
-                role.name || "ini"
+              title="Hapus jenis surat"
+              message={`Apakah anda yakin ingin menghapus jenis surat ${
+                jenis.jenis || "ini"
               }?`}
             />
           )}

@@ -3,17 +3,17 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 
-import { Role, columns } from "./columns";
+import { Jenis, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import RoleForm from "./jenis-surat-form";
+import JenisForm from "./jenis-surat-form";
 import { useToast } from "@/components/ui/use-toast";
 
-async function getData(): Promise<Role[]> {
+async function getData(): Promise<Jenis[]> {
   // Fetch data from your API here.
-  const response = await axios.get("/api/role");
+  const response = await axios.get("/api/jenis-surat");
   return response.data;
 }
 
@@ -23,19 +23,19 @@ export default function DataMasterRolePage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading: isRoleLoading } = useQuery({
-    queryKey: ["role"],
+  const { data = [], isLoading: isJenisLoading } = useQuery({
+    queryKey: ["jenis-surat"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (input: { jenis: string }) => {
       setIsLoading(true);
-      const response = await axios.post(`/api/role/`, data);
+      const response = await axios.post(`/api/jenis-surat/`, { input });
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["role"] });
+      queryClient.invalidateQueries({ queryKey: ["jenis-surat"] });
       setModalCreateOpen(false);
       toast({
         title: "Berhasil menambahkan data",
@@ -56,13 +56,13 @@ export default function DataMasterRolePage() {
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
-      name: e.currentTarget.nama.value,
+      jenis: e.currentTarget.jenis.value,
     };
 
-    if (!data.name) {
+    if (!data.jenis) {
       toast({
         title: "Gagal menambah data",
-        description: "Nama tidak boleh kosong",
+        description: "Data tidak boleh kosong",
       });
       return;
     }
@@ -70,7 +70,7 @@ export default function DataMasterRolePage() {
     mutate(data);
   };
 
-  if (isRoleLoading) {
+  if (isJenisLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -82,14 +82,14 @@ export default function DataMasterRolePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Role
+          Data Master Jenis Surat
         </h1>
         <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Role
+          Tambah Jenis Surat
         </Button>
       </div>
 
@@ -100,7 +100,7 @@ export default function DataMasterRolePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <RoleForm onSubmit={handleCreate} isLoading={isLoading} />
+          <JenisForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>
