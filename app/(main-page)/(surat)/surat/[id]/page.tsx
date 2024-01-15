@@ -87,11 +87,11 @@ export default function SuratSinglePage() {
 
   return (
     <div className="grid sm:grid-cols-1 lg:grid-cols-5 gap-10 w-full">
-      <div className="lg:col-span-2 sm:col-span-1 row-span-1 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+      <div className="lg:col-span-3 sm:col-span-1 row-span-1 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           {singleData && (
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-              <div className="h-96 mb-4">
+              <div className="h-[100vh] mb-4">
                 <Viewer
                   fileUrl={singleData?.url}
                   defaultScale={SpecialZoomLevel.PageFit}
@@ -101,7 +101,7 @@ export default function SuratSinglePage() {
           )}
         </div>
       </div>
-      <div className="lg:col-span-3 sm:col-span-1 row-span-2 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+      <div className="lg:col-span-2 sm:col-span-1 row-span-2 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
             Detail Surat
@@ -143,7 +143,7 @@ export default function SuratSinglePage() {
                 Pembuat Surat
               </span>
               <span className="text-body-sm text-black dark:text-white">
-                {singleData?.user_id}
+                {singleData?.user.name}, {singleData?.user.role.name}
               </span>
             </div>{" "}
             {/* {singleData?.komentar && (

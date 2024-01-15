@@ -51,7 +51,11 @@ export const columns: ColumnDef<Letter>[] = [
     ),
     cell: ({ row }) => {
       const user = row.original.user;
-      return <div>{user.name}</div>;
+      return (
+        <div>
+          {user.name}, {user.prodi.name}
+        </div>
+      );
     },
   },
   {

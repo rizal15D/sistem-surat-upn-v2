@@ -22,8 +22,11 @@ export type Template = {
   id: string;
   judul: string;
   deskripsi: string;
-  lokasi: string;
-  jenis: string;
+  url: string;
+  jenis: {
+    id: number;
+    jenis: string;
+  };
 };
 
 export const columns: ColumnDef<Template>[] = [
@@ -59,6 +62,10 @@ export const columns: ColumnDef<Template>[] = [
       return value.some((val: string[]) =>
         val.some((v) => rowValue.includes(v))
       );
+    },
+    cell: ({ row }) => {
+      const jenis = row.original.jenis;
+      return <div>{jenis.jenis}</div>;
     },
   },
   {
@@ -174,7 +181,7 @@ export const columns: ColumnDef<Template>[] = [
       };
 
       const handleDownload = async () => {
-        const response = await axios.get(`${template.lokasi}`, {
+        const response = await axios.get(`${template.url}`, {
           responseType: "blob",
         });
 

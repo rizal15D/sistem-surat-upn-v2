@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/template-surat/upload/cloudinary`,
+      `${process.env.API_URL}/template-surat/cloudinary/upload`,
       formData,
       {
         headers: {
@@ -87,7 +87,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
 
     const { data } = await axios.delete(
-      `${process.env.API_URL}/template-surat?id=${id}`,
+      `${process.env.API_URL}/template-surat/delete?id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

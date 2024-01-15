@@ -33,7 +33,7 @@ export default function DataMasterTemplatePage() {
     mutationFn: async (input: {
       judul: any;
       deskripsi: any;
-      jenis: any;
+      jenis_id: any;
       surat: File;
       thumbnail: File;
     }) => {
@@ -43,7 +43,7 @@ export default function DataMasterTemplatePage() {
         {
           judul: input.judul,
           deskripsi: input.deskripsi,
-          jenis: input.jenis,
+          jenis_id: input.jenis_id,
           surat: input.surat,
           thumbnail: input.thumbnail,
         },
@@ -83,7 +83,7 @@ export default function DataMasterTemplatePage() {
     const data = {
       judul: formData.get("judul"),
       deskripsi: formData.get("deskripsi"),
-      jenis: formData.get("jenis"),
+      jenis_id: formData.get("jenis_id"),
       surat: formData.get("file") as File,
       thumbnail: formData.get("file") as File,
     };
@@ -91,7 +91,7 @@ export default function DataMasterTemplatePage() {
     if (
       !data.judul ||
       !data.deskripsi ||
-      !data.jenis ||
+      !data.jenis_id ||
       !data.surat ||
       !data.thumbnail
     ) {
