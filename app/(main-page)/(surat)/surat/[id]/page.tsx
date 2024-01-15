@@ -53,7 +53,7 @@ export default function SuratSinglePage() {
   });
 
   const handleDownload = async () => {
-    const response = await axios.get(`${singleData?.lokasi_surat}`, {
+    const response = await axios.get(`${singleData?.url}`, {
       responseType: "blob",
     });
     const url = window.URL.createObjectURL(
@@ -93,7 +93,7 @@ export default function SuratSinglePage() {
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
               <div className="h-96 mb-4">
                 <Viewer
-                  fileUrl={singleData?.lokasi_surat}
+                  fileUrl={singleData?.url}
                   defaultScale={SpecialZoomLevel.PageFit}
                 />
               </div>
@@ -121,7 +121,7 @@ export default function SuratSinglePage() {
                 Status
               </span>
               <span className="text-body-sm text-black dark:text-white">
-                {singleData?.status}
+                {singleData?.status[0].status}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -146,7 +146,7 @@ export default function SuratSinglePage() {
                 {singleData?.user_id}
               </span>
             </div>{" "}
-            {singleData?.komentar && (
+            {/* {singleData?.komentar && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-sm font-medium text-black dark:text-white">
                   Komentar
@@ -155,11 +155,11 @@ export default function SuratSinglePage() {
                   {singleData?.komentar}
                 </span>
               </div>
-            )}
+            )} */}
             {((user?.user.role.name == "TU" &&
-              singleData?.status == "didaftar tunggu tu") ||
+              singleData?.status[0].status == "Di Daftar Tunggu TU") ||
               (user?.user.role.name == "Dekan" &&
-                singleData?.status == "disetujui TU")) && (
+                singleData?.status[0].status == "Di Daftar Tunggu Dekan")) && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button className="bg-success w-full" onClick={handleSetuju}>
                   {isLoading ? (

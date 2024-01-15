@@ -15,13 +15,14 @@ export default function UploadSuratPage() {
   const { toast } = useToast();
 
   const { mutate } = useMutation({
-    mutationFn: async (input: { judul: any; surat: File }) => {
+    mutationFn: async (input: { judul: any; surat: File; jenis_id: any }) => {
       setIsLoading(true);
       const response = await axios.post(
         `/api/surat`,
         {
           judul: input.judul,
           surat: input.surat,
+          jenis_id: input.jenis_id,
         },
         {
           headers: {
@@ -58,6 +59,7 @@ export default function UploadSuratPage() {
     const data = {
       judul: formData.get("judul"),
       surat: formData.get("file") as File,
+      jenis_id: 1,
     };
 
     if (!data.judul || !data.surat) {

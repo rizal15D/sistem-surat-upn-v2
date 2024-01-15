@@ -4,7 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { InfoCircledIcon, SwitchIcon, TrashIcon } from "@radix-ui/react-icons";
 import { Badge } from "@/components/ui/badge";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -17,8 +17,6 @@ import { useToast } from "@/components/ui/use-toast";
 export type Periode = {
   id: string;
   tahun: string;
-  semester: string;
-  prodi_id: string;
   status: boolean;
 };
 
@@ -40,18 +38,6 @@ export const columns: ColumnDef<Periode>[] = [
     },
   },
   {
-    accessorKey: "semester",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Semester" />
-    ),
-  },
-  {
-    accessorKey: "prodi_id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID Prodi (Sementara)" />
-    ),
-  },
-  {
     accessorKey: "status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Aktif" />
@@ -65,7 +51,7 @@ export const columns: ColumnDef<Periode>[] = [
           {isAktif ? (
             <Badge className="bg-success">Aktif</Badge>
           ) : (
-            <Badge className="bg-danger">Tidak Aktif</Badge>
+            <Badge className="bg-danger">Nonaktif</Badge>
           )}
         </div>
       );
@@ -108,14 +94,9 @@ export const columns: ColumnDef<Periode>[] = [
       });
 
       const { mutate: mutatePut } = useMutation({
-        mutationFn: async (input: {
-          tahun: string;
-          semester: string;
-          prodi_id: string;
-          status: boolean;
-        }) => {
+        mutationFn: async (input: { tahun: string }) => {
           setIsLoading(true);
-          const { data } = await axios.put(`/api/periode`, {
+          const { data } = await axios.put(`/api/periode/tahun`, {
             id: periode.id,
             input,
           });
@@ -146,12 +127,9 @@ export const columns: ColumnDef<Periode>[] = [
         e.preventDefault();
         const input = {
           tahun: e.currentTarget.tahun.value,
-          semester: e.currentTarget.semester.value,
-          prodi_id: e.currentTarget.prodi_id.value,
-          status: periode.status,
         };
 
-        if (!input.tahun || !input.semester || !input.prodi_id) {
+        if (!input.tahun) {
           toast({
             title: "Gagal mengubah data",
             description: "Data tidak boleh kosong",
@@ -162,6 +140,44 @@ export const columns: ColumnDef<Periode>[] = [
 
         mutatePut(input);
       };
+
+      const { mutate: activation } = useMutation({
+        mutationFn: async () => {
+          if (periode.status) {
+            toast({
+              title: "Gagal mengubah status",
+              description: "Periode sudah aktif",
+              className: "bg-danger text-white",
+            });
+            return;
+          }
+
+          setIsLoading(true);
+          const { data } = await axios.put(`/api/periode/status`, {
+            id: periode.id,
+          });
+          return data;
+        },
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["periode"],
+          });
+          toast({
+            title: "Berhasil mengubah status",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal mengubah status",
+            description: error.message,
+            className: "bg-error text-white",
+          });
+        },
+        onSettled: () => {
+          setIsLoading(false);
+        },
+      });
 
       return (
         // Edit and Delete buttons
@@ -182,6 +198,19 @@ export const columns: ColumnDef<Periode>[] = [
               onClick={() => setModalDeleteOpen(true)}
             >
               <TrashIcon className="h-5 w-5" />
+            </Button>
+            <Button
+              size="sm"
+              className={`{
+                ${
+                  periode.status
+                    ? "bg-danger hover:bg-opacity-90"
+                    : "bg-success hover:bg-opacity-90"
+                } hover:bg-opacity-90 text-white transition-colors duration-200
+              }`}
+              onClick={() => activation()}
+            >
+              <SwitchIcon className="h-5 w-5" />
             </Button>
           </div>
           {modalDeleteOpen && (

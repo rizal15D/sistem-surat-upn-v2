@@ -1,41 +1,41 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { Periode, columns } from "./columns";
-import { DataTable } from "./data-table";
-import Link from "next/link";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useState } from "react";
+
+import { Role, columns } from "./columns";
+import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
-import PeriodeForm from "./periode-form";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import RoleForm from "./jenis-surat-form";
 import { useToast } from "@/components/ui/use-toast";
 
-async function getData(): Promise<Periode[]> {
+async function getData(): Promise<Role[]> {
   // Fetch data from your API here.
-  const response = await axios.get("/api/periode");
+  const response = await axios.get("/api/role");
   return response.data;
 }
 
-export default function DataMasterPeriodePage() {
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading: isPeriodeLoading } = useQuery({
-    queryKey: ["periode"],
+  const { data = [], isLoading: isRoleLoading } = useQuery({
+    queryKey: ["role"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (input: { tahun: string }) => {
+    mutationFn: async (data: { name: string }) => {
       setIsLoading(true);
-      const response = await axios.post(`/api/periode/`, { input });
+      const response = await axios.post(`/api/role/`, data);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prodi"] });
+      queryClient.invalidateQueries({ queryKey: ["role"] });
       setModalCreateOpen(false);
       toast({
         title: "Berhasil menambahkan data",
@@ -44,9 +44,8 @@ export default function DataMasterPeriodePage() {
     },
     onError: (error) => {
       toast({
-        title: "Gagal menambahkan data",
+        title: "Gagal menambah data",
         description: error.message,
-        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -57,14 +56,13 @@ export default function DataMasterPeriodePage() {
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
-      tahun: e.currentTarget.tahun.value,
+      name: e.currentTarget.nama.value,
     };
 
-    if (!data.tahun) {
+    if (!data.name) {
       toast({
-        title: "Gagal menambahkan data",
-        description: "Data tidak boleh kosong",
-        className: "bg-danger text-white",
+        title: "Gagal menambah data",
+        description: "Nama tidak boleh kosong",
       });
       return;
     }
@@ -72,7 +70,7 @@ export default function DataMasterPeriodePage() {
     mutate(data);
   };
 
-  if (isPeriodeLoading) {
+  if (isRoleLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -84,15 +82,15 @@ export default function DataMasterPeriodePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Periode
+          Data Master Role
         </h1>
-        <button
+        <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Periode
-        </button>
+          Tambah Role
+        </Button>
       </div>
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -102,7 +100,7 @@ export default function DataMasterPeriodePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <PeriodeForm onSubmit={handleCreate} isLoading={isLoading} />
+          <RoleForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

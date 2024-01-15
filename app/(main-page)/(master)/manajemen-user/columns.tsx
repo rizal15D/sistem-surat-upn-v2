@@ -18,10 +18,10 @@ export type Users = {
   id: string;
   name: string;
   email: string;
-  role: { id: string; name: string };
-  prodi: { id: string; name: string };
-  fakultas: { id: string; name: string };
   aktif: boolean;
+  prodi: { id: string; name: string };
+  role: { id: string; name: string };
+  fakultas: { id: string; name: string };
 };
 
 export const columns: ColumnDef<Users>[] = [
@@ -130,7 +130,6 @@ export const columns: ColumnDef<Users>[] = [
               aktif: !users.aktif,
             },
           });
-          setIsLoading(false);
           return data;
         },
         onSuccess: (data) => {
@@ -149,6 +148,9 @@ export const columns: ColumnDef<Users>[] = [
             className: "bg-error text-white",
           });
         },
+        onSettled: () => {
+          setIsLoading(false);
+        },
       });
 
       const { mutate: mutateResetPassword } = useMutation({
@@ -163,7 +165,7 @@ export const columns: ColumnDef<Users>[] = [
             queryKey: ["users"],
           });
           setModalResetPasswordOpen(false);
-          setPassword(data.password);
+          setPassword(data.user.password);
           setModalPasswordOpen(true);
           toast({
             title: "Berhasil mereset password",

@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/daftar-surat/upload/cloudinary/v2`,
+      `${process.env.API_URL}/daftar-surat/cloudinary/upload`,
       formData,
       {
         headers: {

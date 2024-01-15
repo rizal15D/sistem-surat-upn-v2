@@ -3,6 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import { Users } from "../../(master)/manajemen-user/columns";
+import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
@@ -10,13 +12,19 @@ import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTabl
 export type Letter = {
   id: number;
   judul: string;
-  pin: boolean;
-  dibaca: boolean;
+  jenis_id: number;
   user_id: number;
   tanggal: Date;
-  status: string;
-  lokasi_surat: string;
-  komentar: string;
+  url: string;
+  tampilan: {
+    pin: boolean;
+    dibaca: boolean;
+  }[];
+  user: Users;
+  status: {
+    status: string;
+    persetujuan: string;
+  }[];
 };
 
 export const columns: ColumnDef<Letter>[] = [
@@ -37,10 +45,14 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
-    accessorKey: "user_id",
+    accessorKey: "user",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User ID" />
+      <DataTableColumnHeader column={column} title="Pembuat Surat" />
     ),
+    cell: ({ row }) => {
+      const user = row.original.user;
+      return <div>{user.name}</div>;
+    },
   },
   {
     accessorKey: "status",
@@ -52,6 +64,11 @@ export const columns: ColumnDef<Letter>[] = [
       return value.some((val: string[]) =>
         val.some((v) => rowValue.includes(v))
       );
+    },
+    cell: ({ row }) => {
+      const status = row.original.status;
+      const statusSurat = status[status.length - 1].status;
+      return <div className="flex items-center space-x-2">{statusSurat}</div>;
     },
   },
   {
