@@ -178,16 +178,16 @@ export default function SuratSinglePage() {
     }
   };
 
-  const handleMenolak = (e?: React.FormEvent<HTMLFormElement>) => {
+  const handleMenolak = () => {
     if (user?.user.role.name == "TU") {
       mutate({
         persetujuan: "Ditolak TU",
-        komentar: e ? e.currentTarget.komentar.value : "Tidak Sesuai",
+        komentar: "Tidak Sesuai",
       });
     } else if (user?.user.role.name == "Dekan") {
       mutate({
         persetujuan: "Ditolak Dekan",
-        komentar: e ? e.currentTarget.komentar.value : "Tidak Sesuai",
+        komentar: "Tidak Sesuai",
       });
     }
   };
