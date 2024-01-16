@@ -18,10 +18,10 @@ export type Users = {
   id: string;
   name: string;
   email: string;
-  role: { id: string; name: string };
-  prodi: { id: string; name: string };
-  fakultas: { id: string; name: string };
   aktif: boolean;
+  prodi: { id: string; name: string };
+  role: { id: string; name: string };
+  fakultas: { id: string; name: string };
 };
 
 export const columns: ColumnDef<Users>[] = [
@@ -114,6 +114,7 @@ export const columns: ColumnDef<Users>[] = [
       const users = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+      const [isLoading, setIsLoading] = useState(false);
 
       const [password, setPassword] = useState("");
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
@@ -122,6 +123,7 @@ export const columns: ColumnDef<Users>[] = [
 
       const { mutate: activation } = useMutation({
         mutationFn: async () => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/users/aktivasi`, {
             id: users.id,
             input: {
@@ -146,9 +148,12 @@ export const columns: ColumnDef<Users>[] = [
             className: "bg-error text-white",
           });
         },
+        onSettled: () => {
+          setIsLoading(false);
+        },
       });
 
-      const { mutate: mutateChangePassword } = useMutation({
+      const { mutate: mutateResetPassword } = useMutation({
         mutationFn: async () => {
           const { data } = await axios.put(`/api/users/reset-password`, {
             id: users.id,
@@ -160,7 +165,7 @@ export const columns: ColumnDef<Users>[] = [
             queryKey: ["users"],
           });
           setModalResetPasswordOpen(false);
-          setPassword(data.password);
+          setPassword(data.user.password);
           setModalPasswordOpen(true);
           toast({
             title: "Berhasil mereset password",
@@ -196,13 +201,19 @@ export const columns: ColumnDef<Users>[] = [
               }`}
               onClick={() => activation()}
             >
-              <SwitchIcon className="h-5 w-5" />
+              {isLoading ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+              ) : (
+                <SwitchIcon className="h-5 w-5" />
+              )}
             </Button>
           </div>
           {modalResetPasswordOpen && (
             <ConfirmationModal
               setModalOpen={setModalResetPasswordOpen}
-              onClick={mutateChangePassword}
+              onClick={mutateResetPassword}
+              title="Reset Password"
+              message={`Apakah anda yakin ingin mereset password user ${users.name} ?`}
             />
           )}
           {modalPasswordOpen && (

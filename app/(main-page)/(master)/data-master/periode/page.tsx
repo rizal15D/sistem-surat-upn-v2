@@ -19,20 +19,18 @@ async function getData(): Promise<Periode[]> {
 
 export default function DataMasterPeriodePage() {
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading: isPeriodeLoading } = useQuery({
     queryKey: ["periode"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (input: {
-      tahun: string;
-      semester: string;
-      prodi_id: string;
-    }) => {
+    mutationFn: async (input: { tahun: string }) => {
+      setIsLoading(true);
       const response = await axios.post(`/api/periode/`, { input });
       return response.data;
     },
@@ -44,17 +42,25 @@ export default function DataMasterPeriodePage() {
         className: "bg-success text-white",
       });
     },
+    onError: (error) => {
+      toast({
+        title: "Gagal menambahkan data",
+        description: error.message,
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
   });
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
       tahun: e.currentTarget.tahun.value,
-      semester: e.currentTarget.semester.value,
-      prodi_id: e.currentTarget.prodi_id.value,
     };
 
-    if (!data.tahun || !data.semester || !data.prodi_id) {
+    if (!data.tahun) {
       toast({
         title: "Gagal menambahkan data",
         description: "Data tidak boleh kosong",
@@ -66,7 +72,7 @@ export default function DataMasterPeriodePage() {
     mutate(data);
   };
 
-  if (isLoading) {
+  if (isPeriodeLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -96,7 +102,7 @@ export default function DataMasterPeriodePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <PeriodeForm onSubmit={handleCreate} />
+          <PeriodeForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

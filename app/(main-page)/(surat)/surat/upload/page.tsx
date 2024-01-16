@@ -11,15 +11,18 @@ export default function UploadSuratPage() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const [warningMessage, setWarningMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const { mutate } = useMutation({
-    mutationFn: async (input: { judul: any; surat: File }) => {
+    mutationFn: async (input: { judul: any; surat: File; jenis_id: any }) => {
+      setIsLoading(true);
       const response = await axios.post(
         `/api/surat`,
         {
           judul: input.judul,
           surat: input.surat,
+          jenis_id: input.jenis_id,
         },
         {
           headers: {
@@ -43,6 +46,9 @@ export default function UploadSuratPage() {
         description: error.message,
       });
     },
+    onSettled: () => {
+      setIsLoading(false);
+    },
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -53,6 +59,7 @@ export default function UploadSuratPage() {
     const data = {
       judul: formData.get("judul"),
       surat: formData.get("file") as File,
+      jenis_id: 1,
     };
 
     if (!data.judul || !data.surat) {
@@ -81,6 +88,7 @@ export default function UploadSuratPage() {
       onSubmit={handleSubmit}
       warningMessage={warningMessage}
       setWarningMessage={setWarningMessage}
+      isLoading={isLoading}
     />
   );
 }

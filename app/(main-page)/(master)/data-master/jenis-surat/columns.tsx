@@ -2,41 +2,35 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
-import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import axios from "axios";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
+import { useState } from "react";
 import Modal from "@/components/Modal/Modal";
-import ProdiForm from "./prodi-form";
+import RoleForm from "./jenis-surat-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { useToast } from "@/components/ui/use-toast";
 
-export type Prodi = {
-  id: string;
-  name: string;
-  kode_prodi: string;
-  fakultas_id: string;
+export type Jenis = {
+  id: number;
+  jenis: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
-export const columns: ColumnDef<Prodi>[] = [
+export const columns: ColumnDef<Jenis>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "jenis",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nama" />
     ),
   },
   {
-    accessorKey: "kode_prodi",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kode Prodi" />
-    ),
-  },
-  {
     id: "actions",
     cell: ({ row }) => {
-      const prodi = row.original;
+      const jenis = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
@@ -46,14 +40,14 @@ export const columns: ColumnDef<Prodi>[] = [
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
-          const { data } = await axios.delete(`/api/prodi`, {
-            data: { id: prodi.id },
+          const { data } = await axios.delete(`/api/jenis-surat`, {
+            data: { id: jenis.id },
           });
           return data;
         },
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ["prodi"],
+            queryKey: ["jenis-surat"],
           });
           setModalDeleteOpen(false);
           toast({
@@ -63,28 +57,24 @@ export const columns: ColumnDef<Prodi>[] = [
         },
         onError: (error) => {
           toast({
-            title: "Gagal",
+            title: "Gagal menghapus data",
             description: error.message,
           });
         },
       });
 
       const { mutate: mutatePut } = useMutation({
-        mutationFn: async (input: {
-          name: any;
-          kode_prodi: string;
-          fakultas_id: string;
-        }) => {
+        mutationFn: async (input: { id: number; jenis: any }) => {
           setIsLoading(true);
-          const { data } = await axios.put(`/api/prodi`, {
-            id: prodi.id,
+          const { data } = await axios.put(`/api/jenis-surat`, {
+            id: jenis.id,
             input,
           });
           return data;
         },
         onSuccess: () => {
           queryClient.invalidateQueries({
-            queryKey: ["prodi"],
+            queryKey: ["jenis-surat"],
           });
           setModalEditOpen(false);
           toast({
@@ -94,7 +84,7 @@ export const columns: ColumnDef<Prodi>[] = [
         },
         onError: (error) => {
           toast({
-            title: "Gagal",
+            title: "Gagal mengubah data",
             description: error.message,
           });
         },
@@ -106,16 +96,14 @@ export const columns: ColumnDef<Prodi>[] = [
       const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const input = {
-          name: e.currentTarget.nama.value,
-          kode_prodi: e.currentTarget.kode_prodi.value,
-          fakultas_id: e.currentTarget.fakultas_id.value,
+          id: jenis.id,
+          jenis: e.currentTarget.jenis.value,
         };
 
-        if (!input.name || !input.kode_prodi || !input.fakultas_id) {
+        if (!input.jenis) {
           toast({
             title: "Gagal mengubah data",
             description: "Data tidak boleh kosong",
-            className: "bg-danger text-white",
           });
           return;
         }
@@ -143,26 +131,26 @@ export const columns: ColumnDef<Prodi>[] = [
               <TrashIcon className="h-5 w-5" />
             </Button>
           </div>
+          {modalEditOpen && (
+            <Modal setModalOpen={setModalEditOpen}>
+              <RoleForm
+                onSubmit={handleEdit}
+                values={jenis}
+                isLoading={isLoading}
+              />
+            </Modal>
+          )}
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
               onClick={() => {
                 mutateDelete();
               }}
-              title="Hapus Prodi"
-              message={`Apakah anda yakin ingin menghapus prodi ${
-                prodi.name || "ini"
+              title="Hapus jenis surat"
+              message={`Apakah anda yakin ingin menghapus jenis surat ${
+                jenis.jenis || "ini"
               }?`}
             />
-          )}
-          {modalEditOpen && (
-            <Modal setModalOpen={setModalEditOpen}>
-              <ProdiForm
-                onSubmit={handleEdit}
-                values={prodi}
-                isLoading={isLoading}
-              />
-            </Modal>
           )}
         </>
       );

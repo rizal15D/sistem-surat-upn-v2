@@ -45,6 +45,7 @@ export const columns: ColumnDef<Fakultas>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const fakultas = row.original;
+      const [isLoading, setIsLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
@@ -81,6 +82,7 @@ export const columns: ColumnDef<Fakultas>[] = [
           jenjang: string;
           kode_fakultas: string;
         }) => {
+          setIsLoading(true);
           const { data } = await axios.put(`/api/fakultas`, {
             id: fakultas.id,
             input,
@@ -103,6 +105,9 @@ export const columns: ColumnDef<Fakultas>[] = [
             title: "Gagal mengubah data",
             description: error.message,
           });
+        },
+        onSettled: () => {
+          setIsLoading(false);
         },
       });
 
@@ -147,7 +152,11 @@ export const columns: ColumnDef<Fakultas>[] = [
           </div>
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
-              <FakultasForm onSubmit={handleEdit} values={fakultas} />
+              <FakultasForm
+                onSubmit={handleEdit}
+                values={fakultas}
+                isLoading={isLoading}
+              />
             </Modal>
           )}
           {modalDeleteOpen && (
@@ -156,6 +165,10 @@ export const columns: ColumnDef<Fakultas>[] = [
               onClick={() => {
                 mutateDelete();
               }}
+              title="Hapus Fakultas"
+              message={`Apakah anda yakin ingin menghapus fakultas ${
+                fakultas.name || "ini"
+              }?`}
             />
           )}
         </>

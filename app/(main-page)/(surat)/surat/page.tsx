@@ -2,12 +2,13 @@
 
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { Letter, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
-import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 async function getData(): Promise<Letter[]> {
   // Fetch data from your API here.
@@ -20,6 +21,9 @@ async function getData(): Promise<Letter[]> {
 }
 
 export default function ListSuratPage() {
+  const session = useSession();
+  const user = session.data?.user as User;
+
   const { data = [], isLoading } = useQuery({
     queryKey: ["surat"],
     queryFn: getData,
@@ -39,13 +43,15 @@ export default function ListSuratPage() {
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat
         </h1>
-        <Link
-          href="/surat/upload"
-          className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
-        >
-          <PlusIcon className="w-4 h-4 mr-2" />
-          Upload Surat
-        </Link>
+        {(user.user.role.name === "Prodi" || user.user.role.name === "TU") && (
+          <Link
+            href="/surat/upload"
+            className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+          >
+            <PlusIcon className="w-4 h-4 mr-2" />
+            Upload Surat
+          </Link>
+        )}
       </div>
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">

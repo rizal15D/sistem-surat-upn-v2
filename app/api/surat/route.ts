@@ -32,7 +32,36 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/daftar-surat/upload/cloudinary/v2`,
+      `${process.env.API_URL}/daftar-surat/cloudinary/upload`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  if (session) {
+    const formData = await req.formData();
+    const id = formData.get("id");
+    formData.delete("id");
+
+    const { data } = await axios.put(
+      `${process.env.API_URL}/daftar-surat/cloudinary/update?surat_id=${id}`,
       formData,
       {
         headers: {

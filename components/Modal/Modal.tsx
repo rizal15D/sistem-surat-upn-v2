@@ -16,7 +16,7 @@ export default function Modal({
         setModalOpen(false);
       }}
     >
-      <div className="bg-white shadow-default dark:bg-boxdark relative w-[50%] max-h-[85%] overflow-y-auto rounded-lg">
+      <div className="bg-white shadow-default dark:bg-boxdark relative lg:w-[50%] lg:max-h-[85%] sm:w-[100%] sm:max-h-[100%] overflow-y-auto rounded-lg">
         <div
           onClick={() => setModalOpen(false)}
           className="absolute top-0 right-0 m-4 cursor-pointer"

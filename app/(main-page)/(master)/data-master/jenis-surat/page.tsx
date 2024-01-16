@@ -2,61 +2,40 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useState } from "react";
 
-import { Template, columns } from "./columns";
+import { Jenis, columns } from "./columns";
 import { DataTable } from "./data-table";
-import TemplateForm from "./template-form";
 import Modal from "@/components/Modal/Modal";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import JenisForm from "./jenis-surat-form";
 import { useToast } from "@/components/ui/use-toast";
 
-async function getData(): Promise<Template[]> {
+async function getData(): Promise<Jenis[]> {
   // Fetch data from your API here.
-  const response = await axios.get("/api/template");
+  const response = await axios.get("/api/jenis-surat");
   return response.data;
 }
 
-export default function DataMasterTemplatePage() {
-  const { toast } = useToast();
+export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
-
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading: isTemplateLoading } = useQuery({
-    queryKey: ["template"],
+  const { data = [], isLoading: isJenisLoading } = useQuery({
+    queryKey: ["jenis-surat"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (input: {
-      judul: any;
-      deskripsi: any;
-      jenis_id: any;
-      surat: File;
-      thumbnail: File;
-    }) => {
+    mutationFn: async (input: { jenis: string }) => {
       setIsLoading(true);
-      const response = await axios.post(
-        `/api/template`,
-        {
-          judul: input.judul,
-          deskripsi: input.deskripsi,
-          jenis_id: input.jenis_id,
-          surat: input.surat,
-          thumbnail: input.thumbnail,
-        },
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`/api/jenis-surat/`, { input });
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["template"] });
+      queryClient.invalidateQueries({ queryKey: ["jenis-surat"] });
       setModalCreateOpen(false);
       toast({
         title: "Berhasil menambahkan data",
@@ -65,9 +44,8 @@ export default function DataMasterTemplatePage() {
     },
     onError: (error) => {
       toast({
-        title: "Gagal",
+        title: "Gagal menambah data",
         description: error.message,
-        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -75,39 +53,16 @@ export default function DataMasterTemplatePage() {
     },
   });
 
-  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const formData = new FormData(e.currentTarget);
-
     const data = {
-      judul: formData.get("judul"),
-      deskripsi: formData.get("deskripsi"),
-      jenis_id: formData.get("jenis_id"),
-      surat: formData.get("file") as File,
-      thumbnail: formData.get("file") as File,
+      jenis: e.currentTarget.jenis.value,
     };
 
-    if (
-      !data.judul ||
-      !data.deskripsi ||
-      !data.jenis_id ||
-      !data.surat ||
-      !data.thumbnail
-    ) {
+    if (!data.jenis) {
       toast({
-        title: "Gagal menambahkan data",
+        title: "Gagal menambah data",
         description: "Data tidak boleh kosong",
-        className: "bg-danger text-white",
-      });
-      return;
-    }
-
-    if (warningMessage) {
-      toast({
-        title: "Gagal menambahkan data",
-        description: warningMessage,
-        className: "bg-danger text-white",
       });
       return;
     }
@@ -115,7 +70,7 @@ export default function DataMasterTemplatePage() {
     mutate(data);
   };
 
-  if (isTemplateLoading) {
+  if (isJenisLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -127,15 +82,15 @@ export default function DataMasterTemplatePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Template
+          Data Master Jenis Surat
         </h1>
-        <button
+        <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Template
-        </button>
+          Tambah Jenis Surat
+        </Button>
       </div>
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -145,12 +100,7 @@ export default function DataMasterTemplatePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <TemplateForm
-            onSubmit={handleCreate}
-            warningMessage={warningMessage}
-            setWarningMessage={setWarningMessage}
-            isLoading={isLoading}
-          />
+          <JenisForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

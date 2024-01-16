@@ -1,15 +1,15 @@
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions, User } from "../auth/[...nextauth]/authOptions";
 import axios from "axios";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
 
   if (session) {
-    const { data } = await axios.get(`${process.env.API_URL}/template-surat`, {
+    const { data } = await axios.get(`${process.env.API_URL}/jenis`, {
       headers: {
         Authorization: `Bearer ${session.user?.accessToken}`,
       },
@@ -28,19 +28,21 @@ export async function POST(req: NextRequest) {
     user: User;
   } | null;
 
-  if (session) {
-    const formData = await req.formData();
+  const { input } = await req.json();
 
+  if (session) {
     const { data } = await axios.post(
-      `${process.env.API_URL}/template-surat/cloudinary/upload`,
-      formData,
+      `${process.env.API_URL}/jenis`,
+      {
+        jenis: input.jenis,
+      },
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
-          "Content-Type": "multipart/form-data",
         },
       }
     );
+
     return NextResponse.json(data);
   } else {
     return NextResponse.json({
@@ -54,18 +56,17 @@ export async function PUT(req: NextRequest) {
     user: User;
   } | null;
 
-  if (session) {
-    const formData = await req.formData();
-    const id = formData.get("id");
-    formData.delete("id");
+  const { id, input } = await req.json();
 
+  if (session) {
     const { data } = await axios.put(
-      `${process.env.API_URL}/template-surat/update/cloudinary?id=${id}`,
-      formData,
+      `${process.env.API_URL}/jenis?id=${id}`,
+      {
+        jenis: input.jenis,
+      },
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
-          "Content-Type": "multipart/form-data",
         },
       }
     );
@@ -83,11 +84,11 @@ export async function DELETE(req: NextRequest) {
     user: User;
   } | null;
 
-  if (session) {
-    const { id } = await req.json();
+  const { id } = await req.json();
 
+  if (session) {
     const { data } = await axios.delete(
-      `${process.env.API_URL}/template-surat/delete?id=${id}`,
+      `${process.env.API_URL}/jenis?id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
