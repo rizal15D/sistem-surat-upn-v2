@@ -28,7 +28,7 @@ export default function SuratSinglePage() {
     : null;
 
   const { mutate } = useMutation({
-    mutationFn: async (input: { status: string; persetujuan: string }) => {
+    mutationFn: async (input: { persetujuan: string }) => {
       setIsLoading(true);
       const response = await axios.put(`/api/surat/persetujuan`, { id, input });
       return response.data;
@@ -71,17 +71,17 @@ export default function SuratSinglePage() {
 
   const handleSetuju = () => {
     if (user?.user.role.name == "TU") {
-      mutate({ status: "disetujui TU", persetujuan: "disetujui TU" });
+      mutate({ persetujuan: "Disetujui TU" });
     } else if (user?.user.role.name == "Dekan") {
-      mutate({ status: "disetujui Dekan", persetujuan: "disetujui Dekan" });
+      mutate({ persetujuan: "Disetujui Dekan" });
     }
   };
 
   const handleMenolak = () => {
     if (user?.user.role.name == "TU") {
-      mutate({ status: "ditolak TU", persetujuan: "ditolak TU" });
+      mutate({ persetujuan: "ditolak TU" });
     } else if (user?.user.role.name == "Dekan") {
-      mutate({ status: "ditolak Dekan", persetujuan: "ditolak Dekan" });
+      mutate({ persetujuan: "ditolak Dekan" });
     }
   };
 

@@ -12,9 +12,8 @@ export async function PUT(req: NextRequest) {
     const { id, input } = await req.json();
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/daftar-surat/persetujuan?id=${id}`,
+      `${process.env.API_URL}/status?surat_id=${id}`,
       {
-        status: input.status,
         persetujuan: input.persetujuan,
       },
       {

@@ -71,7 +71,7 @@ export const columns: ColumnDef<Letter>[] = [
     },
     cell: ({ row }) => {
       const status = row.original.status;
-      const statusSurat = status[status.length - 1].status;
+      const statusSurat = status[0]?.status;
       return <div className="flex items-center space-x-2">{statusSurat}</div>;
     },
   },
