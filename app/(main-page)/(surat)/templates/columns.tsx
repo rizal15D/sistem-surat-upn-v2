@@ -16,8 +16,11 @@ export type Template = {
   id: number;
   judul: string;
   deskripsi: string;
-  lokasi: string;
-  jenis: string;
+  url: string;
+  jenis: {
+    id: number;
+    jenis: string;
+  };
 };
 
 export const columns: ColumnDef<Template>[] = [
@@ -43,9 +46,6 @@ export const columns: ColumnDef<Template>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Deskripsi" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string).includes(value);
-    },
   },
   {
     accessorKey: "jenis",
@@ -58,6 +58,10 @@ export const columns: ColumnDef<Template>[] = [
         val.some((v) => rowValue.includes(v))
       );
     },
+    cell: ({ row }) => {
+      const template = row.original as Template;
+      return <div>{template.jenis.jenis}</div>;
+    },
   },
   {
     id: "actions",
@@ -65,7 +69,7 @@ export const columns: ColumnDef<Template>[] = [
       const template = row.original as Template;
 
       const handleDownload = async () => {
-        const response = await axios.get(`${template.lokasi}`, {
+        const response = await axios.get(`${template.url}`, {
           responseType: "blob",
         });
 
