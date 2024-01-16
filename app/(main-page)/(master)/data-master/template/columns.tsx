@@ -98,7 +98,7 @@ export const columns: ColumnDef<Template>[] = [
           judul: any;
           surat: File;
           thumbnail: File;
-          jenis: any;
+          jenis_id: any;
           deskripsi: any;
         }) => {
           setIsLoading(true);
@@ -109,7 +109,7 @@ export const columns: ColumnDef<Template>[] = [
               judul: input.judul,
               surat: input.surat,
               thumbnail: input.thumbnail,
-              jenis: input.jenis,
+              jenis_id: input.jenis_id,
               deskripsi: input.deskripsi,
             },
             {
@@ -150,8 +150,7 @@ export const columns: ColumnDef<Template>[] = [
 
         if (
           !formData.get("judul") ||
-          !formData.get("file") ||
-          !formData.get("jenis") ||
+          !formData.get("jenis_id") ||
           !formData.get("deskripsi")
         ) {
           toast({
@@ -175,7 +174,7 @@ export const columns: ColumnDef<Template>[] = [
           judul: formData.get("judul"),
           surat: formData.get("file") as File,
           thumbnail: formData.get("file") as File,
-          jenis: formData.get("jenis"),
+          jenis_id: formData.get("jenis_id"),
           deskripsi: formData.get("deskripsi"),
         });
       };
