@@ -1,17 +1,24 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Letter } from "../columns";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { CheckIcon, Cross2Icon, DownloadIcon } from "@radix-ui/react-icons";
+import {
+  CheckIcon,
+  Cross2Icon,
+  DownloadIcon,
+  UploadIcon,
+} from "@radix-ui/react-icons";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import Modal from "@/components/Modal/Modal";
+import SuratForm from "../surat-form";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -20,16 +27,42 @@ export default function SuratSinglePage() {
   const session = useSession();
   const user = session.data?.user as User;
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isMenolakLoading, setIsMenolakLoading] = useState(false);
+  const [isSetujuLoading, setIsSetujuLoading] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [isUploadLoading, setIsUploadLoading] = useState(false);
+  const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
 
   const allData = queryClient.getQueryData<Letter[]>(["surat"]);
   const singleData = allData
     ? allData.find((item) => item.id === Number(id))
     : null;
 
+  const getKomentar = async () => {
+    const response = await axios.get(`/api/surat/komentar`, {
+      params: { id },
+    });
+    return response.data;
+  };
+
+  const { data: komentar } = useQuery({
+    queryKey: ["komentar", id],
+    queryFn: getKomentar,
+    enabled: !!id,
+  });
+
   const { mutate } = useMutation({
-    mutationFn: async (input: { persetujuan: string }) => {
-      setIsLoading(true);
+    mutationFn: async (input: { persetujuan: string; komentar?: string }) => {
+      if (input.komentar) {
+        setIsMenolakLoading(true);
+        await axios.post(`/api/surat/komentar`, {
+          id,
+          input: { komentar: input.komentar },
+        });
+      } else {
+        setIsSetujuLoading(true);
+      }
       const response = await axios.put(`/api/surat/persetujuan`, { id, input });
       return response.data;
     },
@@ -48,7 +81,8 @@ export default function SuratSinglePage() {
       });
     },
     onSettled: () => {
-      setIsLoading(false);
+      setIsMenolakLoading(false);
+      setIsSetujuLoading(false);
     },
   });
 
@@ -69,6 +103,73 @@ export default function SuratSinglePage() {
     link.remove();
   };
 
+  const { mutate: mutateUpload } = useMutation({
+    mutationFn: async (input: { id: any; surat: File }) => {
+      setIsUploadLoading(true);
+      const response = await axios.put(
+        `/api/surat/`,
+        {
+          id,
+          surat: input.surat,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      router.push("/surat");
+      toast({
+        title: "Berhasil",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsUploadLoading(false);
+    },
+  });
+
+  const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const data = {
+      id,
+      surat: formData.get("file") as File,
+    };
+
+    if (!data.surat) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    if (warningMessage) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: warningMessage,
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    mutateUpload(data);
+  };
+
   const handleSetuju = () => {
     if (user?.user.role.name == "TU") {
       mutate({ persetujuan: "Disetujui TU" });
@@ -77,11 +178,17 @@ export default function SuratSinglePage() {
     }
   };
 
-  const handleMenolak = () => {
+  const handleMenolak = (e?: React.FormEvent<HTMLFormElement>) => {
     if (user?.user.role.name == "TU") {
-      mutate({ persetujuan: "ditolak TU" });
+      mutate({
+        persetujuan: "Ditolak TU",
+        komentar: e ? e.currentTarget.komentar.value : "Tidak Sesuai",
+      });
     } else if (user?.user.role.name == "Dekan") {
-      mutate({ persetujuan: "ditolak Dekan" });
+      mutate({
+        persetujuan: "Ditolak Dekan",
+        komentar: e ? e.currentTarget.komentar.value : "Tidak Sesuai",
+      });
     }
   };
 
@@ -146,38 +253,47 @@ export default function SuratSinglePage() {
                 {singleData?.user.name}, {singleData?.user.role.name}
               </span>
             </div>{" "}
-            {/* {singleData?.komentar && (
+            {/* {
               <div className="flex flex-col space-y-1">
                 <span className="text-title-sm font-medium text-black dark:text-white">
                   Komentar
                 </span>
-                <span className="text-body-sm text-black dark:text-white">
-                  {singleData?.komentar}
-                </span>
+                {komentar?.map((item) => (
+                  <span className="text-body-sm text-black dark:text-white">
+                    
+                  </span>
+                ))}
               </div>
-            )} */}
+            } */}
             {((user?.user.role.name == "TU" &&
               singleData?.status[0].status == "Di Daftar Tunggu TU") ||
               (user?.user.role.name == "Dekan" &&
                 singleData?.status[0].status == "Di Daftar Tunggu Dekan")) && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button className="bg-success w-full" onClick={handleSetuju}>
-                  {isLoading ? (
+                  {isSetujuLoading ? (
                     <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
                   ) : (
                     <CheckIcon className="w-6 h-6" />
                   )}
                 </Button>
                 <Button onClick={handleMenolak} className="bg-danger w-full">
-                  {isLoading ? (
-                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
-                  ) : (
-                    <Cross2Icon className="w-6 h-6" />
-                  )}
+                  <Cross2Icon className="w-6 h-6" />
                 </Button>
               </div>
             )}
-            <div className="flex w-full text-white">
+            <div className="flex gap-4 w-full text-white">
+              {user?.user.role.name == "Admin Dekan" &&
+                singleData?.status[0].status == "Diproses Admin Dekan" && (
+                  <Button
+                    className="bg-primary w-full"
+                    onClick={() => {
+                      setUploadModalOpen(true);
+                    }}
+                  >
+                    <UploadIcon className="w-6 h-6" />
+                  </Button>
+                )}
               <Button className="bg-primary w-full" onClick={handleDownload}>
                 <DownloadIcon className="w-6 h-6" />
               </Button>
@@ -185,6 +301,48 @@ export default function SuratSinglePage() {
           </div>
         </div>
       </div>
+      {uploadModalOpen && (
+        <Modal setModalOpen={setUploadModalOpen}>
+          <SuratForm
+            onSubmit={handleUpload}
+            warningMessage={warningMessage}
+            setWarningMessage={setWarningMessage}
+            isLoading={isUploadLoading}
+            isAdminDekan={true}
+          />
+        </Modal>
+      )}
+      {/* {modalMenolakOpen && (
+        <Modal setModalOpen={setModalMenolakOpen}>
+          <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+              <h3 className="font-medium text-black dark:text-white">
+                Masukkan Komentar
+              </h3>
+            </div>
+            <form onSubmit={handleMenolak}>
+              <div className="p-6.5">
+                <div className="mb-4.5">
+                  <input
+                    name="komentar"
+                    type="text"
+                    placeholder="Masukkan komentar"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+
+                <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
+                  {isMenolakLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    "Kirim Komentar"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </Modal>
+      )} */}
     </div>
   );
 }
