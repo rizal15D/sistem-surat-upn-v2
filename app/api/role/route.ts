@@ -72,12 +72,12 @@ export async function PUT(req: NextRequest) {
     );
 
     const { data: data2 } = await axios.put(
-      `${process.env.API_URL}/permission?jabatan_id=${id}`,
+      `${process.env.API_URL}/permision?jabatan_id=${id}`,
       {
         buat_surat: input.buat_surat,
         download_surat: input.download_surat,
         generate_nomor_surat: input.generate_nomor_surat,
-        upload_tanda_tangan: input.upload_tanda_tangan,
+        upload_tandatangan: input.upload_tandatangan,
         persetujuan: input.persetujuan,
       },
       {
@@ -87,7 +87,24 @@ export async function PUT(req: NextRequest) {
       }
     );
 
-    return NextResponse.json([data1, data2]);
+    const { data: data3 } = await axios.put(
+      `${process.env.API_URL}/akses-master?jabatan_id=${id}`,
+      {
+        prodi: input.prodi,
+        template: input.template,
+        periode: input.periode,
+        fakultas: input.fakultas,
+        jabatan: input.jabatan,
+        jenis_surat: input.jenis_surat,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+      }
+    );
+
+    return NextResponse.json([data1, data2, data3]);
   } else {
     return NextResponse.json({
       error: "Unauthorized",

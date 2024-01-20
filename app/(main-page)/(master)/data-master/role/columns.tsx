@@ -26,7 +26,7 @@ export type Role = {
     buat_surat: boolean;
     download_surat: boolean;
     generate_nomor_surat: boolean;
-    upload_tanda_tangan: boolean;
+    upload_tandatangan: boolean;
     persetujuan: boolean;
     akses_master: {
       id: number;
@@ -90,7 +90,7 @@ export const columns: ColumnDef<Role>[] = [
           </div>
           <div className="flex gap-2">
             <span>
-              {role.permision.upload_tanda_tangan ? (
+              {role.permision.upload_tandatangan ? (
                 <CheckIcon className="h-5 w-5 text-success" />
               ) : (
                 <Cross2Icon className="h-5 w-5 text-danger" />
@@ -113,7 +113,7 @@ export const columns: ColumnDef<Role>[] = [
     },
   },
   {
-    accessorKey: "permision",
+    accessorKey: "permision2",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Akses Master" />
     ),
@@ -277,7 +277,21 @@ export const columns: ColumnDef<Role>[] = [
         e.preventDefault();
         const input = {
           id: role.id,
+          // edit role
           name: e.currentTarget.nama.value,
+          // edit permision
+          buat_surat: e.currentTarget.buat_surat.checked,
+          download_surat: e.currentTarget.download_surat.checked,
+          generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
+          upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
+          persetujuan: e.currentTarget.persetujuan.checked,
+          // edit akses master
+          prodi: e.currentTarget.prodi.checked,
+          template: e.currentTarget.template.checked,
+          periode: e.currentTarget.periode.checked,
+          fakultas: e.currentTarget.fakultas.checked,
+          jabatan: e.currentTarget.jabatan.checked,
+          jenis_surat: e.currentTarget.jenis_surat.checked,
         };
 
         if (!input.name) {
