@@ -28,13 +28,25 @@ export async function POST(req: NextRequest) {
     user: User;
   } | null;
 
-  const { name } = await req.json();
+  const { input } = await req.json();
 
   if (session) {
     const { data } = await axios.post(
-      `${process.env.API_URL}/jabatan`,
+      `${process.env.API_URL}/jabatan/postAll`,
       {
-        name,
+        name: input.name,
+        jabatan_atas_id: null,
+        buat_surat: input.buat_surat,
+        download_surat: input.download_surat,
+        generate_nomor_surat: input.generate_nomor_surat,
+        upload_tandatangan: input.upload_tandatangan,
+        persetujuan: input.persetujuan,
+        prodi: input.prodi,
+        template: input.template,
+        periode: input.periode,
+        fakultas: input.fakultas,
+        jabatan: input.jabatan,
+        jenis_surat: input.jenis_surat,
       },
       {
         headers: {

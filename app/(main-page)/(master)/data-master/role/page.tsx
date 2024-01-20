@@ -40,9 +40,9 @@ export default function DataMasterRolePage() {
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (input: { name: string }) => {
       setIsLoading(true);
-      const response = await axios.post(`/api/role/`, data);
+      const response = await axios.post(`/api/role/`, { input });
       return response.data;
     },
     onSuccess: () => {
@@ -69,6 +69,19 @@ export default function DataMasterRolePage() {
     e.preventDefault();
     const data = {
       name: e.currentTarget.nama.value,
+      // edit permision
+      buat_surat: e.currentTarget.buat_surat.checked,
+      download_surat: e.currentTarget.download_surat.checked,
+      generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
+      upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
+      persetujuan: e.currentTarget.persetujuan.checked,
+      // edit akses master
+      prodi: e.currentTarget.prodi.checked,
+      template: e.currentTarget.template.checked,
+      periode: e.currentTarget.periode.checked,
+      fakultas: e.currentTarget.fakultas.checked,
+      jabatan: e.currentTarget.jabatan.checked,
+      jenis_surat: e.currentTarget.jenis_surat.checked,
     };
 
     if (!data.name) {

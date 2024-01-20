@@ -238,6 +238,7 @@ export const columns: ColumnDef<Role>[] = [
           toast({
             title: "Gagal menghapus data",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
       });
