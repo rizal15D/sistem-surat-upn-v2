@@ -10,11 +10,13 @@ export interface User extends NextAuthUser {
     id: number;
     name: string;
     email: string;
-    fakultas: {
+    aktif: boolean;
+    jabatan: {
       id: number;
       name: string;
+      permission: [];
     };
-    role: {
+    fakultas: {
       id: number;
       name: string;
     };
@@ -22,6 +24,13 @@ export interface User extends NextAuthUser {
       id: number;
       name: string;
     };
+  };
+  jabatan: {
+    id: number;
+    name: string;
+    jabatan_atas_id: null | number;
+    permission: [];
+    jabatan_atas: null;
   };
 }
 
@@ -44,6 +53,7 @@ export const authOptions: NextAuthOptions = {
           id: response.data.user_response.id,
           accessToken: response.data.token,
           user: response.data.user_response,
+          jabatan: response.data.jabatan,
         };
       },
     }),

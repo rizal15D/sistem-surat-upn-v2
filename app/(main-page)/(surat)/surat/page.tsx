@@ -43,7 +43,8 @@ export default function ListSuratPage() {
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat
         </h1>
-        {(user.user.role.name === "Prodi" || user.user.role.name === "TU") && (
+        {(user.user.jabatan.name === "Prodi" ||
+          user.user.jabatan.name === "TU") && (
           <Link
             href="/surat/upload"
             className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"

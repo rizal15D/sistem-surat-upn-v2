@@ -15,7 +15,10 @@ export default async function Layout({
   return (
     <TanstackQueryProvider>
       <ReactQueryDevtools initialIsOpen={false} />
-      <ClientBody session={session}>{children}</ClientBody>
+      <ClientBody session={session}>
+        {JSON.stringify(session, null, 2)}
+        {children}
+      </ClientBody>
     </TanstackQueryProvider>
   );
 }

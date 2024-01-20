@@ -50,7 +50,7 @@ export default function ManajemenUserPage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
-        className: "bg-error text-white",
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {

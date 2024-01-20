@@ -20,7 +20,7 @@ export type Users = {
   email: string;
   aktif: boolean;
   prodi: { id: string; name: string };
-  role: { id: string; name: string };
+  jabatan: { id: string; name: string; jabatan_atas_id: number };
   fakultas: { id: string; name: string };
 };
 
@@ -43,15 +43,15 @@ export const columns: ColumnDef<Users>[] = [
     ),
   },
   {
-    accessorKey: "role",
+    accessorKey: "jabatan",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Role" />
+      <DataTableColumnHeader column={column} title="Jabatan" />
     ),
     cell: ({ row }) => {
-      const role = row.getValue("role") as { name: string };
+      const jabatan = row.getValue("jabatan") as { name: string };
       return (
         <div className="flex items-center space-x-2">
-          <span>{role.name}</span>
+          <span>{jabatan.name}</span>
         </div>
       );
     },

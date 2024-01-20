@@ -11,7 +11,7 @@ export default function RoleForm({
     <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
       <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
         <h3 className="font-medium text-black dark:text-white">
-          {values ? "Edit Role" : "Tambah Role"}
+          {values ? "Edit Jabatan" : "Tambah Jabatan"}
         </h3>
       </div>
       <form onSubmit={onSubmit}>
@@ -24,7 +24,7 @@ export default function RoleForm({
               name="nama"
               type="text"
               defaultValue={values?.name}
-              placeholder={values ? values.name : "Masukkan nama role"}
+              placeholder={values ? values.name : "Masukkan nama jabatan"}
               className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
             />
           </div>
@@ -33,9 +33,9 @@ export default function RoleForm({
             {isLoading ? (
               <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
             ) : values ? (
-              "Edit Role"
+              "Edit Jabatan"
             ) : (
-              "Tambah Role"
+              "Tambah Jabatan"
             )}
           </button>
         </div>

@@ -76,7 +76,7 @@ export default function UserForm({
 
           <div className="mb-4.5">
             <label className="mb-3 block text-black dark:text-white">
-              Role
+              Jabatan
             </label>
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select

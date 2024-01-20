@@ -46,6 +46,7 @@ export default function DataMasterRolePage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -82,14 +83,14 @@ export default function DataMasterRolePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Role
+          Data Master Jabatan
         </h1>
         <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Role
+          Tambah Jabatan
         </Button>
       </div>
 

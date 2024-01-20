@@ -149,6 +149,7 @@ export const columns: ColumnDef<Template>[] = [
         const formData = new FormData(e.currentTarget);
 
         if (
+          !formData.get("file") ||
           !formData.get("judul") ||
           !formData.get("jenis_id") ||
           !formData.get("deskripsi")
