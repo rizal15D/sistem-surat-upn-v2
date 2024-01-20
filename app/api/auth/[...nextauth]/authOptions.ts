@@ -29,7 +29,23 @@ export interface User extends NextAuthUser {
     id: number;
     name: string;
     jabatan_atas_id: null | number;
-    permission: [];
+    permision: {
+      id: number;
+      buat_surat: boolean;
+      download_surat: boolean;
+      generate_nomor_surat: boolean;
+      upload_tandatangan: boolean;
+      persetujuan: boolean;
+      akses_master: {
+        id: number;
+        prodi: boolean;
+        template: boolean;
+        periode: boolean;
+        fakultas: boolean;
+        jabatan: boolean;
+        jenis_surat: boolean;
+      };
+    };
     jabatan_atas: null;
   };
 }

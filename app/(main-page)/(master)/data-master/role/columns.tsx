@@ -265,6 +265,7 @@ export const columns: ColumnDef<Role>[] = [
           toast({
             title: "Gagal mengubah data",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
         onSettled: () => {

@@ -9,6 +9,9 @@ import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import FakultasForm from "./fakultas-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useSession } from "next-auth/react";
 
 async function getData(): Promise<Fakultas[]> {
   // Fetch data from your API here.
@@ -19,6 +22,14 @@ async function getData(): Promise<Fakultas[]> {
 export default function DataMasterFakultasPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.fakultas) {
+    const router = useRouter();
+    router.push("/surat");
+  }
+
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 

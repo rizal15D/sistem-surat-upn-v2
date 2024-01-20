@@ -10,6 +10,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import RoleForm from "./role-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<Role[]> {
   // Fetch data from your API here.
@@ -19,8 +22,16 @@ async function getData(): Promise<Role[]> {
 
 export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.jabatan) {
+    const router = useRouter();
+    router.push("/surat");
+  }
+
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data = [], isLoading: isRoleLoading } = useQuery({

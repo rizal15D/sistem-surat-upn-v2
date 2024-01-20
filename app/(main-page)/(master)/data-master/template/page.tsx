@@ -9,6 +9,9 @@ import { DataTable } from "./data-table";
 import TemplateForm from "./template-form";
 import Modal from "@/components/Modal/Modal";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
@@ -19,6 +22,13 @@ async function getData(): Promise<Template[]> {
 export default function DataMasterTemplatePage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.template) {
+    const router = useRouter();
+    router.push("/surat");
+  }
 
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
