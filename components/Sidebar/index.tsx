@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SidebarLinkGroup from "./SidebarLinkGroup";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 interface SidebarProps {
   session: any;
@@ -20,7 +21,17 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
     storedSidebarExpanded === null ? false : storedSidebarExpanded === "true"
   );
 
-  const isAdmin = session?.user?.user?.role.id == 1;
+  const user = session?.user as User;
+  const permissions = user?.jabatan?.permision;
+
+  const isAdmin = user?.user.jabatan.name == "Super Admin";
+
+  const canAccessDataMaster =
+    permissions?.akses_master.fakultas ||
+    permissions?.akses_master.jenis_surat ||
+    permissions?.akses_master.periode ||
+    permissions?.akses_master.prodi ||
+    permissions?.akses_master.template;
 
   // close on click outside
   useEffect(() => {
@@ -105,14 +116,13 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
         {/* <!-- Sidebar Menu --> */}
         <nav className="py-4 px-4 lg:px-6">
           {/* <!-- Dashboard Group --> */}
-          {isAdmin && (
+          {/* {isAdmin && (
             <div>
               <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
                 DASHBOARD
               </h3>
 
               <ul className="mb-6 flex flex-col gap-1.5">
-                {/* <!-- Menu Item Dashboard --> */}
                 <li>
                   <Link
                     href="/dashboard"
@@ -137,14 +147,13 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     Dashboard
                   </Link>
                 </li>
-                {/* <!-- Menu Item Dashboard End --> */}
               </ul>
             </div>
-          )}
+          )} */}
           {/* <!-- Dashboard Group --> */}
 
           {/* <!-- Master Group --> */}
-          {isAdmin && (
+          {canAccessDataMaster && (
             <div>
               <h3 className="mb-4 ml-4 text-sm font-semibold text-bodydark2">
                 MASTER
@@ -226,61 +235,71 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 Prodi
                               </Link>
                             </li>
-                            <li>
-                              <Link
-                                href="/data-master/template"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/template" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Template
-                              </Link>
-                            </li>{" "}
-                            <li>
-                              <Link
-                                href="/data-master/periode"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/periode" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Periode
-                              </Link>
-                            </li>{" "}
-                            <li>
-                              <Link
-                                href="/data-master/fakultas"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/fakultas" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Fakultas
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/data-master/role"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/role" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Role
-                              </Link>
-                            </li>
-                            <li>
-                              <Link
-                                href="/data-master/jenis-surat"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/jenis-surat" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Jenis Surat
-                              </Link>
-                            </li>
+                            {permissions.akses_master.template && (
+                              <li>
+                                <Link
+                                  href="/data-master/template"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/template" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Template
+                                </Link>
+                              </li>
+                            )}
+                            {permissions.akses_master.periode && (
+                              <li>
+                                <Link
+                                  href="/data-master/periode"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/periode" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Periode
+                                </Link>
+                              </li>
+                            )}
+                            {permissions.akses_master.fakultas && (
+                              <li>
+                                <Link
+                                  href="/data-master/fakultas"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/fakultas" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Fakultas
+                                </Link>
+                              </li>
+                            )}
+                            {permissions.akses_master.jabatan && (
+                              <li>
+                                <Link
+                                  href="/data-master/role"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/role" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Jabatan
+                                </Link>
+                              </li>
+                            )}
+                            {permissions.akses_master.jenis_surat && (
+                              <li>
+                                <Link
+                                  href="/data-master/jenis-surat"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/jenis-surat" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Jenis Surat
+                                </Link>
+                              </li>
+                            )}
                           </ul>
                         </div>
                         {/* <!-- Dropdown Menu End --> */}
@@ -291,35 +310,38 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 {/* <!-- Menu Item Data Master End --> */}
 
                 {/* <!-- Menu Item Manajemen User --> */}
-                <li>
-                  <Link
-                    href="/manajemen-user"
-                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                      pathname === "/manajemen-user" &&
-                      "bg-graydark dark:bg-meta-4"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-6 h-6"
+                {isAdmin && (
+                  <li>
+                    <Link
+                      href="/manajemen-user"
+                      className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                        pathname === "/manajemen-user" &&
+                        "bg-graydark dark:bg-meta-4"
+                      }`}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
-                      />
-                    </svg>
-                    Manajemen User
-                  </Link>
-                </li>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"
+                        />
+                      </svg>
+                      Manajemen User
+                    </Link>
+                  </li>
+                )}
                 {/* <!-- Menu Item Manajemen User End --> */}
               </ul>
             </div>
           )}
+
           {/* <!-- Master Group --> */}
 
           {/* <!-- Surat Group --> */}

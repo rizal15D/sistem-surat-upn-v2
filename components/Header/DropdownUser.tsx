@@ -59,9 +59,9 @@ const DropdownUser = ({
         >
           <span className="hidden text-right lg:block">
             <span className="block text-sm font-medium text-black dark:text-white">
-              {user.user.name}
+              {user?.user.name}
             </span>
-            <span className="block text-xs">{user.user.role.name}</span>
+            <span className="block text-xs">{user?.user.jabatan.name}</span>
           </span>
 
           <span className="h-12 w-12 rounded-full">

@@ -9,6 +9,9 @@ import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import ProdiForm from "./prodi-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useSession } from "next-auth/react";
 
 async function getData(): Promise<Prodi[]> {
   // Fetch data from your API here.
@@ -18,8 +21,16 @@ async function getData(): Promise<Prodi[]> {
 
 export default function DataMasterProdiPage() {
   const queryClient = useQueryClient();
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.prodi) {
+    const router = useRouter();
+    router.push("/surat");
+  }
+
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data = [], isLoading: isProdiLoading } = useQuery({

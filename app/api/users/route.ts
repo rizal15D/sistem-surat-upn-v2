@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       {
         name,
         email,
-        role_id,
+        jabatan_id: role_id,
         prodi_id,
         fakultas_id,
       },

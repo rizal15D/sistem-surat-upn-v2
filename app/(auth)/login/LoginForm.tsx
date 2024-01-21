@@ -32,13 +32,16 @@ export default function LoginForm() {
         title: "Login gagal",
         className: "bg-danger text-white",
       });
-    } else {
-      toast({
-        title: "Login berhasil",
-        className: "bg-success text-white",
-      });
-      router.push("/surat");
+
+      return;
     }
+
+    toast({
+      title: "Login berhasil",
+      className: "bg-success text-white",
+    });
+
+    router.push("/surat");
   };
 
   return (

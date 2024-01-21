@@ -10,6 +10,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import RoleForm from "./role-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<Role[]> {
   // Fetch data from your API here.
@@ -19,8 +22,16 @@ async function getData(): Promise<Role[]> {
 
 export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const { toast } = useToast();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.jabatan) {
+    const router = useRouter();
+    router.push("/surat");
+  }
+
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data = [], isLoading: isRoleLoading } = useQuery({
@@ -29,9 +40,9 @@ export default function DataMasterRolePage() {
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (data: { name: string }) => {
+    mutationFn: async (input: { name: string }) => {
       setIsLoading(true);
-      const response = await axios.post(`/api/role/`, data);
+      const response = await axios.post(`/api/role/`, { input });
       return response.data;
     },
     onSuccess: () => {
@@ -46,6 +57,7 @@ export default function DataMasterRolePage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -57,6 +69,19 @@ export default function DataMasterRolePage() {
     e.preventDefault();
     const data = {
       name: e.currentTarget.nama.value,
+      // edit permision
+      buat_surat: e.currentTarget.buat_surat.checked,
+      download_surat: e.currentTarget.download_surat.checked,
+      generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
+      upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
+      persetujuan: e.currentTarget.persetujuan.checked,
+      // edit akses master
+      prodi: e.currentTarget.prodi.checked,
+      template: e.currentTarget.template.checked,
+      periode: e.currentTarget.periode.checked,
+      fakultas: e.currentTarget.fakultas.checked,
+      jabatan: e.currentTarget.jabatan.checked,
+      jenis_surat: e.currentTarget.jenis_surat.checked,
     };
 
     if (!data.name) {
@@ -82,14 +107,14 @@ export default function DataMasterRolePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Role
+          Data Master Jabatan
         </h1>
         <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Role
+          Tambah Jabatan
         </Button>
       </div>
 

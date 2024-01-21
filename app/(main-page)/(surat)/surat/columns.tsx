@@ -8,23 +8,37 @@ import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
+import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export type Letter = {
   id: number;
   judul: string;
   jenis_id: number;
-  user_id: number;
+  deskripsi: string;
   tanggal: Date;
   url: string;
-  tampilan: {
-    pin: boolean;
-    dibaca: boolean;
-  }[];
-  user: Users;
   status: {
     status: string;
     persetujuan: string;
+  };
+  tampilan: {
+    pin: boolean;
+    dibaca: boolean;
+  };
+  jenis: {
+    id: number;
+    jenis: string;
+  };
+  akses_surat: {
+    id: number;
+    jabatan_id: number;
   }[];
+  komentar: any[];
+  nomor_surat: any[];
+  user: Users;
 };
 
 export const columns: ColumnDef<Letter>[] = [
@@ -53,7 +67,7 @@ export const columns: ColumnDef<Letter>[] = [
       const user = row.original.user;
       return (
         <div>
-          {user.name}, {user.prodi.name}
+          {user.name}, {user.prodi?.name}
         </div>
       );
     },
@@ -71,7 +85,7 @@ export const columns: ColumnDef<Letter>[] = [
     },
     cell: ({ row }) => {
       const status = row.original.status;
-      const statusSurat = status[0]?.status;
+      const statusSurat = status?.status;
       return <div className="flex items-center space-x-2">{statusSurat}</div>;
     },
   },
@@ -98,18 +112,48 @@ export const columns: ColumnDef<Letter>[] = [
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as Letter;
+      const session = useSession();
+      const user = session?.data?.user as Users;
+      const router = useRouter();
+
+      const { mutate: mutateBaca } = useMutation({
+        mutationFn: async () => {
+          if (
+            !letter.tampilan.dibaca &&
+            letter.status.status.includes(user.jabatan.name) &&
+            !letter.status.status.includes("Ditolak") &&
+            !letter.status.status.includes("Disetujui")
+          ) {
+            const input = {
+              dibaca: true,
+              pin: letter.tampilan.pin,
+            };
+
+            await axios.put(`/api/surat/tampilan`, {
+              id: letter.id,
+              input,
+            });
+          }
+        },
+        onSuccess: () => {
+          router.push(`/surat/${letter.id}`);
+        },
+      });
+
+      const handleBaca = async () => {
+        await mutateBaca();
+      };
 
       return (
         <div className="flex items-center space-x-2">
-          <Link href={`/surat/${letter.id}`}>
-            <Button
-              variant="default"
-              size="sm"
-              className="bg-primary hover:bg-opacity-90 text-white"
-            >
-              <InfoCircledIcon className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleBaca}
+            className="bg-primary hover:bg-opacity-90 text-white"
+          >
+            <InfoCircledIcon className="h-5 w-5" />
+          </Button>
         </div>
       );
     },

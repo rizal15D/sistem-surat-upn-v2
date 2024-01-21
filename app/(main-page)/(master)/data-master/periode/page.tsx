@@ -10,6 +10,9 @@ import { useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import PeriodeForm from "./periode-form";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useRouter } from "next/navigation";
 
 async function getData(): Promise<Periode[]> {
   // Fetch data from your API here.
@@ -18,10 +21,18 @@ async function getData(): Promise<Periode[]> {
 }
 
 export default function DataMasterPeriodePage() {
-  const [modalCreateOpen, setModalCreateOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const session = useSession();
+  const user = session.data?.user as User;
+
+  if (!user.jabatan.permision.akses_master.periode) {
+    const router = useRouter();
+    router.push("/surat");
+  }
+
+  const [modalCreateOpen, setModalCreateOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data = [], isLoading: isPeriodeLoading } = useQuery({
     queryKey: ["periode"],
