@@ -16,7 +16,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import SuratForm from "../surat-form";
 
@@ -171,30 +171,45 @@ export default function SuratSinglePage() {
   };
 
   const handleSetuju = () => {
-    if (user?.user.role.name == "TU") {
-      mutate({ persetujuan: "Disetujui TU" });
-    } else if (user?.user.role.name == "Dekan") {
-      mutate({ persetujuan: "Disetujui Dekan" });
+    if (user?.jabatan.permision.persetujuan) {
+      mutate({ persetujuan: `Disetujui ${user?.user.jabatan.name}` });
     }
   };
 
-  const handleMenolak = () => {
-    if (user?.user.role.name == "TU") {
+  const handleMenolak = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (user?.jabatan.permision.persetujuan) {
       mutate({
-        persetujuan: "Ditolak TU",
-        komentar: "Tidak Sesuai",
-      });
-    } else if (user?.user.role.name == "Dekan") {
-      mutate({
-        persetujuan: "Ditolak Dekan",
-        komentar: "Tidak Sesuai",
+        persetujuan: `Ditolak ${user?.user.jabatan.name}`,
+        komentar: e.currentTarget.komentar.value,
       });
     }
   };
+
+  const canPersetujuan =
+    user?.jabatan.permision.persetujuan &&
+    singleData?.status.status.includes(user?.user.jabatan.name) &&
+    !singleData?.status.status.includes("Ditolak") &&
+    !singleData?.status.status.includes("Disetujui");
+
+  const canUpload =
+    user?.jabatan.permision.upload_tandatangan &&
+    ((singleData?.status.status.includes(user?.user.jabatan.name) &&
+      singleData?.status.status.includes("Disetujui")) ||
+      singleData?.status.status.includes("Ditandangan"));
+
+  const canDownload =
+    user?.jabatan.permision.download_surat &&
+    (singleData?.status.status.includes("Disetujui") ||
+      (singleData?.user.jabatan.name == user?.user.jabatan.name &&
+        (singleData?.user.prodi
+          ? singleData?.user.prodi.name == user?.user.prodi.name
+          : true)));
 
   return (
-    <div className="grid sm:grid-cols-1 lg:grid-cols-5 gap-10 w-full">
-      <div className="lg:col-span-3 sm:col-span-1 row-span-1 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+    <div className="lg:flex gap-10 w-full">
+      <div className="lg:w-1/2 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           {singleData && (
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
@@ -208,7 +223,7 @@ export default function SuratSinglePage() {
           )}
         </div>
       </div>
-      <div className="lg:col-span-2 sm:col-span-1 row-span-2 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+      <div className="lg:w-1/2 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
             Detail Surat
@@ -228,7 +243,15 @@ export default function SuratSinglePage() {
                 Status
               </span>
               <span className="text-body-sm text-black dark:text-white">
-                {singleData?.status[0].status}
+                {singleData?.status.status}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-sm font-medium text-black dark:text-white">
+                Komentar
+              </span>
+              <span className="text-body-sm text-black dark:text-white">
+                {komentar[komentar.length - 1]?.komentar}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -250,25 +273,10 @@ export default function SuratSinglePage() {
                 Pembuat Surat
               </span>
               <span className="text-body-sm text-black dark:text-white">
-                {singleData?.user.name}, {singleData?.user.role.name}
+                {singleData?.user.name}, {singleData?.user.jabatan.name}
               </span>
-            </div>{" "}
-            {/* {
-              <div className="flex flex-col space-y-1">
-                <span className="text-title-sm font-medium text-black dark:text-white">
-                  Komentar
-                </span>
-                {komentar?.map((item) => (
-                  <span className="text-body-sm text-black dark:text-white">
-                    
-                  </span>
-                ))}
-              </div>
-            } */}
-            {((user?.user.role.name == "TU" &&
-              singleData?.status[0].status == "Di Daftar Tunggu TU") ||
-              (user?.user.role.name == "Dekan" &&
-                singleData?.status[0].status == "Di Daftar Tunggu Dekan")) && (
+            </div>
+            {canPersetujuan && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button className="bg-success w-full" onClick={handleSetuju}>
                   {isSetujuLoading ? (
@@ -277,26 +285,32 @@ export default function SuratSinglePage() {
                     <CheckIcon className="w-6 h-6" />
                   )}
                 </Button>
-                <Button onClick={handleMenolak} className="bg-danger w-full">
+                <Button
+                  onClick={() => {
+                    setModalMenolakOpen(true);
+                  }}
+                  className="bg-danger w-full"
+                >
                   <Cross2Icon className="w-6 h-6" />
                 </Button>
               </div>
             )}
             <div className="flex gap-4 w-full text-white">
-              {user?.user.role.name == "Admin Dekan" &&
-                singleData?.status[0].status == "Diproses Admin Dekan" && (
-                  <Button
-                    className="bg-primary w-full"
-                    onClick={() => {
-                      setUploadModalOpen(true);
-                    }}
-                  >
-                    <UploadIcon className="w-6 h-6" />
-                  </Button>
-                )}
-              <Button className="bg-primary w-full" onClick={handleDownload}>
-                <DownloadIcon className="w-6 h-6" />
-              </Button>
+              {canUpload && (
+                <Button
+                  className="bg-primary w-full"
+                  onClick={() => {
+                    setUploadModalOpen(true);
+                  }}
+                >
+                  <UploadIcon className="w-6 h-6" />
+                </Button>
+              )}
+              {canDownload && (
+                <Button className="bg-primary w-full" onClick={handleDownload}>
+                  <DownloadIcon className="w-6 h-6" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -312,7 +326,7 @@ export default function SuratSinglePage() {
           />
         </Modal>
       )}
-      {/* {modalMenolakOpen && (
+      {modalMenolakOpen && (
         <Modal setModalOpen={setModalMenolakOpen}>
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -342,7 +356,7 @@ export default function SuratSinglePage() {
             </form>
           </div>
         </Modal>
-      )} */}
+      )}
     </div>
   );
 }

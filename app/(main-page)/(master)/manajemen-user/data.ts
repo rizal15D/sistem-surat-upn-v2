@@ -1,5 +1,5 @@
 export default {
-  role: [
+  jabatan: [
     {
       value: ["Super Admin"],
       label: "Admin",
@@ -9,7 +9,7 @@ export default {
       label: "Prodi",
     },
     {
-      value: ["TU"],
+      value: ["TU", "Tata Usaha"],
       label: "TU",
     },
     {
