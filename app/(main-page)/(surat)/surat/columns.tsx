@@ -119,6 +119,10 @@ export const columns: ColumnDef<Letter>[] = [
         val.some((v) => rowValue.includes(v))
       );
     },
+    cell: ({ row }) => {
+      const jenis = row.original.jenis;
+      return <div>{jenis.jenis}</div>;
+    },
   },
   {
     id: "actions",
