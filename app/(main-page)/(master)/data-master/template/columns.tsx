@@ -183,15 +183,9 @@ export const columns: ColumnDef<Template>[] = [
       };
 
       const handleDownload = async () => {
-        const response = await axios.get(`${template.url}`, {
-          responseType: "blob",
-        });
-
-        const url = window.URL.createObjectURL(
-          new Blob([response.data], {
-            type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          })
-        );
+        const response = await fetch(`${template.url}`);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
 
         const link = document.createElement("a");
         link.href = url;
