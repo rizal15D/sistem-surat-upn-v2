@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
     formData.delete("id");
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/template-surat/cloudinary/update?id=${id}`,
+      `${process.env.API_URL}/template-surat/cloudinary/update?template_id=${id}`,
       formData,
       {
         headers: {

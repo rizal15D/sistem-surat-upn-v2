@@ -120,6 +120,7 @@ export const columns: ColumnDef<Users>[] = [
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
         useState(false);
       const [modalPasswordOpen, setModalPasswordOpen] = useState(false);
+      const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: activation } = useMutation({
         mutationFn: async () => {
@@ -145,7 +146,7 @@ export const columns: ColumnDef<Users>[] = [
           toast({
             title: "Gagal mengubah status",
             description: error.message,
-            className: "bg-error text-white",
+            className: "bg-danger text-white",
           });
         },
         onSettled: () => {
@@ -176,9 +177,42 @@ export const columns: ColumnDef<Users>[] = [
           toast({
             title: "Gagal mereset password",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
       });
+
+      const { mutate: mutateDelete } = useMutation({
+        mutationFn: async () => {
+          const { data } = await axios.delete(`/api/users`, {
+            data: {
+              id: users.id,
+            },
+          });
+          return data;
+        },
+        onSuccess: (data) => {
+          queryClient.invalidateQueries({
+            queryKey: ["users"],
+          });
+          setModalDeleteOpen(false);
+          toast({
+            title: "Berhasil menghapus user",
+            className: "bg-success text-white",
+          });
+        },
+        onError: (error) => {
+          toast({
+            title: "Gagal menghapus user",
+            description: error.message,
+            className: "bg-danger text-white",
+          });
+        },
+      });
+
+      const handleDelete = () => {
+        mutateDelete();
+      };
 
       return (
         <>
@@ -206,6 +240,13 @@ export const columns: ColumnDef<Users>[] = [
               ) : (
                 <SwitchIcon className="h-5 w-5" />
               )}
+            </Button>
+            <Button
+              size="sm"
+              className="bg-danger hover:bg-opacity-90"
+              onClick={() => setModalDeleteOpen(true)}
+            >
+              <TrashIcon className="h-5 w-5" />
             </Button>
           </div>
           {modalResetPasswordOpen && (
@@ -244,6 +285,16 @@ export const columns: ColumnDef<Users>[] = [
                 </div>
               </div>
             </Modal>
+          )}
+          {modalDeleteOpen && (
+            <ConfirmationModal
+              setModalOpen={setModalDeleteOpen}
+              onClick={() => mutateDelete()}
+              title="Hapus User"
+              message={`Apakah anda yakin ingin menghapus user ${
+                users.name || "ini"
+              }?`}
+            />
           )}
         </>
       );

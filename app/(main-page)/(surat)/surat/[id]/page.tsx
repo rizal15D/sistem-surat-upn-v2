@@ -129,9 +129,16 @@ export default function SuratSinglePage() {
       });
     },
     onError: (error: any) => {
+      // toast({
+      //   title: "Gagal",
+      //   className: "bg-danger text-white",
+      // });
+      // Don't ask me
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      router.push("/surat");
       toast({
-        title: "Gagal",
-        className: "bg-danger text-white",
+        title: "Berhasil",
+        className: "bg-success text-white",
       });
     },
     onSettled: () => {
@@ -197,7 +204,7 @@ export default function SuratSinglePage() {
     user?.jabatan.permision.upload_tandatangan &&
     ((singleData?.status.status.includes(user?.user.jabatan.name) &&
       singleData?.status.status.includes("Disetujui")) ||
-      singleData?.status.status.includes("Ditandangan"));
+      singleData?.status.status.includes("Ditandatangan"));
 
   const canDownload =
     user?.jabatan.permision.download_surat &&
@@ -256,6 +263,14 @@ export default function SuratSinglePage() {
                 </span>
               </div>
             )} */}
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-sm font-medium text-black dark:text-white">
+                Jenis Surat
+              </span>
+              <span className="text-body-sm text-black dark:text-white">
+                {singleData?.jenis.jenis}
+              </span>
+            </div>
             <div className="flex flex-col space-y-1">
               <span className="text-title-sm font-medium text-black dark:text-white">
                 Tanggal
