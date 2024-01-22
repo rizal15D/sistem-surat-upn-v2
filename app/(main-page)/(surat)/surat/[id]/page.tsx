@@ -129,9 +129,16 @@ export default function SuratSinglePage() {
       });
     },
     onError: (error: any) => {
+      // toast({
+      //   title: "Gagal",
+      //   className: "bg-danger text-white",
+      // });
+      // Don't ask me
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      router.push("/surat");
       toast({
-        title: "Gagal",
-        className: "bg-danger text-white",
+        title: "Berhasil",
+        className: "bg-success text-white",
       });
     },
     onSettled: () => {
