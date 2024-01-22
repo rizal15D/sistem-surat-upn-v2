@@ -60,6 +60,7 @@ export default function DataMasterFakultasPage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
+        className: "bg-error text-white",
       });
     },
     onSettled: () => {
@@ -79,6 +80,7 @@ export default function DataMasterFakultasPage() {
       toast({
         title: "Gagal menambah data",
         description: "Data tidak boleh kosong",
+        className: "bg-error text-white",
       });
       return;
     }

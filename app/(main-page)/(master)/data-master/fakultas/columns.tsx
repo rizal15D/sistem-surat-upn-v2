@@ -72,6 +72,7 @@ export const columns: ColumnDef<Fakultas>[] = [
           toast({
             title: "Gagal menghapus data",
             description: error.message,
+            className: "bg-error text-white",
           });
         },
       });
@@ -104,6 +105,7 @@ export const columns: ColumnDef<Fakultas>[] = [
           toast({
             title: "Gagal mengubah data",
             description: error.message,
+            className: "bg-error text-white",
           });
         },
         onSettled: () => {

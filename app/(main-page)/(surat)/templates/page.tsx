@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Template, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
+import { useMemo } from "react";
+import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 
 async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
@@ -17,6 +19,26 @@ export default function ListSuratPage() {
     queryKey: ["template"],
     queryFn: getData,
   });
+
+  const { data: jenisData, isLoading: isJenisLoading } = useQuery({
+    queryKey: ["jenis-surat"],
+    queryFn: async () => {
+      const response = await axios.get("/api/jenis-surat");
+      return response.data;
+    },
+  });
+
+  const filterData = useMemo(() => {
+    if (jenisData) {
+      return {
+        jenis: jenisData.map((jenis: Jenis) => ({
+          value: [jenis.jenis],
+          label: jenis.jenis,
+        })),
+      };
+    }
+    return {};
+  }, [jenisData]);
 
   if (isLoading) {
     return (
@@ -36,7 +58,7 @@ export default function ListSuratPage() {
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={data} filterData={filterData} />
         </div>
       </div>
     </>

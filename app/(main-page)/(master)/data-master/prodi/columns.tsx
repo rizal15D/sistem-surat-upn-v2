@@ -65,6 +65,7 @@ export const columns: ColumnDef<Prodi>[] = [
           toast({
             title: "Gagal",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
       });
@@ -96,6 +97,7 @@ export const columns: ColumnDef<Prodi>[] = [
           toast({
             title: "Gagal",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
         onSettled: () => {

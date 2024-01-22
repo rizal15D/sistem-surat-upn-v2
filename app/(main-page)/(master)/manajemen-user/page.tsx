@@ -1,7 +1,7 @@
 "use client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 
 import { Users, columns } from "./columns";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import Modal from "@/components/Modal/Modal";
 import UserForm from "./user-form";
 import { useToast } from "@/components/ui/use-toast";
+import { Role } from "../data-master/role/columns";
 
 async function getData(): Promise<Users[]> {
   const { data } = await axios.get("/api/users");
@@ -80,7 +81,27 @@ export default function ManajemenUserPage() {
     mutate(data);
   };
 
-  if (isUsersLoading) {
+  const { data: roleData, isLoading: isRoleLoading } = useQuery({
+    queryKey: ["role"],
+    queryFn: async () => {
+      const response = await axios.get("/api/role");
+      return response.data;
+    },
+  });
+
+  const filterData = useMemo(() => {
+    if (roleData) {
+      return {
+        jabatan: roleData.map((role: Role) => ({
+          value: [role.name],
+          label: role.name,
+        })),
+      };
+    }
+    return {};
+  }, [roleData]);
+
+  if (isUsersLoading || isRoleLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -105,7 +126,7 @@ export default function ManajemenUserPage() {
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={data} filterData={filterData} />
         </div>
       </div>
       {modalCreateOpen && (

@@ -59,6 +59,7 @@ export const columns: ColumnDef<Jenis>[] = [
           toast({
             title: "Gagal menghapus data",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
       });
@@ -86,6 +87,7 @@ export const columns: ColumnDef<Jenis>[] = [
           toast({
             title: "Gagal mengubah data",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
         onSettled: () => {

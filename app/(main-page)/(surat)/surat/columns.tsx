@@ -109,6 +109,18 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
+    accessorKey: "jenis",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Jenis Surat" />
+    ),
+    filterFn: (row, id, value) => {
+      const rowValue = (row.getValue(id) as { jenis: string }).jenis;
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.includes(v))
+      );
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as Letter;

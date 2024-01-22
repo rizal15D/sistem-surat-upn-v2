@@ -1,3 +1,5 @@
+import { useQuery } from "@tanstack/react-query";
+
 export default {
   jabatan: [
     {
@@ -10,15 +12,11 @@ export default {
     },
     {
       value: ["TU", "Tata Usaha"],
-      label: "TU",
+      label: "Tata Usaha",
     },
     {
       value: ["Dekan"],
       label: "Dekan",
-    },
-    {
-      value: ["Admin Dekan"],
-      label: "Admin Dekan",
     },
   ],
 };

@@ -246,14 +246,16 @@ export default function SuratSinglePage() {
                 {singleData?.status.status}
               </span>
             </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Komentar
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {komentar[komentar.length - 1]?.komentar}
-              </span>
-            </div>
+            {komentar && (
+              <div className="flex flex-col space-y-1">
+                <span className="text-title-sm font-medium text-black dark:text-white">
+                  Alasan Penolakan
+                </span>
+                <span className="text-body-sm text-black dark:text-white">
+                  {komentar[komentar.length - 1]?.komentar}
+                </span>
+              </div>
+            )}
             <div className="flex flex-col space-y-1">
               <span className="text-title-sm font-medium text-black dark:text-white">
                 Tanggal
@@ -331,7 +333,7 @@ export default function SuratSinglePage() {
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">
-                Masukkan Komentar
+                Masukkan Alasan Penolakan
               </h3>
             </div>
             <form onSubmit={handleMenolak}>
