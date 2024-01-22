@@ -46,11 +46,11 @@ export default function SuratSinglePage() {
     return response.data;
   };
 
-  const { data: komentar } = useQuery({
-    queryKey: ["komentar", id],
-    queryFn: getKomentar,
-    enabled: !!id,
-  });
+  // const { data: komentar } = useQuery({
+  //   queryKey: ["komentar", id],
+  //   queryFn: getKomentar,
+  //   enabled: !!id,
+  // });
 
   const { mutate } = useMutation({
     mutationFn: async (input: { persetujuan: string; komentar?: string }) => {
@@ -246,7 +246,7 @@ export default function SuratSinglePage() {
                 {singleData?.status.status}
               </span>
             </div>
-            {komentar && (
+            {/* {komentar && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-sm font-medium text-black dark:text-white">
                   Alasan Penolakan
@@ -255,7 +255,7 @@ export default function SuratSinglePage() {
                   {komentar[komentar.length - 1]?.komentar}
                 </span>
               </div>
-            )}
+            )} */}
             <div className="flex flex-col space-y-1">
               <span className="text-title-sm font-medium text-black dark:text-white">
                 Tanggal
