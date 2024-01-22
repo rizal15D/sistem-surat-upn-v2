@@ -36,9 +36,8 @@ export default function SuratForm({
     event.preventDefault();
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      if (!file.name.endsWith(".doc") && !file.name.endsWith(".pdf")) {
-        setSelectedFile(URL.createObjectURL(file));
-        setWarningMessage("");
+      if (!file.name.endsWith(".pdf")) {
+        setWarningMessage("Tolong upload file .pdf .");
       } else if (file.size > 1024 * 1024) {
         setWarningMessage("Ukuran file tidak boleh lebih dari 1MB.");
       } else {
