@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest) {
     const { id, input } = await req.json();
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/periode/status?id=${id}`,
+      `${process.env.API_URL}/periode/status?periode_id=${id}`,
       {
         status: true,
       },

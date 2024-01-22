@@ -87,7 +87,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
 
     const { data } = await axios.delete(
-      `${process.env.API_URL}/template-surat/delete?id=${id}`,
+      `${process.env.API_URL}/template-surat/delete?template_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

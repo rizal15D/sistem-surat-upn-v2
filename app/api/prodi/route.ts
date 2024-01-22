@@ -62,7 +62,7 @@ export async function PUT(req: NextRequest) {
     const { id, input } = await req.json();
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/prodi?id=${id}`,
+      `${process.env.API_URL}/prodi?prodi_id=${id}`,
       {
         name: input.name,
         kode_prodi: input.kode_prodi,
@@ -92,7 +92,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
 
     const { data } = await axios.delete(
-      `${process.env.API_URL}/prodi?id=${id}`,
+      `${process.env.API_URL}/prodi?prodi_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
 
   if (session) {
     const { data } = await axios.put(
-      `${process.env.API_URL}/jenis?id=${id}`,
+      `${process.env.API_URL}/jenis?jenis_id=${id}`,
       {
         jenis: input.jenis,
       },
@@ -88,7 +88,7 @@ export async function DELETE(req: NextRequest) {
 
   if (session) {
     const { data } = await axios.delete(
-      `${process.env.API_URL}/jenis?id=${id}`,
+      `${process.env.API_URL}/jenis?jenis_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

@@ -57,6 +57,7 @@ export default function DataMasterRolePage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -74,6 +75,7 @@ export default function DataMasterRolePage() {
       toast({
         title: "Gagal menambah data",
         description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
       });
       return;
     }

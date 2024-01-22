@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Template, columns } from "./columns";
 import { DataTable } from "./data-table";
@@ -12,6 +12,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { useRouter } from "next/navigation";
+import { Jenis } from "../jenis-surat/columns";
 
 async function getData(): Promise<Template[]> {
   // Fetch data from your API here.
@@ -125,7 +126,27 @@ export default function DataMasterTemplatePage() {
     mutate(data);
   };
 
-  if (isTemplateLoading) {
+  const { data: jenisData, isLoading: isJenisLoading } = useQuery({
+    queryKey: ["jenis-surat"],
+    queryFn: async () => {
+      const response = await axios.get("/api/jenis-surat");
+      return response.data;
+    },
+  });
+
+  const filterData = useMemo(() => {
+    if (jenisData) {
+      return {
+        jenis: jenisData.map((jenis: Jenis) => ({
+          value: [jenis.jenis],
+          label: jenis.jenis,
+        })),
+      };
+    }
+    return {};
+  }, [jenisData]);
+
+  if (isTemplateLoading || isJenisLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -150,7 +171,7 @@ export default function DataMasterTemplatePage() {
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={data} filterData={filterData} />
         </div>
       </div>
       {modalCreateOpen && (

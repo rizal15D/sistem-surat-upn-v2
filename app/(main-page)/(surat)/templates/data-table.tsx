@@ -31,11 +31,13 @@ import { DataTableToolbar } from "@/components/DataTableComponents/DataTableTool
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  filterData: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  filterData,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -65,7 +67,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <DataTableToolbar table={table} filterInput="judul" />
+      <DataTableToolbar table={table} filterInput="judul" data={filterData} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

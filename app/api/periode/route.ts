@@ -93,7 +93,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
 
     const { data } = await axios.delete(
-      `${process.env.API_URL}/periode?id=${id}`,
+      `${process.env.API_URL}/periode?periode_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

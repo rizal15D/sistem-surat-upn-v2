@@ -27,16 +27,20 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/DataTableComponents/DataTablePagination";
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
-import filterData from "./data";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Role } from "../data-master/role/columns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  filterData: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  filterData,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(

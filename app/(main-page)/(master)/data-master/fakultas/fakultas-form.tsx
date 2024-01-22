@@ -29,7 +29,7 @@ export default function FakultasForm({
             />
           </div>
 
-          <div>
+          <div className="mb-4.5">
             <label className="mb-3 block text-black dark:text-white">
               Jenjang
             </label>
