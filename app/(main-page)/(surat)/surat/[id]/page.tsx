@@ -10,6 +10,7 @@ import {
   CheckIcon,
   Cross2Icon,
   DownloadIcon,
+  TrashIcon,
   UploadIcon,
 } from "@radix-ui/react-icons";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
@@ -19,6 +20,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { FormEvent, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import SuratForm from "../surat-form";
+import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -30,13 +32,28 @@ export default function SuratSinglePage() {
   const [isMenolakLoading, setIsMenolakLoading] = useState(false);
   const [isSetujuLoading, setIsSetujuLoading] = useState(false);
   const [warningMessage, setWarningMessage] = useState("");
+
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
+  const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
-  const allData = queryClient.getQueryData<Letter[]>(["surat"]);
-  const singleData = allData
-    ? allData.find((item) => item.id === Number(id))
+  // const allData = queryClient.getQueryData<Letter[]>(["surat"]);
+  // const singleData = allData
+  //   ? allData.find((item) => item.id === Number(id))
+  //   : null;
+
+  const { data: letterData } = useQuery({
+    queryKey: ["surat"],
+    queryFn: async () => {
+      const response = await axios.get(`/api/surat`);
+      return response.data;
+    },
+    enabled: !!id,
+  });
+
+  const singleData = letterData
+    ? (letterData.find((item: Letter) => item.id === Number(id)) as Letter)
     : null;
 
   const getKomentar = async () => {
@@ -177,6 +194,33 @@ export default function SuratSinglePage() {
     mutateUpload(data);
   };
 
+  const { mutate: mutateDelete } = useMutation({
+    mutationFn: async () => {
+      const response = await axios.delete(`/api/surat`, {
+        params: { id },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      router.push("/surat");
+      toast({
+        title: "Berhasil menghapus surat",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus surat",
+        className: "bg-danger text-white",
+      });
+    },
+  });
+
+  const handleDelete = async () => {
+    await mutateDelete();
+  };
+
   const handleSetuju = () => {
     if (user?.jabatan.permision.persetujuan) {
       mutate({ persetujuan: `Disetujui ${user?.user.jabatan.name}` });
@@ -196,23 +240,35 @@ export default function SuratSinglePage() {
 
   const canPersetujuan =
     user?.jabatan.permision.persetujuan &&
+    // Surat di tangan user
     singleData?.status.status.includes(user?.user.jabatan.name) &&
-    !singleData?.status.status.includes("Ditolak") &&
-    !singleData?.status.status.includes("Disetujui");
+    (singleData?.status.status.includes("Daftar Tunggu") ||
+      singleData?.status.status.includes("Diproses"));
 
   const canUpload =
-    user?.jabatan.permision.upload_tandatangan &&
-    ((singleData?.status.status.includes(user?.user.jabatan.name) &&
+    (user?.jabatan.permision.upload_tandatangan &&
+      // Surat di tangan user & surat belum ditandatangan
+      singleData?.status.status.includes(user?.user.jabatan.name) &&
       singleData?.status.status.includes("Disetujui")) ||
-      singleData?.status.status.includes("Ditandatangan"));
+    // Surat sudah ditandatangan
+    singleData?.status.status.includes("Ditandatangan");
 
   const canDownload =
-    user?.jabatan.permision.download_surat &&
-    (singleData?.status.status.includes("Disetujui") ||
-      (singleData?.user.jabatan.name == user?.user.jabatan.name &&
-        (singleData?.user.prodi
-          ? singleData?.user.prodi.name == user?.user.prodi.name
-          : true)));
+    (user?.jabatan.permision.download_surat &&
+      // User tidak punya atasan & surat belum ditandatangan
+      !user?.jabatan.jabatan_atas.name &&
+      singleData?.status.status.includes("Disetujui")) ||
+    // User adalah pembuat surat & surat sudah ditandatangan
+    (user?.jabatan.name === singleData?.user.jabatan.name &&
+      singleData?.status.status.includes("Ditandatangan"));
+
+  const canDelete =
+    // User yang mempunyai surat
+    user?.jabatan.name === singleData?.user.jabatan.name &&
+    user?.user.prodi.name === singleData?.user.prodi.name &&
+    // Surat masih di tangan atasan
+    singleData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
+    !singleData?.status.status.includes("Ditolak");
 
   return (
     <div className="lg:flex gap-10 w-full">
@@ -328,6 +384,14 @@ export default function SuratSinglePage() {
                   <DownloadIcon className="w-6 h-6" />
                 </Button>
               )}
+              {canDelete && (
+                <Button
+                  className="bg-danger w-full"
+                  onClick={() => setModalDeleteOpen(true)}
+                >
+                  <TrashIcon className="w-6 h-6" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -373,6 +437,16 @@ export default function SuratSinglePage() {
             </form>
           </div>
         </Modal>
+      )}
+      {modalDeleteOpen && (
+        <ConfirmationModal
+          setModalOpen={setModalDeleteOpen}
+          title="Hapus Surat"
+          message={`Apakah anda yakin ingin menghapus surat ${
+            singleData?.judul.split(".")[0]
+          }?`}
+          onClick={handleDelete}
+        />
       )}
     </div>
   );

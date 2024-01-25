@@ -9,7 +9,7 @@ export async function GET() {
   } | null;
 
   if (session) {
-    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat/v2`, {
+    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat`, {
       headers: {
         Authorization: `Bearer ${session.user?.accessToken}`,
       },
@@ -67,6 +67,31 @@ export async function PUT(req: NextRequest) {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
           "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  if (session) {
+    const id = req.nextUrl.searchParams.get("id");
+
+    const { data } = await axios.delete(
+      `${process.env.API_URL}/daftar-surat/delete?surat_id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
         },
       }
     );
