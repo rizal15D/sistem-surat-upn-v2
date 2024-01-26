@@ -4,6 +4,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Letter } from "../columns";
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
+import { toolbarPlugin } from "@react-pdf-viewer/toolbar";
+import type {
+  ToolbarSlot,
+  TransformToolbarSlot,
+} from "@react-pdf-viewer/toolbar";
+import "@react-pdf-viewer/toolbar/lib/styles/index.css";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,10 +44,15 @@ export default function SuratSinglePage() {
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
-  // const allData = queryClient.getQueryData<Letter[]>(["surat"]);
-  // const singleData = allData
-  //   ? allData.find((item) => item.id === Number(id))
-  //   : null;
+  const toolbarPluginInstance = toolbarPlugin({});
+  const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
+  const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
+    ...slot,
+    // These slots will be empty
+    Download: () => <></>,
+    Open: () => <></>,
+    SwitchTheme: () => <></>,
+  });
 
   const { data: letterData } = useQuery({
     queryKey: ["surat"],
@@ -118,6 +129,18 @@ export default function SuratSinglePage() {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  };
+
+  const handleOpenFile = async () => {
+    const response = await axios.get(`${singleData?.url}`, {
+      responseType: "blob",
+    });
+    const file = new Blob([response.data], { type: "application/pdf" });
+    //Build a URL from the file
+    const fileURL = URL.createObjectURL(file);
+    //Open the URL on new Window
+    const pdfWindow = window.open() as Window;
+    pdfWindow.location.href = fileURL;
   };
 
   const { mutate: mutateUpload } = useMutation({
@@ -268,108 +291,125 @@ export default function SuratSinglePage() {
     <div className="lg:flex gap-10 w-full">
       <div className="lg:w-3/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
+          {/* Tombol buka file, absolute di atas worker */}
           {singleData && (
             <>
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-                <div className="h-[100vh] mb-4">
+                <div className="mb-4 h-[100vh]">
+                  <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>;
                   <Viewer
                     fileUrl={singleData?.url}
-                    defaultScale={SpecialZoomLevel.PageFit}
+                    defaultScale={SpecialZoomLevel.ActualSize}
+                    plugins={[toolbarPluginInstance]}
                   />
                 </div>
               </Worker>
-              <embed
-                src={PDF}
-                type="application/pdf"
-                height={800}
-                width={500}
-              />
             </>
           )}
         </div>
       </div>
       <div className="lg:w-2/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
-        <div className="container mx-auto py-10">
+        <div className="container mx-auto py-10 relative">
+          <div className="absolute top-10 right-0 z-99">
+            <Button
+              onClick={handleOpenFile}
+              className="bg-primary text-white font-medium"
+            >
+              Buka File
+            </Button>
+          </div>
+
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
             Detail Surat
           </h1>
 
           <div className="flex flex-col space-y-2 gap-2">
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Judul
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData?.judul.split(".")[0].split("-")[0]}
-              </span>
+            <div className="flex justify-between items-center">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Judul
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData?.judul.split(".")[0].split("-")[0]}
+                  </span>
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Status
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData?.status.status}
+                  </span>
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Tanggal Dibuat
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData &&
+                      new Intl.DateTimeFormat("id-ID", {
+                        weekday: "long" as "long",
+                        day: "numeric" as "numeric",
+                        month: "long" as "long",
+                        year: "numeric" as "numeric",
+                      }).format(new Date(singleData.tanggal.toString()))}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Pembuat Surat
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData?.user.name}, {singleData?.user.jabatan.name}
+                  </span>
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Nomor Surat
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                      ? singleData?.nomor_surat[
+                          singleData.nomor_surat.length - 1
+                        ].nomor_surat
+                      : "-"}
+                  </span>
+                </div>
+                <div className="flex flex-col space-y-1">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Jenis Surat
+                  </span>
+                  <span className="text-body-xs text-black dark:text-white">
+                    {singleData?.jenis.jenis}
+                  </span>
+                </div>
+              </div>
             </div>
+
             <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
+              <span className="text-title-xs font-medium text-black dark:text-white">
                 Deskripsi
               </span>
-              <span className="text-body-sm text-black dark:text-white">
+              <span className="text-body-xs text-black dark:text-white">
                 {singleData?.deskripsi}
               </span>
             </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Nomor Surat
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
-                  ? singleData?.nomor_surat[singleData.nomor_surat.length - 1]
-                      .nomor_surat
-                  : "-"}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Status
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData?.status.status}
-              </span>
-            </div>
+
             {/* {komentar && (
               <div className="flex flex-col space-y-1">
-                <span className="text-title-sm font-medium text-black dark:text-white">
+                <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
                 </span>
-                <span className="text-body-sm text-black dark:text-white">
+                <span className="text-body-xs text-black dark:text-white">
                   {komentar[komentar.length - 1]?.komentar}
                 </span>
               </div>
             )} */}
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Jenis Surat
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData?.jenis.jenis}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Tanggal
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData &&
-                  new Intl.DateTimeFormat("id-ID", {
-                    weekday: "long" as "long",
-                    day: "numeric" as "numeric",
-                    month: "long" as "long",
-                    year: "numeric" as "numeric",
-                  }).format(new Date(singleData.tanggal.toString()))}
-              </span>
-            </div>
-            <div className="flex flex-col space-y-1">
-              <span className="text-title-sm font-medium text-black dark:text-white">
-                Pembuat Surat
-              </span>
-              <span className="text-body-sm text-black dark:text-white">
-                {singleData?.user.name}, {singleData?.user.jabatan.name}
-              </span>
-            </div>
+
             {canPersetujuan && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button className="bg-success w-full" onClick={handleSetuju}>

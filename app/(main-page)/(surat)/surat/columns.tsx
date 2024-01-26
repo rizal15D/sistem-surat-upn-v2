@@ -27,7 +27,7 @@ export type Letter = {
   tampilan: {
     pin: boolean;
     dibaca: boolean;
-  };
+  }[];
   jenis: {
     id: number;
     jenis: string;
@@ -63,6 +63,23 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const judul = row.original.judul;
       return <div>{judul.split(".")[0].split("-")[0]}</div>;
+    },
+  },
+  {
+    accessorKey: "nomor_surat",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nomor Surat" />
+    ),
+    filterFn: (row, id, value) => {
+      const rowValue = (row.getValue(id) as { nomor_surat: string })
+        .nomor_surat;
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.includes(v))
+      );
+    },
+    cell: ({ row }) => {
+      const nomorSurat = row.original.nomor_surat;
+      return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
     },
   },
   {
@@ -157,14 +174,13 @@ export const columns: ColumnDef<Letter>[] = [
       const { mutate: mutateBaca } = useMutation({
         mutationFn: async () => {
           if (
-            !letter.tampilan.dibaca &&
             letter.status.status.includes(user.jabatan.name) &&
             !letter.status.status.includes("Ditolak") &&
             !letter.status.status.includes("Disetujui")
           ) {
             const input = {
               dibaca: true,
-              pin: letter.tampilan.pin,
+              pin: letter.tampilan[0]?.pin,
             };
 
             await axios.put(`/api/surat/tampilan`, {
@@ -175,6 +191,9 @@ export const columns: ColumnDef<Letter>[] = [
         },
         onSuccess: () => {
           router.push(`/surat/${letter.id}`);
+        },
+        onError: (error) => {
+          console.log(error);
         },
       });
 
