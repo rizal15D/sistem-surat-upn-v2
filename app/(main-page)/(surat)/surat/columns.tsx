@@ -37,7 +37,15 @@ export type Letter = {
     jabatan_id: number;
   }[];
   komentar: any[];
-  nomor_surat: any[];
+  nomor_surat: {
+    id: number;
+    nomor_surat: string;
+    periode: {
+      id: number;
+      tahun: string;
+      status: string;
+    };
+  }[];
   user: Users;
 };
 
@@ -54,8 +62,7 @@ export const columns: ColumnDef<Letter>[] = [
     },
     cell: ({ row }) => {
       const judul = row.original.judul;
-      const judulWithoutExtension = judul.split(".")[0];
-      return <div>{judulWithoutExtension}</div>;
+      return <div>{judul.split(".")[0].split("-")[0]}</div>;
     },
   },
   {
@@ -86,7 +93,22 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
-      return <div className="flex items-center space-x-2">{statusSurat}</div>;
+      // return <div className="flex items-center space-x-2">{statusSurat}</div>;
+      return (
+        <Badge
+          className={`text-white
+            ${
+              (statusSurat.includes("Daftar Tunggu") ||
+                statusSurat.includes("Diproses")) &&
+              "bg-warning"
+            }
+            ${statusSurat.includes("Ditolak") && "bg-danger"}
+            ${statusSurat.includes("Ditandatangani") && "bg-success"}
+            `}
+        >
+          {statusSurat}
+        </Badge>
+      );
     },
   },
   {

@@ -242,25 +242,19 @@ export default function SuratSinglePage() {
     user?.jabatan.permision.persetujuan &&
     // Surat di tangan user
     singleData?.status.status.includes(user?.user.jabatan.name) &&
+    !singleData?.status.status.includes(user?.jabatan.jabatan_atas?.name) &&
     (singleData?.status.status.includes("Daftar Tunggu") ||
       singleData?.status.status.includes("Diproses"));
 
-  const canUpload =
-    (user?.jabatan.permision.upload_tandatangan &&
-      // Surat di tangan user & surat belum ditandatangan
-      singleData?.status.status.includes(user?.user.jabatan.name) &&
-      singleData?.status.status.includes("Disetujui")) ||
-    // Surat sudah ditandatangan
-    singleData?.status.status.includes("Ditandatangan");
+  const canUpload = user?.jabatan.permision.upload_tandatangan;
 
   const canDownload =
-    (user?.jabatan.permision.download_surat &&
-      // User tidak punya atasan & surat belum ditandatangan
-      !user?.jabatan.jabatan_atas.name &&
-      singleData?.status.status.includes("Disetujui")) ||
-    // User adalah pembuat surat & surat sudah ditandatangan
-    (user?.jabatan.name === singleData?.user.jabatan.name &&
-      singleData?.status.status.includes("Ditandatangan"));
+    user?.jabatan.permision.download_surat &&
+    // User tidak punya jabatan atas & surat belum ditandatangani
+    ((!user?.jabatan.jabatan_atas &&
+      !singleData?.status.status.includes("Ditandatangani")) ||
+      // User adalah pembuat surat
+      user?.jabatan.name === singleData?.user.jabatan.name);
 
   const canDelete =
     // User yang mempunyai surat
@@ -272,21 +266,29 @@ export default function SuratSinglePage() {
 
   return (
     <div className="lg:flex gap-10 w-full">
-      <div className="lg:w-1/2 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+      <div className="lg:w-3/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           {singleData && (
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-              <div className="h-[100vh] mb-4">
-                <Viewer
-                  fileUrl={singleData?.url}
-                  defaultScale={SpecialZoomLevel.PageFit}
-                />
-              </div>
-            </Worker>
+            <>
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
+                <div className="h-[100vh] mb-4">
+                  <Viewer
+                    fileUrl={singleData?.url}
+                    defaultScale={SpecialZoomLevel.PageFit}
+                  />
+                </div>
+              </Worker>
+              <embed
+                src={PDF}
+                type="application/pdf"
+                height={800}
+                width={500}
+              />
+            </>
           )}
         </div>
       </div>
-      <div className="lg:w-1/2 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+      <div className="lg:w-2/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
             Detail Surat
@@ -298,7 +300,26 @@ export default function SuratSinglePage() {
                 Judul
               </span>
               <span className="text-body-sm text-black dark:text-white">
-                {singleData?.judul.split(".")[0]}
+                {singleData?.judul.split(".")[0].split("-")[0]}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-sm font-medium text-black dark:text-white">
+                Deskripsi
+              </span>
+              <span className="text-body-sm text-black dark:text-white">
+                {singleData?.deskripsi}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-sm font-medium text-black dark:text-white">
+                Nomor Surat
+              </span>
+              <span className="text-body-sm text-black dark:text-white">
+                {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                  ? singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                      .nomor_surat
+                  : "-"}
               </span>
             </div>
             <div className="flex flex-col space-y-1">

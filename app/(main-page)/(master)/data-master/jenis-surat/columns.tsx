@@ -16,8 +16,7 @@ import { useToast } from "@/components/ui/use-toast";
 export type Jenis = {
   id: number;
   jenis: string;
-  createdAt: string;
-  updatedAt: string;
+  kode_jenis: string;
 };
 
 export const columns: ColumnDef<Jenis>[] = [
@@ -25,6 +24,12 @@ export const columns: ColumnDef<Jenis>[] = [
     accessorKey: "jenis",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nama" />
+    ),
+  },
+  {
+    accessorKey: "kode_jenis",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Kode" />
     ),
   },
   {
@@ -65,7 +70,11 @@ export const columns: ColumnDef<Jenis>[] = [
       });
 
       const { mutate: mutatePut } = useMutation({
-        mutationFn: async (input: { id: number; jenis: any }) => {
+        mutationFn: async (input: {
+          id: number;
+          jenis: any;
+          kode_jenis: any;
+        }) => {
           setIsLoading(true);
           const { data } = await axios.put(`/api/jenis-surat`, {
             id: jenis.id,
@@ -100,6 +109,7 @@ export const columns: ColumnDef<Jenis>[] = [
         const input = {
           id: jenis.id,
           jenis: e.currentTarget.jenis.value,
+          kode_jenis: e.currentTarget.kode_jenis.value,
         };
 
         if (!input.jenis) {

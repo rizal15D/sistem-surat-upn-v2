@@ -40,7 +40,7 @@ export default function DataMasterRolePage() {
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (input: { jenis: string }) => {
+    mutationFn: async (input: { jenis: string; kode_jenis: string }) => {
       setIsLoading(true);
       const response = await axios.post(`/api/jenis-surat/`, { input });
       return response.data;
@@ -69,6 +69,7 @@ export default function DataMasterRolePage() {
     e.preventDefault();
     const data = {
       jenis: e.currentTarget.jenis.value,
+      kode_jenis: e.currentTarget.kode_jenis.value,
     };
 
     if (!data.jenis) {

@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       `${process.env.API_URL}/jenis`,
       {
         jenis: input.jenis,
+        kode_jenis: input.kode_jenis,
       },
       {
         headers: {
@@ -63,6 +64,7 @@ export async function PUT(req: NextRequest) {
       `${process.env.API_URL}/jenis?jenis_id=${id}`,
       {
         jenis: input.jenis,
+        kode_jenis: input.kode_jenis,
       },
       {
         headers: {
