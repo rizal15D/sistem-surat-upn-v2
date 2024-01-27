@@ -27,6 +27,7 @@ import { FormEvent, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import SuratForm from "../surat-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
+import { Badge } from "@/components/ui/badge";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -74,11 +75,11 @@ export default function SuratSinglePage() {
     return response.data;
   };
 
-  // const { data: komentar } = useQuery({
-  //   queryKey: ["komentar", id],
-  //   queryFn: getKomentar,
-  //   enabled: !!id,
-  // });
+  const { data: komentar, isLoading: isKomentarLoading } = useQuery({
+    queryKey: ["komentar", id],
+    queryFn: getKomentar,
+    enabled: !!id,
+  });
 
   const { mutate } = useMutation({
     mutationFn: async (input: { persetujuan: string; komentar?: string }) => {
@@ -287,6 +288,13 @@ export default function SuratSinglePage() {
     singleData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
     !singleData?.status.status.includes("Ditolak");
 
+  if (isKomentarLoading)
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+      </div>
+    );
+
   return (
     <div className="lg:flex gap-10 w-full">
       <div className="lg:w-3/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -323,73 +331,82 @@ export default function SuratSinglePage() {
             Detail Surat
           </h1>
 
-          <div className="flex flex-col space-y-2 gap-2">
-            <div className="flex justify-between items-center">
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Judul
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData?.judul.split(".")[0].split("-")[0]}
-                  </span>
-                </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Status
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData?.status.status}
-                  </span>
-                </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Tanggal Dibuat
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData &&
-                      new Intl.DateTimeFormat("id-ID", {
-                        weekday: "long" as "long",
-                        day: "numeric" as "numeric",
-                        month: "long" as "long",
-                        year: "numeric" as "numeric",
-                      }).format(new Date(singleData.tanggal.toString()))}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Pembuat Surat
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData?.user.name}, {singleData?.user.jabatan.name}
-                  </span>
-                </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Nomor Surat
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
-                      ? singleData?.nomor_surat[
-                          singleData.nomor_surat.length - 1
-                        ].nomor_surat
-                      : "-"}
-                  </span>
-                </div>
-                <div className="flex flex-col space-y-1">
-                  <span className="text-title-xs font-medium text-black dark:text-white">
-                    Jenis Surat
-                  </span>
-                  <span className="text-body-xs text-black dark:text-white">
-                    {singleData?.jenis.jenis}
-                  </span>
-                </div>
-              </div>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Judul
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {singleData?.judul.split(".")[0].split("-")[0]}
+              </span>
             </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Pembuat Surat
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {singleData?.user.name}, {singleData?.user.prodi.name}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Status
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                <Badge
+                  className={`text-white text-center
+            ${
+              (singleData?.status.status.includes("Daftar Tunggu") ||
+                singleData?.status.status.includes("Diproses")) &&
+              "bg-warning"
+            }
+            ${singleData?.status.status.includes("Ditolak") && "bg-danger"}
+            ${
+              singleData?.status.status.includes("Ditandatangani") &&
+              "bg-success"
+            }
+            `}
+                >
+                  {singleData?.status.status}
+                </Badge>
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Nomor Surat
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                  ? singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                      .nomor_surat
+                  : "-"}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Tanggal Dibuat
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {singleData &&
+                  new Intl.DateTimeFormat("id-ID", {
+                    weekday: "long" as "long",
+                    day: "numeric" as "numeric",
+                    month: "long" as "long",
+                    year: "numeric" as "numeric",
+                  }).format(new Date(singleData.tanggal.toString()))}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Jenis Surat
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {singleData?.jenis.jenis}
+              </span>
+            </div>
+          </div>
 
+          <div className="flex flex-col space-y-2 gap-2">
             <div className="flex flex-col space-y-1">
               <span className="text-title-xs font-medium text-black dark:text-white">
                 Deskripsi
@@ -399,7 +416,7 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {/* {komentar && (
+            {komentar && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
@@ -408,7 +425,7 @@ export default function SuratSinglePage() {
                   {komentar[komentar.length - 1]?.komentar}
                 </span>
               </div>
-            )} */}
+            )}
 
             {canPersetujuan && (
               <div className="pt-12 flex gap-4 text-white">

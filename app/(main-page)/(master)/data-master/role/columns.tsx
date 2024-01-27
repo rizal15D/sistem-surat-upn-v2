@@ -38,8 +38,12 @@ export type Role = {
       jenis_surat: boolean;
     };
   };
-  createdAt: string;
-  updatedAt: string;
+  jabatan_atas_id: number;
+  jabatan_atas: {
+    id: number;
+    name: string;
+    jabatan_atas_id: number;
+  };
 };
 
 export const columns: ColumnDef<Role>[] = [
@@ -207,6 +211,16 @@ export const columns: ColumnDef<Role>[] = [
     },
   },
   {
+    accessorKey: "jabatan_atas",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Jabatan Atas" />
+    ),
+    cell: ({ row }) => {
+      const role = row.original;
+      return <span>{role.jabatan_atas ? role.jabatan_atas.name : "-"}</span>;
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const role = row.original;
@@ -280,6 +294,7 @@ export const columns: ColumnDef<Role>[] = [
           id: role.id,
           // edit role
           name: e.currentTarget.nama.value,
+          jabatan_atas_id: e.currentTarget.jabatan_atas_id.value,
           // edit permision
           buat_surat: e.currentTarget.buat_surat.checked,
           download_surat: e.currentTarget.download_surat.checked,

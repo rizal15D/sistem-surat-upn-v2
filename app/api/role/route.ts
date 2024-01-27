@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       `${process.env.API_URL}/jabatan/postAll`,
       {
         name: input.name,
-        jabatan_atas_id: null,
+        jabatan_atas_id: input.jabatan_atas_id,
         buat_surat: input.buat_surat,
         download_surat: input.download_surat,
         generate_nomor_surat: input.generate_nomor_surat,
@@ -71,10 +71,13 @@ export async function PUT(req: NextRequest) {
   if (session) {
     const { id, input } = await req.json();
 
+    console.log(input.jabatan_atas_id);
+
     const { data: data1 } = await axios.put(
       `${process.env.API_URL}/jabatan?jabatan_id=${id}`,
       {
         name: input.name,
+        jabatan_atas_id: input.jabatan_atas_id,
       },
       {
         headers: {

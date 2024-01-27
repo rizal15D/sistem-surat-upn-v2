@@ -224,17 +224,19 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           }`}
                         >
                           <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                            <li>
-                              <Link
-                                href="/data-master/prodi"
-                                className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
-                                  pathname === "/data-master/prodi" &&
-                                  "text-white"
-                                }`}
-                              >
-                                Prodi
-                              </Link>
-                            </li>
+                            {permissions.akses_master.prodi && (
+                              <li>
+                                <Link
+                                  href="/data-master/prodi"
+                                  className={`group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ${
+                                    pathname === "/data-master/prodi" &&
+                                    "text-white"
+                                  }`}
+                                >
+                                  Prodi
+                                </Link>
+                              </li>
+                            )}
                             {permissions.akses_master.template && (
                               <li>
                                 <Link

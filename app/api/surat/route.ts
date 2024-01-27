@@ -9,7 +9,7 @@ export async function GET() {
   } | null;
 
   if (session) {
-    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat`, {
+    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat/`, {
       headers: {
         Authorization: `Bearer ${session.user?.accessToken}`,
       },

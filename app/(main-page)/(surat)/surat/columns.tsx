@@ -113,7 +113,7 @@ export const columns: ColumnDef<Letter>[] = [
       // return <div className="flex items-center space-x-2">{statusSurat}</div>;
       return (
         <Badge
-          className={`text-white
+          className={`text-white text-center
             ${
               (statusSurat.includes("Daftar Tunggu") ||
                 statusSurat.includes("Diproses")) &&
