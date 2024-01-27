@@ -46,6 +46,14 @@ export default function ListSuratPage() {
           value: [jenis.jenis],
           label: jenis.jenis,
         })),
+        status: [
+          {
+            value: ["Daftar Tunggu", "Diproses", "Disetujui"],
+            label: "Diproses",
+          },
+          { value: ["Ditandatangani"], label: "Diterima" },
+          { value: ["Ditolak"], label: "Ditolak" },
+        ],
       };
     }
     return {};

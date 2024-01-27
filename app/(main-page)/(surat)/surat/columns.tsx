@@ -102,7 +102,7 @@ export const columns: ColumnDef<Letter>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as string).split(" ");
+      const rowValue = (row.getValue(id) as { status: string }).status;
       return value.some((val: string[]) =>
         val.some((v) => rowValue.includes(v))
       );

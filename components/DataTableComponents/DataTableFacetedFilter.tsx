@@ -48,7 +48,9 @@ export function DataTableFacetedFilter<TData, TValue>({
           className="h-8 border-dashed bg-transparent font-medium focus:outline-none"
         >
           <PlusCircledIcon className="mr-2 h-4 w-4" />
-          {title}
+          {/* Title with the first letter capitalized */}
+          {title?.charAt(0).toUpperCase()}
+          {title?.slice(1)}
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
