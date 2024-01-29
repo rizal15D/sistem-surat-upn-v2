@@ -19,8 +19,8 @@ export type Users = {
   name: string;
   email: string;
   aktif: boolean;
-  prodi: { id: string; name: string };
   jabatan: { id: string; name: string; jabatan_atas_id: number };
+  prodi: { id: string; name: string };
   fakultas: { id: string; name: string };
 };
 

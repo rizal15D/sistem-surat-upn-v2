@@ -39,7 +39,7 @@ export default function UploadSuratPage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["template"] });
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
       router.push("/surat");
       toast({
         title: "Berhasil menambahkan data",
@@ -50,6 +50,7 @@ export default function UploadSuratPage() {
       toast({
         title: "Gagal menambah data",
         description: error.message,
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
@@ -69,7 +70,7 @@ export default function UploadSuratPage() {
       deskripsi: formData.get("deskripsi"),
     };
 
-    if (!data.judul || !data.surat) {
+    if (!data.judul || !data.surat || !data.jenis_id || !data.deskripsi) {
       toast({
         title: "Gagal mengupload surat",
         description: "Data tidak boleh kosong",

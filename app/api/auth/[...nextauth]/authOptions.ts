@@ -46,7 +46,11 @@ export interface User extends NextAuthUser {
         jenis_surat: boolean;
       };
     };
-    jabatan_atas: null;
+    jabatan_atas: {
+      id: number;
+      name: string;
+      jabatan_atas_id: null | number;
+    };
   };
 }
 

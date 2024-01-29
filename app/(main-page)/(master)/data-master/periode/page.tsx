@@ -46,7 +46,7 @@ export default function DataMasterPeriodePage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["prodi"] });
+      queryClient.invalidateQueries({ queryKey: ["periode"] });
       setModalCreateOpen(false);
       toast({
         title: "Berhasil menambahkan data",

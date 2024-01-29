@@ -3,17 +3,39 @@ import { authOptions, User } from "../auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
 
+  const startDateStr = req.nextUrl.searchParams.get("startDate");
+  let startDate: Date | null = null;
+  if (startDateStr) {
+    startDate = new Date(startDateStr);
+  }
+
+  const endDateStr = req.nextUrl.searchParams.get("endDate");
+  let endDate: Date | null = null;
+  if (endDateStr) {
+    endDate = new Date(endDateStr);
+  }
+
+  const formattedStartDate = startDate
+    ? startDate.toISOString().split("T")[0]
+    : null;
+  const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
+
+  console.log(formattedStartDate, formattedEndDate);
+
   if (session) {
-    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat/v2`, {
-      headers: {
-        Authorization: `Bearer ${session.user?.accessToken}`,
-      },
-    });
+    const { data } = await axios.get(
+      `${process.env.API_URL}/daftar-surat?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+      }
+    );
 
     return NextResponse.json(data);
   } else {
@@ -67,6 +89,31 @@ export async function PUT(req: NextRequest) {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
           "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  if (session) {
+    const id = req.nextUrl.searchParams.get("id");
+
+    const { data } = await axios.delete(
+      `${process.env.API_URL}/daftar-surat/delete?surat_id=${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
         },
       }
     );

@@ -2,7 +2,11 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DownloadIcon,
+  InfoCircledIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 import { Users } from "../../(master)/manajemen-user/columns";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +16,7 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export type Letter = {
   id: number;
@@ -27,7 +32,7 @@ export type Letter = {
   tampilan: {
     pin: boolean;
     dibaca: boolean;
-  };
+  }[];
   jenis: {
     id: number;
     jenis: string;
@@ -37,7 +42,15 @@ export type Letter = {
     jabatan_id: number;
   }[];
   komentar: any[];
-  nomor_surat: any[];
+  nomor_surat: {
+    id: number;
+    nomor_surat: string;
+    periode: {
+      id: number;
+      tahun: string;
+      status: string;
+    };
+  }[];
   user: Users;
 };
 
@@ -54,8 +67,24 @@ export const columns: ColumnDef<Letter>[] = [
     },
     cell: ({ row }) => {
       const judul = row.original.judul;
-      const judulWithoutExtension = judul.split(".")[0];
-      return <div>{judulWithoutExtension}</div>;
+      return <div>{judul.split(".")[0].split("-")[0]}</div>;
+    },
+  },
+  {
+    accessorKey: "nomor_surat",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Nomor Surat" />
+    ),
+    filterFn: (row, id, value) => {
+      const rowValue = (row.getValue(id) as { nomor_surat: string })
+        .nomor_surat;
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.includes(v))
+      );
+    },
+    cell: ({ row }) => {
+      const nomorSurat = row.original.nomor_surat;
+      return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
     },
   },
   {
@@ -78,7 +107,7 @@ export const columns: ColumnDef<Letter>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as string).split(" ");
+      const rowValue = (row.getValue(id) as { status: string }).status;
       return value.some((val: string[]) =>
         val.some((v) => rowValue.includes(v))
       );
@@ -86,7 +115,22 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
-      return <div className="flex items-center space-x-2">{statusSurat}</div>;
+      // return <div className="flex items-center space-x-2">{statusSurat}</div>;
+      return (
+        <Badge
+          className={`text-white text-center
+            ${
+              (statusSurat.includes("Daftar Tunggu") ||
+                statusSurat.includes("Diproses")) &&
+              "bg-warning"
+            }
+            ${statusSurat.includes("Ditolak") && "bg-danger"}
+            ${statusSurat.includes("Ditandatangani") && "bg-success"}
+            `}
+        >
+          {statusSurat}
+        </Badge>
+      );
     },
   },
   {
@@ -128,21 +172,24 @@ export const columns: ColumnDef<Letter>[] = [
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as Letter;
-      const session = useSession();
-      const user = session?.data?.user as Users;
       const router = useRouter();
+      const session = useSession();
+      const user = session.data?.user as User;
+
+      const canDownload =
+        user?.jabatan.permision.download_surat &&
+        // User tidak punya jabatan atas & surat belum ditandatangani
+        ((!user?.jabatan.jabatan_atas &&
+          !letter?.status.status.includes("Ditandatangani")) ||
+          // User adalah pembuat surat
+          user?.jabatan.name === letter?.user.jabatan.name);
 
       const { mutate: mutateBaca } = useMutation({
         mutationFn: async () => {
-          if (
-            !letter.tampilan.dibaca &&
-            letter.status.status.includes(user.jabatan.name) &&
-            !letter.status.status.includes("Ditolak") &&
-            !letter.status.status.includes("Disetujui")
-          ) {
+          if (!letter.tampilan[0]?.dibaca) {
             const input = {
               dibaca: true,
-              pin: letter.tampilan.pin,
+              pin: letter.tampilan[0]?.pin,
             };
 
             await axios.put(`/api/surat/tampilan`, {
@@ -154,10 +201,33 @@ export const columns: ColumnDef<Letter>[] = [
         onSuccess: () => {
           router.push(`/surat/${letter.id}`);
         },
+        onError: (error) => {
+          console.log(error);
+        },
       });
 
       const handleBaca = async () => {
         await mutateBaca();
+      };
+
+      const handleDownload = async () => {
+        const response = await axios.get(`${row.original.url}`, {
+          responseType: "blob",
+        });
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: "application/pdf",
+          })
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `${row.original.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
       };
 
       return (
@@ -170,6 +240,15 @@ export const columns: ColumnDef<Letter>[] = [
           >
             <InfoCircledIcon className="h-5 w-5" />
           </Button>
+          {canDownload && (
+            <Button
+              className="bg-primary hover:bg-opacity-90 text-white"
+              size="sm"
+              onClick={handleDownload}
+            >
+              <DownloadIcon className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       );
     },

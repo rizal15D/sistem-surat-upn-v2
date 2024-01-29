@@ -7,12 +7,14 @@ import Modal from "../Modal/Modal";
 import { useToast } from "../ui/use-toast";
 import ConfirmationModal from "../Modal/ConfirmationModal";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
   const { toast } = useToast();
+  const router = useRouter();
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
@@ -74,8 +76,8 @@ const Header = (props: {
   return (
     <>
       <header className="sticky top-0 z-999 flex w-full bg-white drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
-        <div className="flex flex-grow items-center justify-between lg:justify-end px-4 py-4 shadow-2 md:px-6 2xl:px-11">
-          <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
+        <div className="flex flex-grow items-center justify-between px-4 py-2 shadow-2 md:px-6 2xl:px-11">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* <!-- Hamburger Toggle BTN --> */}
             <button
               aria-controls="sidebar"
@@ -83,7 +85,7 @@ const Header = (props: {
                 e.stopPropagation();
                 props.setSidebarOpen(!props.sidebarOpen);
               }}
-              className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark lg:hidden"
+              className="z-99999 block rounded-sm border border-stroke bg-white p-1.5 shadow-sm dark:border-strokedark dark:bg-boxdark"
             >
               <span className="relative block h-5.5 w-5.5 cursor-pointer">
                 <span className="du-block absolute right-0 h-full w-full">
@@ -126,7 +128,16 @@ const Header = (props: {
               src={"/images/logo/logo-icon.svg"}
               alt="Logo"
             />
+
           </Link> */}
+            <span
+              className="ml-2 text-xl font-bold text-black dark:text-white cursor-pointer"
+              onClick={() => {
+                router.push("/surat");
+              }}
+            >
+              UPN
+            </span>
           </div>
 
           {/* <div className="hidden sm:block">

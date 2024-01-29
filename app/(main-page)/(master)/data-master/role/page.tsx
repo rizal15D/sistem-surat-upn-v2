@@ -69,6 +69,7 @@ export default function DataMasterRolePage() {
     e.preventDefault();
     const data = {
       name: e.currentTarget.nama.value,
+      jabatan_atas_id: e.currentTarget.jabatan_atas_id.value,
       // edit permision
       buat_surat: e.currentTarget.buat_surat.checked,
       download_surat: e.currentTarget.download_surat.checked,
