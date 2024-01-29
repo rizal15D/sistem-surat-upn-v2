@@ -186,6 +186,8 @@ export const columns: ColumnDef<Letter>[] = [
 
       const { mutate: mutateBaca } = useMutation({
         mutationFn: async () => {
+          if (!letter.tampilan) return;
+
           if (!letter.tampilan[0]?.dibaca) {
             const input = {
               dibaca: true,
