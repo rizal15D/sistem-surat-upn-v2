@@ -39,7 +39,7 @@ export default function UploadSuratPage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["template"] });
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
       router.push("/surat");
       toast({
         title: "Berhasil menambahkan data",

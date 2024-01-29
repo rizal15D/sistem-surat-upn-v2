@@ -27,17 +27,25 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/DataTableComponents/DataTablePagination";
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
+import { Letter } from "./columns";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   filterData: any;
+  onDateRangeApply?: (date: any) => void;
+  date?: any;
+  setDate?: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   filterData,
+  onDateRangeApply,
+  date,
+  setDate,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -68,7 +76,12 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <DataTableToolbar table={table} filterInput="judul" data={filterData} />
-      <div className="rounded-md border">
+      <DatePickerWithRange
+        onDateRangeApply={onDateRangeApply}
+        date={date}
+        setDate={setDate}
+      />
+      <div className="rounded-md border mt-4">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -94,11 +107,12 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  // className={
-                  //   (row.original as { dibaca: boolean }).dibaca
-                  //     ? ""
-                  //     : "font-bold bg-gray-100 dark:bg-boxdark-2"
-                  // }
+                  className={
+                    (row.original as Letter).tampilan &&
+                    !(row.original as Letter).tampilan[0].dibaca
+                      ? "font-bold"
+                      : "bg-disabled"
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

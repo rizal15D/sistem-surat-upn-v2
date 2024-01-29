@@ -2,7 +2,11 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
-import { InfoCircledIcon, TrashIcon } from "@radix-ui/react-icons";
+import {
+  DownloadIcon,
+  InfoCircledIcon,
+  TrashIcon,
+} from "@radix-ui/react-icons";
 import { Users } from "../../(master)/manajemen-user/columns";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +16,7 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export type Letter = {
   id: number;
@@ -167,17 +172,21 @@ export const columns: ColumnDef<Letter>[] = [
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as Letter;
-      const session = useSession();
-      const user = session?.data?.user as Users;
       const router = useRouter();
+      const session = useSession();
+      const user = session.data?.user as User;
+
+      const canDownload =
+        user?.jabatan.permision.download_surat &&
+        // User tidak punya jabatan atas & surat belum ditandatangani
+        ((!user?.jabatan.jabatan_atas &&
+          !letter?.status.status.includes("Ditandatangani")) ||
+          // User adalah pembuat surat
+          user?.jabatan.name === letter?.user.jabatan.name);
 
       const { mutate: mutateBaca } = useMutation({
         mutationFn: async () => {
-          if (
-            letter.status.status.includes(user.jabatan.name) &&
-            !letter.status.status.includes("Ditolak") &&
-            !letter.status.status.includes("Disetujui")
-          ) {
+          if (!letter.tampilan[0]?.dibaca) {
             const input = {
               dibaca: true,
               pin: letter.tampilan[0]?.pin,
@@ -201,6 +210,26 @@ export const columns: ColumnDef<Letter>[] = [
         await mutateBaca();
       };
 
+      const handleDownload = async () => {
+        const response = await axios.get(`${row.original.url}`, {
+          responseType: "blob",
+        });
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: "application/pdf",
+          })
+        );
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute(
+          "download",
+          `${row.original.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
         <div className="flex items-center space-x-2">
           <Button
@@ -211,6 +240,15 @@ export const columns: ColumnDef<Letter>[] = [
           >
             <InfoCircledIcon className="h-5 w-5" />
           </Button>
+          {canDownload && (
+            <Button
+              className="bg-primary hover:bg-opacity-90 text-white"
+              size="sm"
+              onClick={handleDownload}
+            >
+              <DownloadIcon className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       );
     },

@@ -7,12 +7,14 @@ import Modal from "../Modal/Modal";
 import { useToast } from "../ui/use-toast";
 import ConfirmationModal from "../Modal/ConfirmationModal";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
   const { toast } = useToast();
+  const router = useRouter();
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [logoutModalOpen, setLogoutModalOpen] = useState(false);
 
@@ -128,7 +130,12 @@ const Header = (props: {
             />
 
           </Link> */}
-            <span className="ml-2 text-xl font-bold text-black dark:text-white">
+            <span
+              className="ml-2 text-xl font-bold text-black dark:text-white cursor-pointer"
+              onClick={() => {
+                router.push("/surat");
+              }}
+            >
               UPN
             </span>
           </div>

@@ -58,7 +58,14 @@ export default function SuratSinglePage() {
   const { data: letterData } = useQuery({
     queryKey: ["surat"],
     queryFn: async () => {
-      const response = await axios.get(`/api/surat`);
+      const response = await axios.get(
+        `/api/surat?startDate=${new Date(
+          2000,
+          1,
+          1
+        ).toISOString()}&endDate=${new Date().toISOString()}`
+      );
+
       return response.data;
     },
     enabled: !!id,
@@ -97,7 +104,6 @@ export default function SuratSinglePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["surat"] });
-      router.push("/surat");
       toast({
         title: "Berhasil",
         className: "bg-success text-white",
@@ -112,6 +118,7 @@ export default function SuratSinglePage() {
     onSettled: () => {
       setIsMenolakLoading(false);
       setIsSetujuLoading(false);
+      setModalDeleteOpen(false);
     },
   });
 
@@ -283,7 +290,7 @@ export default function SuratSinglePage() {
   const canDelete =
     // User yang mempunyai surat
     user?.jabatan.name === singleData?.user.jabatan.name &&
-    user?.user.prodi.name === singleData?.user.prodi.name &&
+    user?.user.prodi?.name === singleData?.user.prodi?.name &&
     // Surat masih di tangan atasan
     singleData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
     !singleData?.status.status.includes("Ditolak");
@@ -345,7 +352,10 @@ export default function SuratSinglePage() {
                 Pembuat Surat
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.user.name}, {singleData?.user.prodi.name}
+                {singleData?.user.name}
+                {singleData?.user.prodi
+                  ? `, (${singleData?.user.prodi.name})`
+                  : ""}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -499,7 +509,7 @@ export default function SuratSinglePage() {
                   <input
                     name="komentar"
                     type="text"
-                    placeholder="Masukkan komentar"
+                    placeholder="Masukkan alasan penolakan"
                     className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                   />
                 </div>
@@ -508,7 +518,7 @@ export default function SuratSinglePage() {
                   {isMenolakLoading ? (
                     <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
                   ) : (
-                    "Kirim Komentar"
+                    "Kirim alasan"
                   )}
                 </button>
               </div>

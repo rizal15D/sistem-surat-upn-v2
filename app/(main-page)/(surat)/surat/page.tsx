@@ -2,33 +2,67 @@
 
 import { PlusIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Letter, columns } from "./columns";
 import { DataTable } from "./data-table";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
-
-async function getData(): Promise<Letter[]> {
-  // Fetch data from your API here.
-  const { data } = await axios.get("/api/surat");
-  // sort data based on creationDate (descending)
-  data.sort((a: any, b: any) => {
-    return new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime();
-  });
-  return data;
-}
+import { useToast } from "@/components/ui/use-toast";
 
 export default function ListSuratPage() {
   const session = useSession();
   const user = session.data?.user as User;
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const [date, setDate] = useState({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 2),
+    to: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() + 1
+    ),
+  });
+
+  const [tableDate, setTableDate] = useState({
+    from: new Date(new Date().getFullYear(), new Date().getMonth(), 2),
+    to: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate() + 1
+    ),
+  });
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ["surat"],
-    queryFn: getData,
+    queryKey: ["surat", tableDate],
+    queryFn: async () => {
+      const startDate = new Date(
+        tableDate.from.getFullYear(),
+        tableDate.from.getMonth(),
+        tableDate.from.getDate()
+      );
+      const endDate = new Date(
+        tableDate.to.getFullYear(),
+        tableDate.to.getMonth(),
+        tableDate.to.getDate() + 1
+      );
+
+      const response = await axios.get(
+        `/api/surat?startDate=${startDate}&endDate=${endDate}`
+      );
+
+      const sortedData = response.data.sort(
+        (a: Letter, b: Letter) =>
+          new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime()
+      );
+
+      return sortedData;
+    },
+    staleTime: Infinity,
   });
 
   const { data: jenisData, isLoading: isJenisLoading } = useQuery({
@@ -59,6 +93,31 @@ export default function ListSuratPage() {
     return {};
   }, [jenisData]);
 
+  const handleOnDateRangeApply = useMemo(
+    () => (date: { from: Date; to: Date }) => {
+      if (!date.from && !date.to) {
+        toast({
+          title: "Gagal",
+          description: "Inputkan tanggal dengan benar",
+          className: "bg-danger text-white",
+        });
+        return;
+      }
+
+      if (!date.from) {
+        date.from = date.to;
+      }
+
+      if (!date.to) {
+        date.to = date.from;
+      }
+
+      setTableDate(date);
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+    },
+    []
+  );
+
   if (isLoading || isJenisLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -86,7 +145,14 @@ export default function ListSuratPage() {
 
       <div className="rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={data} filterData={filterData} />
+          <DataTable
+            columns={columns}
+            data={data}
+            filterData={filterData}
+            onDateRangeApply={handleOnDateRangeApply}
+            date={date}
+            setDate={setDate}
+          />
         </div>
       </div>
     </>
