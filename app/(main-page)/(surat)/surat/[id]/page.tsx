@@ -63,7 +63,11 @@ export default function SuratSinglePage() {
           2000,
           1,
           1
-        ).toISOString()}&endDate=${new Date().toISOString()}`
+        ).toISOString()}&endDate=${new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          new Date().getDate() + 1
+        ).toISOString()}`
       );
 
       return response.data;
