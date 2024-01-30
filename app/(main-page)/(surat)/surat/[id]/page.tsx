@@ -66,7 +66,7 @@ export default function SuratSinglePage() {
         ).toISOString()}&endDate=${new Date(
           new Date().getFullYear(),
           new Date().getMonth(),
-          new Date().getDate() + 1
+          new Date().getDate() + 3
         ).toISOString()}`
       );
 
@@ -430,7 +430,7 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {komentar && (
+            {komentar[komentar.length - 1] && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
