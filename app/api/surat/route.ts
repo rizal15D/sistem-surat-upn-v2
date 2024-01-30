@@ -25,8 +25,6 @@ export async function GET(req: NextRequest) {
     : null;
   const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
 
-  console.log(formattedStartDate, formattedEndDate);
-
   if (session) {
     const { data } = await axios.get(
       `${process.env.API_URL}/daftar-surat?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
@@ -72,6 +70,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Upload TTD
 export async function PUT(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
@@ -83,7 +82,7 @@ export async function PUT(req: NextRequest) {
     formData.delete("id");
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/daftar-surat/cloudinary/update?surat_id=${id}`,
+      `${process.env.API_URL}/daftar-surat/multer/ttd?surat_id=${id}`,
       formData,
       {
         headers: {

@@ -20,39 +20,28 @@ export default function ListSuratPage() {
   const { toast } = useToast();
 
   const [date, setDate] = useState({
-    from: new Date(new Date().getFullYear(), new Date().getMonth(), 2),
-    to: new Date(
+    from: new Date(
       new Date().getFullYear(),
-      new Date().getMonth(),
+      new Date().getMonth() - 1,
       new Date().getDate() + 1
     ),
+    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
   });
 
   const [tableDate, setTableDate] = useState({
-    from: new Date(new Date().getFullYear(), new Date().getMonth(), 2),
-    to: new Date(
+    from: new Date(
       new Date().getFullYear(),
-      new Date().getMonth(),
+      new Date().getMonth() - 1,
       new Date().getDate() + 1
     ),
+    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
   });
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["surat", tableDate],
     queryFn: async () => {
-      const startDate = new Date(
-        tableDate.from.getFullYear(),
-        tableDate.from.getMonth(),
-        tableDate.from.getDate()
-      );
-      const endDate = new Date(
-        tableDate.to.getFullYear(),
-        tableDate.to.getMonth(),
-        tableDate.to.getDate() + 1
-      );
-
       const response = await axios.get(
-        `/api/surat?startDate=${startDate}&endDate=${endDate}`
+        `/api/surat?startDate=${tableDate.from}&endDate=${tableDate.to}`
       );
 
       const sortedData = response.data.sort(
@@ -62,7 +51,6 @@ export default function ListSuratPage() {
 
       return sortedData;
     },
-    staleTime: Infinity,
   });
 
   const { data: jenisData, isLoading: isJenisLoading } = useQuery({
