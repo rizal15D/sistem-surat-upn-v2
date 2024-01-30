@@ -70,6 +70,10 @@ export const columns: ColumnDef<Periode>[] = [
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (periode.status) {
+            throw new Error("Periode aktif");
+          }
+
           const { data } = await axios.delete(`/api/periode`, {
             data: { id: periode.id },
           });
@@ -87,8 +91,9 @@ export const columns: ColumnDef<Periode>[] = [
         },
         onError: (error) => {
           toast({
-            title: "Gagal",
+            title: "Gagal menghapus data",
             description: error.message,
+            className: "bg-danger text-white",
           });
         },
       });

@@ -122,7 +122,7 @@ export default function SuratSinglePage() {
     onSettled: () => {
       setIsMenolakLoading(false);
       setIsSetujuLoading(false);
-      setModalDeleteOpen(false);
+      setModalMenolakOpen(false);
     },
   });
 
@@ -177,20 +177,15 @@ export default function SuratSinglePage() {
       router.push("/surat");
       toast({
         title: "Berhasil",
+        description: "Surat berhasil diupload",
         className: "bg-success text-white",
       });
     },
     onError: (error: any) => {
-      // toast({
-      //   title: "Gagal",
-      //   className: "bg-danger text-white",
-      // });
-      // Don't ask me
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
-      router.push("/surat");
       toast({
-        title: "Berhasil",
-        className: "bg-success text-white",
+        title: "Gagal",
+        description: error.response.data.message,
+        className: "bg-danger text-white",
       });
     },
     onSettled: () => {
