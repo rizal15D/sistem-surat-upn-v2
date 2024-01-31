@@ -25,7 +25,7 @@ export default function ListSuratPage() {
       new Date().getMonth() - 1,
       new Date().getDate() + 1
     ),
-    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+    to: new Date(),
   });
 
   const [tableDate, setTableDate] = useState({
@@ -34,19 +34,26 @@ export default function ListSuratPage() {
       new Date().getMonth() - 1,
       new Date().getDate() + 1
     ),
-    to: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
+    to: new Date(),
   });
 
   const { data = [], isLoading } = useQuery({
     queryKey: ["surat", tableDate],
     queryFn: async () => {
       const response = await axios.get(
-        `/api/surat?startDate=${tableDate.from}&endDate=${tableDate.to}`
+        `/api/surat?startDate=${tableDate.from}&endDate=${new Date(
+          tableDate.to.getFullYear(),
+          tableDate.to.getMonth(),
+          tableDate.to.getDate(),
+          0,
+          0,
+          0
+        )}`
       );
 
       const sortedData = response.data.sort(
         (a: Letter, b: Letter) =>
-          new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime()
+          new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime()
       );
 
       return sortedData;
