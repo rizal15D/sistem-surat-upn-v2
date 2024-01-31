@@ -41,7 +41,14 @@ export default function ListSuratPage() {
     queryKey: ["surat", tableDate],
     queryFn: async () => {
       const response = await axios.get(
-        `/api/surat?startDate=${tableDate.from}&endDate=${tableDate.to}`
+        `/api/surat?startDate=${tableDate.from}&endDate=${new Date(
+          tableDate.to.getFullYear(),
+          tableDate.to.getMonth(),
+          tableDate.to.getDate(),
+          0,
+          0,
+          0
+        )}`
       );
 
       const sortedData = response.data.sort(

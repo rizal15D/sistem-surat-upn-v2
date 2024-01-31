@@ -28,6 +28,7 @@ import Modal from "@/components/Modal/Modal";
 import SuratForm from "../surat-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { Badge } from "@/components/ui/badge";
+import { EditIcon } from "lucide-react";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -44,6 +45,7 @@ export default function SuratSinglePage() {
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+  const [modalRevisiOpen, setModalRevisiOpen] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -268,6 +270,77 @@ export default function SuratSinglePage() {
     }
   };
 
+  const { mutate: mutateRevisi } = useMutation({
+    mutationFn: async (input: { id: any; surat: File }) => {
+      setIsUploadLoading(true);
+      const response = await axios.put(
+        `/api/surat/revisi`,
+        {
+          id,
+          judul: singleData?.judul,
+          deskripsi: singleData?.deskripsi,
+          surat: input.surat,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      toast({
+        title: "Berhasil",
+        description: "Surat berhasil direvisi",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        description: error.response.data.message,
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsUploadLoading(false);
+      setModalRevisiOpen(false);
+    },
+  });
+
+  const handleRevisi = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const data = {
+      id,
+      surat: formData.get("file") as File,
+    };
+
+    if (!data.surat) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    if (warningMessage) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: warningMessage,
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    mutateRevisi(data);
+  };
+
   const canPersetujuan =
     user?.jabatan.permision.persetujuan &&
     // Surat di tangan user
@@ -293,6 +366,13 @@ export default function SuratSinglePage() {
     // Surat masih di tangan atasan
     singleData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
     !singleData?.status.status.includes("Ditolak");
+
+  const canRevisi =
+    // User yang mempunyai surat
+    user?.jabatan.name === singleData?.user.jabatan.name &&
+    user?.user.prodi?.name === singleData?.user.prodi?.name &&
+    // Surat punya nomor surat
+    singleData?.nomor_surat[singleData.nomor_surat.length - 1];
 
   if (isKomentarLoading)
     return (
@@ -479,6 +559,14 @@ export default function SuratSinglePage() {
                   <TrashIcon className="w-6 h-6" />
                 </Button>
               )}
+              {canRevisi && (
+                <Button
+                  className="bg-primary w-full"
+                  onClick={() => setModalRevisiOpen(true)}
+                >
+                  <EditIcon className="w-6 h-6" />
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -534,6 +622,17 @@ export default function SuratSinglePage() {
           }?`}
           onClick={handleDelete}
         />
+      )}
+      {modalRevisiOpen && (
+        <Modal setModalOpen={setModalRevisiOpen}>
+          <SuratForm
+            onSubmit={handleRevisi}
+            warningMessage={warningMessage}
+            setWarningMessage={setWarningMessage}
+            isLoading={isUploadLoading}
+            isAdminDekan={true}
+          />
+        </Modal>
       )}
     </div>
   );
