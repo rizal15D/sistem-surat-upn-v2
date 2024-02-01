@@ -2,9 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions, User } from "../../auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { NextResponse } from "next/server";
-import { NextApiRequest } from "next";
 
-export async function GET(req: NextApiRequest, context: any) {
+export async function GET(context: any) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
