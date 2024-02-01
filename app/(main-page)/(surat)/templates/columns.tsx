@@ -11,6 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
 import axios from "axios";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { useSession } from "next-auth/react";
 
 export type Template = {
   id: number;
@@ -67,14 +69,26 @@ export const columns: ColumnDef<Template>[] = [
     id: "actions",
     cell: ({ row }) => {
       const template = row.original as Template;
+      const session = useSession();
+      const user = session.data?.user as User;
 
       const handleDownload = async () => {
-        const response = await fetch(`${template.url}`);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        const token = user.accessToken;
+        const response = await axios.get(`${template.url}`, {
+          responseType: "arraybuffer",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        });
+
+        const file = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+        const fileURL = URL.createObjectURL(file);
 
         const link = document.createElement("a");
-        link.href = url;
+        link.href = fileURL;
         link.setAttribute("download", template.judul);
         document.body.appendChild(link);
         link.click();

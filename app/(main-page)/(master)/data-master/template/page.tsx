@@ -46,7 +46,6 @@ export default function DataMasterTemplatePage() {
       deskripsi: any;
       jenis_id: any;
       surat: File;
-      thumbnail: File;
     }) => {
       setIsLoading(true);
       const response = await axios.post(
@@ -56,7 +55,6 @@ export default function DataMasterTemplatePage() {
           deskripsi: input.deskripsi,
           jenis_id: input.jenis_id,
           surat: input.surat,
-          thumbnail: input.thumbnail,
         },
         {
           headers: {
@@ -96,16 +94,9 @@ export default function DataMasterTemplatePage() {
       deskripsi: formData.get("deskripsi"),
       jenis_id: formData.get("jenis_id"),
       surat: formData.get("file") as File,
-      thumbnail: formData.get("file") as File,
     };
 
-    if (
-      !data.judul ||
-      !data.deskripsi ||
-      !data.jenis_id ||
-      !data.surat ||
-      !data.thumbnail
-    ) {
+    if (!data.judul || !data.deskripsi || !data.jenis_id || !data.surat) {
       toast({
         title: "Gagal menambahkan data",
         description: "Data tidak boleh kosong",

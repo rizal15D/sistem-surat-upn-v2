@@ -17,6 +17,8 @@ import Modal from "@/components/Modal/Modal";
 import TemplateForm from "./template-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 export type Template = {
   id: string;
@@ -73,11 +75,15 @@ export const columns: ColumnDef<Template>[] = [
     cell: ({ row }) => {
       const template = row.original;
       const queryClient = useQueryClient();
+      const session = useSession();
+      const user = session.data?.user as User;
+      const { toast } = useToast();
+      const [warningMessage, setWarningMessage] = useState("");
+
+      const [isLoading, setIsLoading] = useState(false);
+
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
-      const [isLoading, setIsLoading] = useState(false);
-      const [warningMessage, setWarningMessage] = useState("");
-      const { toast } = useToast();
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
@@ -196,12 +202,22 @@ export const columns: ColumnDef<Template>[] = [
       };
 
       const handleDownload = async () => {
-        const response = await fetch(`${template.url}`);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        const token = user.accessToken;
+        const response = await axios.get(`${template.url}`, {
+          responseType: "arraybuffer",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": true,
+          },
+        });
+
+        const file = new Blob([response.data], {
+          type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+        const fileURL = URL.createObjectURL(file);
 
         const link = document.createElement("a");
-        link.href = url;
+        link.href = fileURL;
         link.setAttribute("download", template.judul);
         document.body.appendChild(link);
         link.click();
