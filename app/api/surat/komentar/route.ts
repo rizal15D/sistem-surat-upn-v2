@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
 
     const { data } = await axios.get(
-      `${process.env.API_URL}/komentar?id=${id}`,
+      `${process.env.API_URL}/komentar/detail?surat_id=${id}`,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

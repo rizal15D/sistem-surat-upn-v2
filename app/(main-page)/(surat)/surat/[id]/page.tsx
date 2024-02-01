@@ -632,13 +632,13 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {komentar[komentar.length - 1] && (
+            {komentar.komentar && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
                 </span>
                 <span className="text-body-xs text-black dark:text-white">
-                  {komentar[komentar.length - 1]?.komentar}
+                  {komentar.komentar.komentar}
                 </span>
               </div>
             )}
@@ -706,8 +706,14 @@ export default function SuratSinglePage() {
                   className="flex gap-2 bg-primary w-full"
                   onClick={() => mutateOCR()}
                 >
-                  <Clipboard className="w-6 h-6" />
-                  Tempel Nomor Surat
+                  {isOCRLoading ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    <>
+                      <Clipboard className="w-6 h-6" />
+                      Tempel Nomor Surat
+                    </>
+                  )}
                 </Button>
               )}
             </div>

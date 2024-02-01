@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/template-surat/cloudinary/upload`,
+      `${process.env.API_URL}/template-surat/multer/upload`,
       formData,
       {
         headers: {
@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
     formData.delete("id");
 
     const { data } = await axios.put(
-      `${process.env.API_URL}/template-surat/cloudinary/update?template_id=${id}`,
+      `${process.env.API_URL}/template-surat/multer/update?template_id=${id}`,
       formData,
       {
         headers: {
