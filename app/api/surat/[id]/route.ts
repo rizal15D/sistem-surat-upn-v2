@@ -1,9 +1,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions, User } from "../../auth/[...nextauth]/authOptions";
 import axios from "axios";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(context: any) {
+export async function GET(req: NextRequest, context: any) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
