@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/daftar-surat/cloudinary/upload`,
+      `${process.env.API_URL}/daftar-surat/multer/upload`,
       formData,
       {
         headers: {

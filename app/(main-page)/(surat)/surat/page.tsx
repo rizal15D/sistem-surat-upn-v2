@@ -23,18 +23,38 @@ export default function ListSuratPage() {
     from: new Date(
       new Date().getFullYear(),
       new Date().getMonth() - 1,
-      new Date().getDate() + 1
+      new Date().getDate(),
+      0,
+      0,
+      0
     ),
-    to: new Date(),
+    to: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate(),
+      0,
+      0,
+      0
+    ),
   });
 
   const [tableDate, setTableDate] = useState({
     from: new Date(
       new Date().getFullYear(),
       new Date().getMonth() - 1,
-      new Date().getDate() + 1
+      new Date().getDate(),
+      0,
+      0,
+      0
     ),
-    to: new Date(),
+    to: new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      new Date().getDate(),
+      0,
+      0,
+      0
+    ),
   });
 
   const { data = [], isLoading } = useQuery({
@@ -107,7 +127,24 @@ export default function ListSuratPage() {
         date.to = date.from;
       }
 
-      setTableDate(date);
+      setTableDate({
+        from: new Date(
+          date.from.getFullYear(),
+          date.from.getMonth(),
+          date.from.getDate(),
+          0,
+          0,
+          0
+        ),
+        to: new Date(
+          date.to.getFullYear(),
+          date.to.getMonth(),
+          date.to.getDate(),
+          0,
+          0,
+          0
+        ),
+      });
       queryClient.invalidateQueries({ queryKey: ["surat"] });
     },
     []
