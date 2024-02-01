@@ -115,17 +115,16 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
-      // return <div className="flex items-center space-x-2">{statusSurat}</div>;
       return (
         <Badge
           className={`text-white text-center
             ${
-              (statusSurat.includes("Daftar Tunggu") ||
-                statusSurat.includes("Diproses")) &&
+              (statusSurat?.includes("Daftar Tunggu") ||
+                statusSurat?.includes("Diproses")) &&
               "bg-warning"
             }
-            ${statusSurat.includes("Ditolak") && "bg-danger"}
-            ${statusSurat.includes("Ditandatangani") && "bg-success"}
+            ${statusSurat?.includes("Ditolak") && "bg-danger"}
+            ${statusSurat?.includes("Ditandatangani") && "bg-success"}
             `}
         >
           {statusSurat}
@@ -213,16 +212,20 @@ export const columns: ColumnDef<Letter>[] = [
       };
 
       const handleDownload = async () => {
-        const response = await axios.get(`${row.original.url}`, {
-          responseType: "blob",
+        const token = user.accessToken;
+        const response = await axios.get(`${row.original?.url}`, {
+          responseType: "arraybuffer",
+          headers: {
+            // "Content-Type": "application/pdf",
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": true,
+          },
         });
-        const url = window.URL.createObjectURL(
-          new Blob([response.data], {
-            type: "application/pdf",
-          })
-        );
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+
         const link = document.createElement("a");
-        link.href = url;
+        link.href = fileURL;
         link.setAttribute(
           "download",
           `${row.original.judul.split(".")[0]}.pdf`

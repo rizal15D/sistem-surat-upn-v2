@@ -20,10 +20,10 @@ import {
   UploadIcon,
 } from "@radix-ui/react-icons";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Modal from "@/components/Modal/Modal";
 import SuratForm from "../surat-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
@@ -32,17 +32,19 @@ import { EditIcon } from "lucide-react";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
-  const { toast } = useToast();
-  const { id } = useParams();
+  const router = useRouter();
   const session = useSession();
   const user = session.data?.user as User;
-  const router = useRouter();
+  const { toast } = useToast();
+  const { id } = useParams();
+  const [warningMessage, setWarningMessage] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+
   const [isMenolakLoading, setIsMenolakLoading] = useState(false);
   const [isSetujuLoading, setIsSetujuLoading] = useState(false);
-  const [warningMessage, setWarningMessage] = useState("");
+  const [isUploadLoading, setIsUploadLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [modalRevisiOpen, setModalRevisiOpen] = useState(false);
@@ -57,30 +59,41 @@ export default function SuratSinglePage() {
     SwitchTheme: () => <></>,
   });
 
+  // Get Data Surat
   const { data: letterData } = useQuery({
-    queryKey: ["surat"],
+    queryKey: ["surat", id],
     queryFn: async () => {
-      const response = await axios.get(
-        `/api/surat?startDate=${new Date(
-          2000,
-          1,
-          1
-        ).toISOString()}&endDate=${new Date(
-          new Date().getFullYear(),
-          new Date().getMonth(),
-          new Date().getDate() + 3
-        ).toISOString()}`
-      );
+      const response = await axios.get(`/api/surat/${id}`);
+
+      console.log(response.data);
 
       return response.data;
     },
     enabled: !!id,
   });
 
-  const singleData = letterData
-    ? (letterData.find((item: Letter) => item.id === Number(id)) as Letter)
-    : null;
+  const getFileUrl = async () => {
+    const token = user.accessToken;
+    const response = await axios.get(`${letterData?.url}`, {
+      responseType: "arraybuffer",
+      headers: {
+        // "Content-Type": "application/pdf",
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": true,
+      },
+    });
+    const file = new Blob([response.data], { type: "application/pdf" });
+    const fileURL = URL.createObjectURL(file);
+    return fileURL;
+  };
 
+  useEffect(() => {
+    if (letterData) {
+      getFileUrl().then((url) => setFileUrl(url));
+    }
+  }, [letterData]);
+
+  // Get Komentar
   const getKomentar = async () => {
     const response = await axios.get(`/api/surat/komentar`, {
       params: { id },
@@ -94,6 +107,7 @@ export default function SuratSinglePage() {
     enabled: !!id,
   });
 
+  // Buat Komentar
   const { mutate } = useMutation({
     mutationFn: async (input: { persetujuan: string; komentar?: string }) => {
       if (input.komentar) {
@@ -128,35 +142,87 @@ export default function SuratSinglePage() {
     },
   });
 
+  // Download Surat
+  // const handleDownload = async (): Promise<void> => {
+  //   try {
+  //     const user = (session.data?.user as User) || {};
+  //     const token = user.accessToken;
+  //     const response: AxiosResponse<ArrayBuffer> = await axios.get<ArrayBuffer>(
+  //       `${letterData?.url}`,
+  //       {
+  //         responseType: "arraybuffer",
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           "ngrok-skip-browser-warning": true,
+  //         },
+  //       }
+  //     );
+
+  //     const blob = new Blob([response.data], {
+  //       type: "application/pdf",
+  //     });
+
+  //     const url = window.URL.createObjectURL(blob);
+
+  //     let link = document.createElement("a");
+  //     link.href = url;
+  //     link.setAttribute("download", `${letterData?.judul.split(".")[0]}`);
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     link.remove();
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     // Handle error as needed
+  //   }
+  // };
   const handleDownload = async () => {
-    const response = await axios.get(`${singleData?.url}`, {
-      responseType: "blob",
-    });
-    const url = window.URL.createObjectURL(
-      new Blob([response.data], {
-        type: "application/pdf",
-      })
-    );
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", `${singleData?.judul.split(".")[0]}.pdf`);
+    let link = document.createElement("a");
+    link.href = fileUrl;
+    link.setAttribute("download", `${letterData?.judul.split(".")[0]}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();
   };
 
+  // Buka File
   const handleOpenFile = async () => {
-    const response = await axios.get(`${singleData?.url}`, {
-      responseType: "blob",
-    });
-    const file = new Blob([response.data], { type: "application/pdf" });
-    //Build a URL from the file
-    const fileURL = URL.createObjectURL(file);
-    //Open the URL on new Window
-    const pdfWindow = window.open() as Window;
-    pdfWindow.location.href = fileURL;
+    const pdfWindow = window.open();
+    if (pdfWindow) {
+      pdfWindow.location.href = fileUrl;
+    } else {
+      console.error("Failed to open a new window.");
+    }
+    // console.log(letterData?.url);
+    // const response = await axios.get(`${letterData?.url}`, {
+    //   responseType: "blob",
+    //   headers: {
+    //     Authorization: "Bearer " + token,
+    //   },
+    // });
+    // console.log(response.data);
+    // const file = new Blob([response.data], { type: "application/pdf" });
+    // //Build a URL from the file
+    // const fileURL = URL.createObjectURL(file);
+    // //Open the URL on new Window
+    // const pdfWindow = window.open() as Window;
+    // pdfWindow.location.href = fileURL;
+
+    // const response = await axios.get(`${letterData?.url}`, {
+    //   responseType: "blob",
+    //   headers: {
+    //     "Content-Type": "application/pdf",
+    //     Authorization: "Bearer " + token,
+    //     "ngrok-skip-browser-warning": true,
+    //   },
+    // });
+
+    // const file = new Blob([response.data], { type: "application/pdf" });
+    // const fileURL = URL.createObjectURL(file);
+    // const pdfWindow = window.open() as Window;
+    // pdfWindow.location.href = fileURL;
   };
 
+  // Upload Surat TTD (Admin Dekan)
   const { mutate: mutateUpload } = useMutation({
     mutationFn: async (input: { id: any; surat: File }) => {
       setIsUploadLoading(true);
@@ -226,6 +292,7 @@ export default function SuratSinglePage() {
     mutateUpload(data);
   };
 
+  // Delete Surat
   const { mutate: mutateDelete } = useMutation({
     mutationFn: async () => {
       const response = await axios.delete(`/api/surat`, {
@@ -253,6 +320,7 @@ export default function SuratSinglePage() {
     await mutateDelete();
   };
 
+  // Persetujuan
   const handleSetuju = () => {
     if (user?.jabatan.permision.persetujuan) {
       mutate({ persetujuan: `Disetujui ${user?.user.jabatan.name}` });
@@ -277,8 +345,8 @@ export default function SuratSinglePage() {
         `/api/surat/revisi`,
         {
           id,
-          judul: singleData?.judul,
-          deskripsi: singleData?.deskripsi,
+          judul: letterData?.judul,
+          deskripsi: letterData?.deskripsi,
           surat: input.surat,
         },
         {
@@ -344,10 +412,10 @@ export default function SuratSinglePage() {
   const canPersetujuan =
     user?.jabatan.permision.persetujuan &&
     // Surat di tangan user
-    singleData?.status.status.includes(user?.user.jabatan.name) &&
-    !singleData?.status.status.includes(user?.jabatan.jabatan_atas?.name) &&
-    (singleData?.status.status.includes("Daftar Tunggu") ||
-      singleData?.status.status.includes("Diproses"));
+    letterData?.status.status.includes(user?.user.jabatan.name) &&
+    !letterData?.status.status.includes(user?.jabatan.jabatan_atas?.name) &&
+    (letterData?.status.status.includes("Daftar Tunggu") ||
+      letterData?.status.status.includes("Diproses"));
 
   const canUpload = user?.jabatan.permision.upload_tandatangan;
 
@@ -355,24 +423,24 @@ export default function SuratSinglePage() {
     user?.jabatan.permision.download_surat &&
     // User tidak punya jabatan atas & surat belum ditandatangani
     ((!user?.jabatan.jabatan_atas &&
-      !singleData?.status.status.includes("Ditandatangani")) ||
+      !letterData?.status.status.includes("Ditandatangani")) ||
       // User adalah pembuat surat
-      user?.jabatan.name === singleData?.user.jabatan.name);
+      user?.jabatan.name === letterData?.user?.jabatan.name);
 
   const canDelete =
     // User yang mempunyai surat
-    user?.jabatan.name === singleData?.user.jabatan.name &&
-    user?.user.prodi?.name === singleData?.user.prodi?.name &&
+    user?.jabatan.name === letterData?.user?.jabatan.name &&
+    user?.user.prodi?.name === letterData?.user?.prodi?.name &&
     // Surat masih di tangan atasan
-    singleData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
-    !singleData?.status.status.includes("Ditolak");
+    letterData?.status.status.includes(user.jabatan.jabatan_atas.name) &&
+    !letterData?.status.status.includes("Ditolak");
 
   const canRevisi =
     // User yang mempunyai surat
-    user?.jabatan.name === singleData?.user.jabatan.name &&
-    user?.user.prodi?.name === singleData?.user.prodi?.name &&
+    user?.jabatan.name === letterData?.user?.jabatan.name &&
+    user?.user.prodi?.name === letterData?.user?.prodi?.name &&
     // Surat punya nomor surat
-    singleData?.nomor_surat[singleData.nomor_surat.length - 1];
+    letterData?.nomor_surat[letterData.nomor_surat.length - 1];
 
   if (isKomentarLoading)
     return (
@@ -385,14 +453,14 @@ export default function SuratSinglePage() {
     <div className="lg:flex gap-10 w-full">
       <div className="lg:w-3/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10">
-          {/* Tombol buka file, absolute di atas worker */}
-          {singleData && (
+          {/* Tombol buka file, absolute di atas worker*/}
+          {letterData && fileUrl && (
             <>
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
                 <div className="mb-4 h-[100vh]">
                   <Toolbar>{renderDefaultToolbar(transform)}</Toolbar>;
                   <Viewer
-                    fileUrl={singleData?.url}
+                    fileUrl={fileUrl}
                     defaultScale={SpecialZoomLevel.ActualSize}
                     plugins={[toolbarPluginInstance]}
                   />
@@ -423,7 +491,7 @@ export default function SuratSinglePage() {
                 Judul
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.judul.split(".")[0].split("-")[0]}
+                {letterData?.judul.split(".")[0].split("-")[0]}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -431,9 +499,9 @@ export default function SuratSinglePage() {
                 Pembuat Surat
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.user.name}
-                {singleData?.user.prodi
-                  ? `, (${singleData?.user.prodi.name})`
+                {letterData?.user?.name}
+                {letterData?.user?.prodi
+                  ? `, (${letterData?.user?.prodi.name})`
                   : ""}
               </span>
             </div>
@@ -445,18 +513,18 @@ export default function SuratSinglePage() {
                 <Badge
                   className={`text-white text-center
             ${
-              (singleData?.status.status.includes("Daftar Tunggu") ||
-                singleData?.status.status.includes("Diproses")) &&
+              (letterData?.status.status.includes("Daftar Tunggu") ||
+                letterData?.status.status.includes("Diproses")) &&
               "bg-warning"
             }
-            ${singleData?.status.status.includes("Ditolak") && "bg-danger"}
+            ${letterData?.status.status.includes("Ditolak") && "bg-danger"}
             ${
-              singleData?.status.status.includes("Ditandatangani") &&
+              letterData?.status.status.includes("Ditandatangani") &&
               "bg-success"
             }
             `}
                 >
-                  {singleData?.status.status}
+                  {letterData?.status.status}
                 </Badge>
               </span>
             </div>
@@ -465,8 +533,8 @@ export default function SuratSinglePage() {
                 Nomor Surat
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.nomor_surat[singleData.nomor_surat.length - 1]
-                  ? singleData?.nomor_surat[singleData.nomor_surat.length - 1]
+                {letterData?.nomor_surat[letterData.nomor_surat.length - 1]
+                  ? letterData?.nomor_surat[letterData.nomor_surat.length - 1]
                       .nomor_surat
                   : "-"}
               </span>
@@ -476,13 +544,13 @@ export default function SuratSinglePage() {
                 Tanggal Dibuat
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData &&
+                {letterData &&
                   new Intl.DateTimeFormat("id-ID", {
                     weekday: "long" as "long",
                     day: "numeric" as "numeric",
                     month: "long" as "long",
                     year: "numeric" as "numeric",
-                  }).format(new Date(singleData.tanggal.toString()))}
+                  }).format(new Date(letterData.tanggal.toString()))}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -490,7 +558,7 @@ export default function SuratSinglePage() {
                 Jenis Surat
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.jenis.jenis}
+                {letterData?.jenis.jenis}
               </span>
             </div>
           </div>
@@ -501,7 +569,7 @@ export default function SuratSinglePage() {
                 Deskripsi
               </span>
               <span className="text-body-xs text-black dark:text-white">
-                {singleData?.deskripsi}
+                {letterData?.deskripsi}
               </span>
             </div>
 
@@ -618,7 +686,7 @@ export default function SuratSinglePage() {
           setModalOpen={setModalDeleteOpen}
           title="Hapus Surat"
           message={`Apakah anda yakin ingin menghapus surat ${
-            singleData?.judul.split(".")[0]
+            letterData?.judul.split(".")[0]
           }?`}
           onClick={handleDelete}
         />
