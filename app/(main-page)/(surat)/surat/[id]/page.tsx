@@ -104,7 +104,7 @@ export default function SuratSinglePage() {
   const { data: komentar, isLoading: isKomentarLoading } = useQuery({
     queryKey: ["komentar", id],
     queryFn: getKomentar,
-    enabled: !!id,
+    enabled: !!letterData?.surat.status.status.includes("Ditolak"),
   });
 
   // Buat Komentar
@@ -632,7 +632,7 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {komentar.komentar && (
+            {komentar?.komentar && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
