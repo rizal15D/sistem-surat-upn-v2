@@ -706,8 +706,14 @@ export default function SuratSinglePage() {
                   className="flex gap-2 bg-primary w-full"
                   onClick={() => mutateOCR()}
                 >
-                  <Clipboard className="w-6 h-6" />
-                  Tempel Nomor Surat
+                  {isOCRLoading ? (
+                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    <>
+                      <Clipboard className="w-6 h-6" />
+                      Tempel Nomor Surat
+                    </>
+                  )}
                 </Button>
               )}
             </div>
