@@ -8,6 +8,7 @@ import { useToast } from "../ui/use-toast";
 import ConfirmationModal from "../Modal/ConfirmationModal";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import DropdownNotification from "./DropdownNotification";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
@@ -183,7 +184,7 @@ const Header = (props: {
               {/* <!-- Dark Mode Toggler --> */}
 
               {/* <!-- Notification Menu Area --> */}
-              {/* <DropdownNotification /> */}
+              <DropdownNotification />
               {/* <!-- Notification Menu Area --> */}
 
               {/* <!-- Chat Notification Area --> */}

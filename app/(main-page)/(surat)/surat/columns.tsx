@@ -183,34 +183,6 @@ export const columns: ColumnDef<Letter>[] = [
           // User adalah pembuat surat
           user?.jabatan.name === letter?.user.jabatan.name);
 
-      const { mutate: mutateBaca } = useMutation({
-        mutationFn: async () => {
-          if (!letter.tampilan) return;
-
-          if (!letter.tampilan[0]?.dibaca) {
-            const input = {
-              dibaca: true,
-              pin: letter.tampilan[0]?.pin,
-            };
-
-            await axios.put(`/api/surat/tampilan`, {
-              id: letter.id,
-              input,
-            });
-          }
-        },
-        onSuccess: () => {
-          router.push(`/surat/${letter.id}`);
-        },
-        onError: (error) => {
-          console.log(error);
-        },
-      });
-
-      const handleBaca = async () => {
-        await mutateBaca();
-      };
-
       const handleDownload = async () => {
         const token = user.accessToken;
         const response = await axios.get(`${row.original?.url}`, {
@@ -240,7 +212,9 @@ export const columns: ColumnDef<Letter>[] = [
           <Button
             variant="default"
             size="sm"
-            onClick={handleBaca}
+            onClick={() => {
+              router.push(`/surat/${letter.id}`);
+            }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
             <InfoCircledIcon className="h-5 w-5" />
