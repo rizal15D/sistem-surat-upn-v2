@@ -72,6 +72,26 @@ export default function SuratSinglePage() {
     enabled: !!id,
   });
 
+  const { mutate: mutateBaca } = useMutation({
+    mutationFn: async () => {
+      const input = {
+        dibaca: true,
+        pin: letterData.tampilan[0]?.pin,
+      };
+
+      await axios.put(`/api/surat/tampilan`, {
+        id: id,
+        input,
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (!letterData?.tampilan) return;
+    if (letterData?.tampilan[0]?.dibaca) return;
+    mutateBaca();
+  }, [letterData]);
+
   const getFileUrl = async () => {
     const token = user.accessToken;
     const response = await axios.get(`${letterData?.surat.url}`, {

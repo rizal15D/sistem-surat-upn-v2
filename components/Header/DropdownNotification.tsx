@@ -1,9 +1,22 @@
-import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  const { data: notifikasi } = useQuery({
+    queryKey: ["notifikasi"],
+    queryFn: async () => {
+      const res = await axios.get("/api/notifikasi");
+      return res.data;
+    },
+  });
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -19,8 +32,8 @@ const DropdownNotification = () => {
         return;
       setDropdownOpen(false);
     };
-    document.addEventListener('click', clickHandler);
-    return () => document.removeEventListener('click', clickHandler);
+    document.addEventListener("click", clickHandler);
+    return () => document.removeEventListener("click", clickHandler);
   });
 
   // close if the esc key is pressed
@@ -29,8 +42,41 @@ const DropdownNotification = () => {
       if (!dropdownOpen || keyCode !== 27) return;
       setDropdownOpen(false);
     };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
+    document.addEventListener("keydown", keyHandler);
+    return () => document.removeEventListener("keydown", keyHandler);
+  });
+
+  const { mutate: deleteNotifikasi } = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await axios.delete(`/api/notifikasi?id=${id}`);
+
+      if (res.status === 200) {
+        setNotifying(false);
+        queryClient.invalidateQueries({
+          queryKey: ["notifikasi"],
+        });
+        router.push(`/surat/${id}`);
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+
+  const { mutate: deleteAllNotifikasi } = useMutation({
+    mutationFn: async () => {
+      const res = await axios.delete(`/api/notifikasi`);
+
+      if (res.status === 200) {
+        setNotifying(false);
+        queryClient.invalidateQueries({
+          queryKey: ["notifikasi"],
+        });
+      }
+    },
+    onError: (error) => {
+      console.log(error);
+    },
   });
 
   return (
@@ -46,7 +92,7 @@ const DropdownNotification = () => {
       >
         <span
           className={`absolute -top-0.5 right-0 z-1 h-2 w-2 rounded-full bg-meta-1 ${
-            notifying === false ? 'hidden' : 'inline'
+            notifying === false ? "hidden" : "inline"
           }`}
         >
           <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
@@ -71,78 +117,55 @@ const DropdownNotification = () => {
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
         onBlur={() => setDropdownOpen(false)}
-        className={`absolute -right-27 mt-2.5 flex h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
-          dropdownOpen === true ? 'block' : 'hidden'
+        className={`absolute -right-27 mt-2.5 flex max-h-90 w-75 flex-col rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark sm:right-0 sm:w-80 ${
+          dropdownOpen === true ? "block" : "hidden"
         }`}
       >
         <div className="px-4.5 py-3">
-          <h5 className="text-sm font-medium text-bodydark2">Notification</h5>
+          <h5 className="text-sm font-medium text-bodydark2">Notifikasi</h5>
         </div>
 
         <ul className="flex h-auto flex-col overflow-y-auto">
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  Edit your information in a swipe
-                </span>{' '}
-                Sint occaecat cupidatat non proident, sunt in culpa qui officia
-                deserunt mollit anim.
-              </p>
+          {notifikasi?.map((notif: any, index: number) => (
+            <li key={index}>
+              <button
+                className="w-full flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
+                onClick={() => {
+                  deleteNotifikasi(notif.id);
+                }}
+              >
+                <p className="text-sm text-left">
+                  <span className="text-black dark:text-white">
+                    {notif.surat.judul.split(".")[0]}
+                  </span>
+                  , {notif.pesan}
+                </p>
 
-              <p className="text-xs">12 May, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  It is a long established fact
-                </span>{' '}
-                that a reader will be distracted by the readable.
+                {/* <p className="text-xs">{notif.date}</p> */}
+              </button>
+            </li>
+          ))}
+          {notifikasi?.length === 0 && (
+            <li>
+              <p className="w-full flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 dark:border-strokedark dark:hover:bg-meta-4">
+                <span className="text-sm text-left">Tidak ada notifikasi</span>
               </p>
-
-              <p className="text-xs">24 Feb, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  There are many variations
-                </span>{' '}
-                of passages of Lorem Ipsum available, but the majority have
-                suffered
-              </p>
-
-              <p className="text-xs">04 Jan, 2025</p>
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              href="#"
-            >
-              <p className="text-sm">
-                <span className="text-black dark:text-white">
-                  There are many variations
-                </span>{' '}
-                of passages of Lorem Ipsum available, but the majority have
-                suffered
-              </p>
-
-              <p className="text-xs">01 Dec, 2024</p>
-            </Link>
-          </li>
+            </li>
+          )}
+          {notifikasi?.length > 0 && (
+            <li>
+              <button
+                className="w-full flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
+                onClick={() => {
+                  deleteAllNotifikasi();
+                }}
+              >
+                <p className="text-sm text-left text-primary">
+                  Hapus Semua Notifikasi
+                </p>
+              </button>
+            </li>
+          )}
         </ul>
       </div>
     </li>
