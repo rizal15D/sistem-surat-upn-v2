@@ -62,7 +62,7 @@ export default function SuratSinglePage() {
   });
 
   // Get Data Surat
-  const { data: letterData } = useQuery({
+  const { data: letterData, isLoading: isLetterLoading } = useQuery({
     queryKey: ["surat", id],
     queryFn: async () => {
       const response = await axios.get(`/api/surat/${id}`);
@@ -76,7 +76,7 @@ export default function SuratSinglePage() {
     mutationFn: async () => {
       const input = {
         dibaca: true,
-        pin: letterData.tampilan[0]?.pin,
+        pin: letterData.surat.tampilan[0]?.pin,
       };
 
       await axios.put(`/api/surat/tampilan`, {
@@ -84,13 +84,10 @@ export default function SuratSinglePage() {
         input,
       });
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+    },
   });
-
-  useEffect(() => {
-    if (!letterData?.tampilan) return;
-    if (letterData?.tampilan[0]?.dibaca) return;
-    mutateBaca();
-  }, [letterData]);
 
   const getFileUrl = async () => {
     const token = user.accessToken;
@@ -110,6 +107,12 @@ export default function SuratSinglePage() {
   useEffect(() => {
     if (letterData) {
       getFileUrl().then((url) => setFileUrl(url));
+
+      if (letterData.surat.tampilan) {
+        if (!letterData.surat.tampilan[0]?.dibaca) {
+          mutateBaca();
+        }
+      }
     }
   }, [letterData]);
 
@@ -505,7 +508,7 @@ export default function SuratSinglePage() {
     // Surat punya nomor surat
     letterData?.surat.nomor_surat[letterData?.surat.nomor_surat.length - 1];
 
-  if (isKomentarLoading)
+  if (isKomentarLoading || isLetterLoading)
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>

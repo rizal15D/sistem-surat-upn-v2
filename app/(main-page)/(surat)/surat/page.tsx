@@ -88,8 +88,16 @@ export default function ListSuratPage() {
     },
   });
 
+  const { data: prodiData, isLoading: isProdiLoading } = useQuery({
+    queryKey: ["prodi"],
+    queryFn: async () => {
+      const response = await axios.get("/api/prodi");
+      return response.data;
+    },
+  });
+
   const filterData = useMemo(() => {
-    if (jenisData) {
+    if (prodiData && jenisData) {
       return {
         jenis: jenisData.map((jenis: Jenis) => ({
           value: [jenis.jenis],
@@ -150,7 +158,7 @@ export default function ListSuratPage() {
     []
   );
 
-  if (isLoading || isJenisLoading) {
+  if (isLoading || isJenisLoading || isProdiLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>

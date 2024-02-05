@@ -47,15 +47,21 @@ const DropdownNotification = () => {
   });
 
   const { mutate: deleteNotifikasi } = useMutation({
-    mutationFn: async (id: number) => {
-      const res = await axios.delete(`/api/notifikasi?id=${id}`);
+    mutationFn: async ({
+      idNotif,
+      idSurat,
+    }: {
+      idNotif: number;
+      idSurat: number;
+    }) => {
+      const res = await axios.delete(`/api/notifikasi?id=${idNotif}`);
 
       if (res.status === 200) {
         setNotifying(false);
         queryClient.invalidateQueries({
           queryKey: ["notifikasi"],
         });
-        router.push(`/surat/${id}`);
+        router.push(`/surat/${idSurat}`);
       }
     },
     onError: (error) => {
@@ -131,7 +137,10 @@ const DropdownNotification = () => {
               <button
                 className="w-full flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
                 onClick={() => {
-                  deleteNotifikasi(notif.id);
+                  deleteNotifikasi({
+                    idNotif: notif.id,
+                    idSurat: notif.surat.id,
+                  });
                 }}
               >
                 <p className="text-sm text-left">
@@ -141,7 +150,13 @@ const DropdownNotification = () => {
                   , {notif.pesan}
                 </p>
 
-                {/* <p className="text-xs">{notif.date}</p> */}
+                <p className="text-xs text-left">
+                  {new Date(notif.createdAt).toLocaleString("id-ID", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
               </button>
             </li>
           ))}

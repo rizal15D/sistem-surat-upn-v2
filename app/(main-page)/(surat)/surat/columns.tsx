@@ -100,6 +100,12 @@ export const columns: ColumnDef<Letter>[] = [
         </div>
       );
     },
+    filterFn: (row, id, value) => {
+      const rowValue = (row.getValue(id) as Users).prodi?.name;
+      return value.some((val: string[]) =>
+        val.some((v) => rowValue.toLowerCase().includes(v.toLowerCase()))
+      );
+    },
   },
   {
     accessorKey: "status",
