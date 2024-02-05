@@ -27,9 +27,6 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/DataTableComponents/DataTablePagination";
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { Role } from "../data-master/role/columns";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -61,6 +58,7 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
+    autoResetPageIndex: false,
     state: {
       sorting,
       columnVisibility,
