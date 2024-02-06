@@ -24,7 +24,7 @@ export type Letter = {
   jenis_id: number;
   deskripsi: string;
   tanggal: Date;
-  url: string;
+  path: string;
   status: {
     status: string;
     persetujuan: string;
@@ -191,7 +191,7 @@ export const columns: ColumnDef<Letter>[] = [
 
       const handleDownload = async () => {
         const token = user.accessToken;
-        const response = await axios.get(`${row.original?.url}`, {
+        const response = await axios.get(`${row.original?.path}`, {
           responseType: "arraybuffer",
           headers: {
             // "Content-Type": "application/pdf",

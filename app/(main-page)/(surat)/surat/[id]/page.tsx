@@ -91,14 +91,18 @@ export default function SuratSinglePage() {
 
   const getFileUrl = async () => {
     const token = user.accessToken;
-    const response = await axios.get(`${letterData?.surat.url}`, {
-      responseType: "arraybuffer",
-      headers: {
-        // "Content-Type": "application/pdf",
-        Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": true,
-      },
-    });
+    const response = await axios.get(
+      `/api/surat/download?filepath=${letterData.surat?.path}`,
+      {
+        responseType: "arraybuffer",
+        headers: {
+          // "Content-Type": "application/pdf",
+        },
+      }
+    );
+
+    console.log(response.data);
+
     const file = new Blob([response.data], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(file);
     return fileURL;
