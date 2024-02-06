@@ -1,27 +1,25 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import Link from "next/link";
 import {
   DownloadIcon,
   InfoCircledIcon,
   TrashIcon,
 } from "@radix-ui/react-icons";
 import { Users } from "../../(master)/manajemen-user/columns";
-import { Badge } from "@/components/ui/badge";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
 import axios from "axios";
-import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
-export type Letter = {
+export type LetterRepo = {
   id: number;
   judul: string;
   jenis_id: number;
+  user_id: number;
   deskripsi: string;
   tanggal: Date;
   path: string;
@@ -29,19 +27,10 @@ export type Letter = {
     status: string;
     persetujuan: string;
   };
-  tampilan: {
-    pin: boolean;
-    dibaca: boolean;
-  }[];
   jenis: {
     id: number;
     jenis: string;
   };
-  akses_surat: {
-    id: number;
-    jabatan_id: number;
-  }[];
-  komentar: any[];
   nomor_surat: {
     id: number;
     nomor_surat: string;
@@ -54,7 +43,7 @@ export type Letter = {
   user: Users;
 };
 
-export const columns: ColumnDef<Letter>[] = [
+export const columns: ColumnDef<LetterRepo>[] = [
   {
     accessorKey: "judul",
     header: ({ column }) => (
@@ -108,37 +97,6 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as { status: string }).status;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.includes(v))
-      );
-    },
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const statusSurat = status?.status;
-      return (
-        <Badge
-          className={`text-white text-center
-            ${
-              (statusSurat?.includes("Daftar Tunggu") ||
-                statusSurat?.includes("Diproses")) &&
-              "bg-warning"
-            }
-            ${statusSurat?.includes("Ditolak") && "bg-danger"}
-            ${statusSurat?.includes("Ditandatangani") && "bg-success"}
-            `}
-        >
-          {statusSurat}
-        </Badge>
-      );
-    },
-  },
-  {
     accessorKey: "tanggal",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
@@ -176,8 +134,29 @@ export const columns: ColumnDef<Letter>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const letter = row.original as Letter;
+      const letter = row.original as LetterRepo;
       const router = useRouter();
+
+      const handleDownload = async () => {
+        const response = await axios.get(
+          `/api/surat/download?filepath=${letter?.path}`,
+          {
+            responseType: "arraybuffer",
+          }
+        );
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+
+        const link = document.createElement("a");
+        link.href = fileURL;
+        link.setAttribute(
+          "download",
+          `${row.original.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
 
       return (
         <div className="flex items-center space-x-2">
@@ -185,11 +164,18 @@ export const columns: ColumnDef<Letter>[] = [
             variant="default"
             size="sm"
             onClick={() => {
-              router.push(`/surat/${letter.id}`);
+              router.push(`/repo/${letter.id}`);
             }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
             <InfoCircledIcon className="h-5 w-5" />
+          </Button>
+          <Button
+            className="bg-primary hover:bg-opacity-90 text-white"
+            size="sm"
+            onClick={handleDownload}
+          >
+            <DownloadIcon className="w-5 h-5" />
           </Button>
         </div>
       );

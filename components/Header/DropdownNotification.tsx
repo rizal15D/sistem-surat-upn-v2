@@ -14,6 +14,8 @@ const DropdownNotification = () => {
     queryKey: ["notifikasi"],
     queryFn: async () => {
       const res = await axios.get("/api/notifikasi");
+
+      if (res.status === 200) setNotifying(true);
       return res.data;
     },
   });

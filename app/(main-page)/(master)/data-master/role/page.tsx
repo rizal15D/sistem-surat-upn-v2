@@ -76,6 +76,7 @@ export default function DataMasterRolePage() {
       generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
       upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
       persetujuan: e.currentTarget.persetujuan.checked,
+      view_all_repo: e.currentTarget.view_all_repo.checked,
       // edit akses master
       prodi: e.currentTarget.prodi.checked,
       template: e.currentTarget.template.checked,

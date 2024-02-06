@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
         generate_nomor_surat: input.generate_nomor_surat,
         upload_tandatangan: input.upload_tandatangan,
         persetujuan: input.persetujuan,
+        view_all_repo: input.view_all_repo,
         prodi: input.prodi,
         template: input.template,
         periode: input.periode,

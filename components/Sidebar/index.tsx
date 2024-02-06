@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import SidebarLinkGroup from "./SidebarLinkGroup";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { FolderIcon } from "lucide-react";
 
 interface SidebarProps {
   session: any;
@@ -380,7 +381,7 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
               </li>
               {/* <!-- Menu Item List Surat --> */}
 
-              {/* <!-- Menu Item Template --> */}
+              {/* <!-- Menu Item Repositori --> */}
               {user.jabatan.permision.buat_surat && (
                 <li>
                   <Link
@@ -407,7 +408,21 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   </Link>
                 </li>
               )}
-              {/* <!-- Menu Item Template --> */}
+              {(user.jabatan.permision.buat_surat ||
+                user.jabatan.permision.view_all_repo) && (
+                <li>
+                  <Link
+                    href="/repo"
+                    className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                      pathname === "/repo" && "bg-graydark dark:bg-meta-4"
+                    }`}
+                  >
+                    <FolderIcon className="w-5 h-5" />
+                    Repositori
+                  </Link>
+                </li>
+              )}
+              {/* <!-- Menu Item Repositori --> */}
             </ul>
           </div>
           {/* <!-- Surat Group --> */}

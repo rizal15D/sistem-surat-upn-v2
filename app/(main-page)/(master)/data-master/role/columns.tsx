@@ -28,6 +28,7 @@ export type Role = {
     generate_nomor_surat: boolean;
     upload_tandatangan: boolean;
     persetujuan: boolean;
+    view_all_repo: boolean;
     akses_master: {
       id: number;
       prodi: boolean;
@@ -111,6 +112,16 @@ export const columns: ColumnDef<Role>[] = [
               )}
             </span>
             <span className="font-bold">Persetujuan</span>
+          </div>
+          <div className="flex gap-2">
+            <span>
+              {role.permision.view_all_repo ? (
+                <CheckIcon className="h-5 w-5 text-success" />
+              ) : (
+                <Cross2Icon className="h-5 w-5 text-danger" />
+              )}
+            </span>
+            <span className="font-bold">Lihat Semua Repo</span>
           </div>
         </div>
       );
@@ -301,6 +312,7 @@ export const columns: ColumnDef<Role>[] = [
           generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
           upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
           persetujuan: e.currentTarget.persetujuan.checked,
+          view_all_repo: e.currentTarget.view_all_repo.checked,
           // edit akses master
           prodi: e.currentTarget.prodi.checked,
           template: e.currentTarget.template.checked,

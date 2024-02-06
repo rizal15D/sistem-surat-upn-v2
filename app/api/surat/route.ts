@@ -8,6 +8,9 @@ export async function GET(req: NextRequest) {
     user: User;
   } | null;
 
+  const prodi_id = req.nextUrl.searchParams.get("prodi_id");
+  const repo = req.nextUrl.searchParams.get("repo")?.toString();
+
   const startDateStr = req.nextUrl.searchParams.get("startDate");
   let startDate: Date | null = null;
   if (startDateStr) {
@@ -26,14 +29,17 @@ export async function GET(req: NextRequest) {
   const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
 
   if (session) {
-    const { data } = await axios.get(
-      `${process.env.API_URL}/daftar-surat?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session.user?.accessToken}`,
-        },
-      }
-    );
+    const { data } = await axios.get(`${process.env.API_URL}/daftar-surat`, {
+      headers: {
+        Authorization: `Bearer ${session.user?.accessToken}`,
+      },
+      params: {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+        ...(prodi_id && { prodi_id }),
+        ...(repo && { repo }),
+      },
+    });
 
     return NextResponse.json(data);
   } else {

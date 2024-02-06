@@ -36,6 +36,7 @@ export interface User extends NextAuthUser {
       generate_nomor_surat: boolean;
       upload_tandatangan: boolean;
       persetujuan: boolean;
+      view_all_repo: boolean;
       akses_master: {
         id: number;
         prodi: boolean;
@@ -80,7 +81,7 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
-    maxAge: 2 * 60 * 60,
+    maxAge: 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user, account }) {
