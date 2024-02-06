@@ -191,14 +191,15 @@ export const columns: ColumnDef<Letter>[] = [
 
       const handleDownload = async () => {
         const token = user.accessToken;
-        const response = await axios.get(`${row.original?.path}`, {
-          responseType: "arraybuffer",
-          headers: {
-            // "Content-Type": "application/pdf",
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": true,
-          },
-        });
+        const response = await axios.get(
+          `/api/surat/download?filepath=${letter?.path}`,
+          {
+            responseType: "arraybuffer",
+            headers: {
+              // "Content-Type": "application/pdf",
+            },
+          }
+        );
         const file = new Blob([response.data], { type: "application/pdf" });
         const fileURL = URL.createObjectURL(file);
 

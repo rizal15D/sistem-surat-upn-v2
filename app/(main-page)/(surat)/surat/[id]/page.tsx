@@ -101,8 +101,6 @@ export default function SuratSinglePage() {
       }
     );
 
-    console.log(response.data);
-
     const file = new Blob([response.data], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(file);
     return fileURL;
