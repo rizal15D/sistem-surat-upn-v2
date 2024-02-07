@@ -574,7 +574,7 @@ export default function SuratSinglePage() {
                   Hapus
                 </Button>
               )}
-              {canOCR && (
+              {/* {canOCR && (
                 <Button
                   className="flex gap-2 bg-primary w-full"
                   onClick={() => mutateOCR()}
@@ -588,7 +588,7 @@ export default function SuratSinglePage() {
                     </>
                   )}
                 </Button>
-              )}
+              )} */}
             </div>
           </div>
         </div>

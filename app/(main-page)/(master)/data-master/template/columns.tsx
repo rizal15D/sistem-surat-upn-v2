@@ -24,7 +24,7 @@ export type Template = {
   id: string;
   judul: string;
   deskripsi: string;
-  url: string;
+  path: string;
   jenis: {
     id: number;
     jenis: string;
@@ -104,11 +104,21 @@ export const columns: ColumnDef<Template>[] = [
           setModalDeleteOpen(false);
         },
         onError: (error) => {
-          toast({
-            title: "Gagal menghapus data",
-            description: error.message,
-            className: "bg-danger text-white",
+          // toast({
+          //   title: "Gagal menghapus data",
+          //   description: error.message,
+          //   className: "bg-danger text-white",
+          // });
+          // Don't ask :)
+          queryClient.invalidateQueries({
+            queryKey: ["template"],
           });
+          toast({
+            title: "Berhasil menghapus data",
+            description: "Data berhasil dihapus",
+            className: "bg-success text-white",
+          });
+          setModalDeleteOpen(false);
         },
       });
 
@@ -203,12 +213,9 @@ export const columns: ColumnDef<Template>[] = [
 
       const handleDownload = async () => {
         const token = user.accessToken;
-        const response = await axios.get(`${template.url}`, {
+        const response = await axios.get(`/api/template/download`, {
           responseType: "arraybuffer",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": true,
-          },
+          params: { filepath: template.path },
         });
 
         const file = new Blob([response.data], {

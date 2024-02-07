@@ -18,7 +18,7 @@ export type Template = {
   id: number;
   judul: string;
   deskripsi: string;
-  url: string;
+  path: string;
   jenis: {
     id: number;
     jenis: string;
@@ -74,12 +74,9 @@ export const columns: ColumnDef<Template>[] = [
 
       const handleDownload = async () => {
         const token = user.accessToken;
-        const response = await axios.get(`${template.url}`, {
+        const response = await axios.get(`/api/template/download`, {
           responseType: "arraybuffer",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "ngrok-skip-browser-warning": true,
-          },
+          params: { filepath: template.path },
         });
 
         const file = new Blob([response.data], {

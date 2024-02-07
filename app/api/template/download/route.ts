@@ -1,27 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
 import { getServerSession } from "next-auth";
 import { authOptions, User } from "../../auth/[...nextauth]/authOptions";
+import axios from "axios";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
 
-  if (session) {
-    const id = req.nextUrl.searchParams.get("id");
+  const filepath = req.nextUrl.searchParams.get("filepath");
+  console.log("filePath : ", filepath);
+  if (!filepath) {
+    return NextResponse.json({
+      error: "Filepath is required",
+    });
+  }
 
+  if (session) {
     const { data } = await axios.get(
-      `${process.env.API_URL}/template-surat/download/cloudinary?id=${id}`,
+      `${process.env.API_URL}/download?filepath=${filepath}`,
       {
+        responseType: "arraybuffer",
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
+          "ngrok-skip-browser-warning": true,
         },
-        responseType: "blob",
       }
     );
 
-    return NextResponse.json(data);
+    const pdfBuffer = Buffer.from(data, "binary");
+    return new NextResponse(pdfBuffer, {
+      headers: {
+        "Content-Type":
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      },
+    });
   } else {
     return NextResponse.json({
       error: "Unauthorized",
