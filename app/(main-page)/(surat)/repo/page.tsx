@@ -152,17 +152,6 @@ export default function ListSuratPage() {
         date.to = date.from;
       }
 
-      // if (date.to === date.from) {
-      //   date.to = new Date(
-      //     date.to.getFullYear(),
-      //     date.to.getMonth(),
-      //     date.to.getDate() + 1,
-      //     0,
-      //     0,
-      //     0
-      //   );
-      // }
-
       setTableDate({
         from: new Date(
           date.from.getFullYear(),
