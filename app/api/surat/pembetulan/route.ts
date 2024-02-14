@@ -3,7 +3,7 @@ import { authOptions, User } from "../../auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest) {
     const formData = await req.formData();
 
     const { data } = await axios.post(
-      `${process.env.API_URL}/daftar-surat/multer/revisi`,
+      `${process.env.API_URL}/daftar-surat/multer/pembetulan`,
       formData,
       {
         headers: {

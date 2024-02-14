@@ -17,13 +17,21 @@ export default function SuratForm({
   warningMessage,
   setWarningMessage,
   isLoading,
-  isAdminDekan = false,
+  hasFile = true,
+  hasJudul = true,
+  hasDeskripsi = true,
+  hasJenis = true,
+  isModal = false,
 }: {
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   warningMessage: string;
   setWarningMessage: (message: string) => void;
   isLoading?: boolean;
-  isAdminDekan?: boolean;
+  hasFile?: boolean;
+  hasJudul?: boolean;
+  hasDeskripsi?: boolean;
+  hasJenis?: boolean;
+  isModal?: boolean;
 }) {
   const [selectedFile, setSelectedFile] = useState("");
 
@@ -57,13 +65,13 @@ export default function SuratForm({
   return (
     <form
       className={`grid sm:grid-cols-1 ${
-        isAdminDekan ? "lg:grid-cols-1" : "lg:grid-cols-5"
+        isModal ? "lg:grid-cols-1" : "lg:grid-cols-5"
       } gap-10 w-full`}
       onSubmit={onSubmit}
     >
       <div
         className={`${
-          isAdminDekan ? "lg:col-span-1" : "lg:col-span-3"
+          isModal ? "lg:col-span-1" : "lg:col-span-3"
         } sm:col-span-1 row-span-1`}
       >
         <div className="container mx-auto py-10 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -109,7 +117,7 @@ export default function SuratForm({
       </div>
       <div
         className={`${
-          isAdminDekan ? "lg:col-span-1" : "lg:col-span-2"
+          isModal ? "lg:col-span-1" : "lg:col-span-2"
         } sm:col-span-1`}
       >
         <div className="container mx-auto py-10 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
@@ -121,8 +129,8 @@ export default function SuratForm({
             </div>
 
             <div className="p-6.5">
-              {!isAdminDekan && (
-                <>
+              <>
+                {hasJudul && (
                   <div className="mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Judul Surat
@@ -134,6 +142,8 @@ export default function SuratForm({
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </div>
+                )}
+                {hasDeskripsi && (
                   <div className="mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Deksripsi
@@ -145,6 +155,8 @@ export default function SuratForm({
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     />
                   </div>
+                )}
+                {hasJenis && (
                   <div className="mb-4.5">
                     <label className="mb-2.5 block text-black dark:text-white">
                       Jenis Surat<span className="text-meta-1">*</span>
@@ -160,8 +172,8 @@ export default function SuratForm({
                       ))}
                     </select>
                   </div>
-                </>
-              )}
+                )}
+              </>
 
               <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
                 {isLoading ? (

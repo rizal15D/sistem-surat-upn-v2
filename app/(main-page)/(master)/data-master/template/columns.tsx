@@ -104,19 +104,10 @@ export const columns: ColumnDef<Template>[] = [
           setModalDeleteOpen(false);
         },
         onError: (error) => {
-          // toast({
-          //   title: "Gagal menghapus data",
-          //   description: error.message,
-          //   className: "bg-danger text-white",
-          // });
-          // Don't ask :)
-          queryClient.invalidateQueries({
-            queryKey: ["template"],
-          });
           toast({
-            title: "Berhasil menghapus data",
-            description: "Data berhasil dihapus",
-            className: "bg-success text-white",
+            title: "Gagal menghapus data",
+            description: error.message,
+            className: "bg-danger text-white",
           });
           setModalDeleteOpen(false);
         },

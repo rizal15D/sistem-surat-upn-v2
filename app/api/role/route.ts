@@ -72,8 +72,6 @@ export async function PUT(req: NextRequest) {
   if (session) {
     const { id, input } = await req.json();
 
-    console.log(input.jabatan_atas_id);
-
     const { data: data1 } = await axios.put(
       `${process.env.API_URL}/jabatan?jabatan_id=${id}`,
       {

@@ -9,7 +9,6 @@ export async function GET(req: NextRequest) {
   } | null;
 
   const filepath = req.nextUrl.searchParams.get("filepath");
-  console.log("filePath : ", filepath);
   if (!filepath) {
     return NextResponse.json({
       error: "Filepath is required",

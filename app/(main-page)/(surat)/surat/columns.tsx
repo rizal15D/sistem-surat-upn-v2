@@ -9,6 +9,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Users } from "../../(master)/manajemen-user/columns";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
@@ -25,6 +26,7 @@ export type Letter = {
   deskripsi: string;
   tanggal: Date;
   path: string;
+  visible: boolean;
   status: {
     status: string;
     persetujuan: string;
@@ -52,6 +54,7 @@ export type Letter = {
     };
   }[];
   user: Users;
+  progressBar: number;
 };
 
 export const columns: ColumnDef<Letter>[] = [
@@ -121,9 +124,13 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
+      const progressBar = row.original.progressBar;
+      const tampilan = row.original.tampilan;
+
       return (
-        <Badge
-          className={`text-white text-center
+        <>
+          <Badge
+            className={`text-white text-center w-full mb-2
             ${
               (statusSurat?.includes("Daftar Tunggu") ||
                 statusSurat?.includes("Diproses")) &&
@@ -132,9 +139,22 @@ export const columns: ColumnDef<Letter>[] = [
             ${statusSurat?.includes("Ditolak") && "bg-danger"}
             ${statusSurat?.includes("Ditandatangani") && "bg-success"}
             `}
-        >
-          {statusSurat}
-        </Badge>
+          >
+            <p className="text-center w-full">{statusSurat}</p>
+          </Badge>
+          {(statusSurat?.includes("Daftar Tunggu") ||
+            statusSurat?.includes("Diproses")) && (
+            <span className="flex gap-2 items-center">
+              <Progress
+                className={`h-2 ${
+                  tampilan && tampilan[0]?.dibaca ? "bg-white" : "bg-disabled"
+                }`}
+                value={progressBar}
+              />
+              <p className="text-xs">{progressBar}%</p>
+            </span>
+          )}
+        </>
       );
     },
   },

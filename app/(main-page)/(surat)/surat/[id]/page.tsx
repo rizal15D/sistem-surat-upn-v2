@@ -12,6 +12,7 @@ import type {
 import "@react-pdf-viewer/toolbar/lib/styles/index.css";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   CheckIcon,
   Cross2Icon,
@@ -45,10 +46,12 @@ export default function SuratSinglePage() {
   const [isSetujuLoading, setIsSetujuLoading] = useState(false);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [isOCRLoading, setIsOCRLoading] = useState(false);
+  const [isPerbaikanLoading, setIsPerbaikanLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
+  const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -332,6 +335,82 @@ export default function SuratSinglePage() {
     },
   });
 
+  // Perbaikan Surat
+  const { mutate: mutatePerbaikan } = useMutation({
+    mutationFn: async (input: {
+      surat_id: any;
+      surat: File;
+      deskripsi: string;
+    }) => {
+      setIsPerbaikanLoading(true);
+      const response = await axios.post(
+        `/api/surat/perbaikan`,
+        {
+          surat_id: input.surat_id,
+          surat: input.surat,
+          deskripsi: input.deskripsi,
+        },
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      setModalPerbaikanOpen(false);
+      toast({
+        title: "Berhasil",
+        description: "Surat berhasil diperbaiki",
+        className: "bg-success text-white",
+      });
+      router.push("/surat");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        description: error.response.data.message,
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsPerbaikanLoading(false);
+    },
+  });
+
+  const handlePerbaikan = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const data = {
+      surat_id: id,
+      surat: formData.get("file") as File,
+      deskripsi: formData.get("deskripsi") as string,
+    };
+
+    if (!data.surat || !data.deskripsi) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    if (warningMessage) {
+      toast({
+        title: "Gagal mengupload surat",
+        description: warningMessage,
+        className: "bg-danger text-white",
+      });
+      return;
+    }
+
+    mutatePerbaikan(data);
+  };
+
   const canPersetujuan =
     user?.jabatan.permision.persetujuan &&
     // Surat di tangan user
@@ -355,13 +434,22 @@ export default function SuratSinglePage() {
     user?.jabatan.name === letterData?.surat.user?.jabatan.name &&
     user?.user.prodi?.name === letterData?.surat.user?.prodi?.name &&
     // Surat masih di tangan atasan
-    letterData?.surat.status.status.includes(user.jabatan.jabatan_atas.name) &&
+    letterData?.surat.status.status.includes(
+      user?.jabatan.jabatan_atas?.name
+    ) &&
     !letterData?.surat.status.status.includes("Ditolak");
 
   const canOCR =
     user?.jabatan.permision.generate_nomor_surat &&
     // Surat punya nomor surat
     letterData?.surat.nomor_surat[letterData?.surat.nomor_surat.length - 1];
+
+  const canPerbaikan =
+    // User yang mempunyai surat
+    user?.jabatan.name === letterData?.surat.user?.jabatan.name &&
+    user?.user.prodi?.name === letterData?.surat.user?.prodi?.name &&
+    // Surat ditolak
+    letterData?.surat.status.status.includes("Ditolak");
 
   if (isKomentarLoading || isLetterLoading)
     return (
@@ -409,12 +497,14 @@ export default function SuratSinglePage() {
                 </Button>
               </Link>
             )}
-            <Button
-              onClick={handleOpenFile}
-              className="bg-primary text-white font-medium"
-            >
-              Buka File
-            </Button>
+            {fileUrl && (
+              <Button
+                onClick={handleOpenFile}
+                className="bg-primary text-white font-medium"
+              >
+                Buka File
+              </Button>
+            )}
           </div>
 
           <h1 className="text-3xl pb-6 font-semibold text-black dark:text-white">
@@ -447,7 +537,7 @@ export default function SuratSinglePage() {
               </span>
               <span className="text-body-xs text-black dark:text-white">
                 <Badge
-                  className={`text-white text-center
+                  className={`text-white text-center w-full mb-2
             ${
               (letterData?.surat.status.status.includes("Daftar Tunggu") ||
                 letterData?.surat.status.status.includes("Diproses")) &&
@@ -462,8 +552,19 @@ export default function SuratSinglePage() {
             }
             `}
                 >
-                  {letterData?.surat.status.status}
+                  <p className="text-center w-full">
+                    {letterData?.surat.status.status}
+                  </p>
                 </Badge>
+                {!letterData?.surat.status.status.includes("Ditolak") && (
+                  <span className="flex gap-2">
+                    <Progress
+                      className="h-2"
+                      value={letterData?.surat.progressBar}
+                    />
+                    <p className="text-xs">{letterData?.surat.progressBar}%</p>
+                  </span>
+                )}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -589,6 +690,15 @@ export default function SuratSinglePage() {
                   )}
                 </Button>
               )} */}
+              {canPerbaikan && (
+                <Button
+                  className="bg-warning w-full"
+                  onClick={() => setModalPerbaikanOpen(true)}
+                >
+                  <EditIcon className="w-6 h-6" />
+                  Perbaiki Surat
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -600,7 +710,10 @@ export default function SuratSinglePage() {
             warningMessage={warningMessage}
             setWarningMessage={setWarningMessage}
             isLoading={isUploadLoading}
-            isAdminDekan={true}
+            isModal={true}
+            hasJenis={false}
+            hasJudul={false}
+            hasDeskripsi={false}
           />
         </Modal>
       )}
@@ -644,6 +757,19 @@ export default function SuratSinglePage() {
           }?`}
           onClick={handleDelete}
         />
+      )}
+      {modalPerbaikanOpen && (
+        <Modal setModalOpen={setModalPerbaikanOpen}>
+          <SuratForm
+            onSubmit={handlePerbaikan}
+            warningMessage={warningMessage}
+            setWarningMessage={setWarningMessage}
+            isLoading={isPerbaikanLoading}
+            isModal={true}
+            hasJenis={false}
+            hasJudul={false}
+          />
+        </Modal>
       )}
     </div>
   );
