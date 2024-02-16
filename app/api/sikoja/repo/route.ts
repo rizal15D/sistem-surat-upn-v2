@@ -18,8 +18,6 @@ export async function GET(req: NextRequest) {
   const strategi_id = strategi_idJson ? JSON.parse(strategi_idJson) : [];
   const iku_id = iku_idJson ? JSON.parse(iku_idJson) : [];
 
-  console.log(prodi_id, indikator_id, strategi_id, iku_id);
-
   const startDateStr = req.nextUrl.searchParams.get("startDate");
   let startDate: Date | null = null;
   if (startDateStr) {
@@ -38,22 +36,24 @@ export async function GET(req: NextRequest) {
   const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
 
   if (session) {
-    const { data } = await axios.get(`${process.env.API_URL}/repo`, {
-      headers: {
-        Authorization: `Bearer ${session.user?.accessToken}`,
-        "Content-Type": `application/json`,
-      },
-      params: {
-        startDate: formattedStartDate,
-        endDate: formattedEndDate,
-      },
-      data: {
+    const { data } = await axios.post(
+      `${process.env.API_URL}/repo/filter`,
+      {
         prodi_id: prodi_id,
         indikator_id: indikator_id,
         strategi_id: strategi_id,
         iku_id: iku_id,
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+        params: {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
+        },
+      }
+    );
 
     return NextResponse.json(data);
   } else {

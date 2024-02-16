@@ -13,12 +13,10 @@ import { useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function ListSuratPage() {
+export default function ListRepoPage() {
   const session = useSession();
   const user = session.data?.user as User;
-  const [prodi_id, setProdi_id] = useState<number[]>(
-    user.user.prodi ? [user.user.prodi.id] : []
-  );
+  const [prodi_id, setProdi_id] = useState<number[]>(user.user.prodi ? [] : []);
   const [indikator_id, setIndikatorId] = useState<number[]>([]);
   const [strategi_id, setStrategiId] = useState<number[]>([]);
   const [iku_id, setIkuId] = useState<number[]>([]);
@@ -64,7 +62,11 @@ export default function ListSuratPage() {
   });
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ["repo", prodi_id, tableDate],
+    queryKey: [
+      "repo",
+      { prodi_id, indikator_id, strategi_id, iku_id },
+      tableDate,
+    ],
     queryFn: async () => {
       const response = await axios.get("/api/sikoja/repo", {
         params: {
@@ -77,12 +79,12 @@ export default function ListSuratPage() {
         },
       });
 
-      const sortedData = response.data.sort(
-        (a: LetterRepo, b: LetterRepo) =>
-          new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime()
-      );
+      // const sortedData = response.data.repo.sort(
+      //   (a: LetterRepo, b: LetterRepo) =>
+      //     new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime()
+      // );
 
-      return sortedData;
+      return response.data.repo;
     },
   });
 

@@ -56,18 +56,18 @@ export default function SuratSinglePage() {
 
   // Get Data Surat
   const { data: letterData, isLoading: isLetterLoading } = useQuery({
-    queryKey: ["surat", id],
+    queryKey: ["repo", id],
     queryFn: async () => {
-      const response = await axios.get(`/api/surat/${id}`);
+      const response = await axios.get(`/api/sikoja/repo/${id}`);
 
-      return response.data;
+      return response.data as LetterRepo;
     },
     enabled: !!id,
   });
 
   const getFileUrl = async () => {
     const response = await axios.get(
-      `/api/surat/download?filepath=${letterData.surat?.path}`,
+      `/api/surat/download?filepath=${letterData?.surat.path}`,
       {
         responseType: "arraybuffer",
       }
@@ -219,7 +219,7 @@ export default function SuratSinglePage() {
       <div className="lg:w-2/5 sm:w-full h-fit rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
         <div className="container mx-auto py-10 relative">
           <div className="absolute flex gap-2 top-10 right-0 z-99">
-            {letterData?.revisi[letterData?.revisi.length - 1] && (
+            {/* {letterData?.revisi[letterData?.revisi.length - 1] && (
               <Link
                 href={`/repo/${
                   letterData?.revisi[letterData?.revisi.length - 1]
@@ -230,7 +230,7 @@ export default function SuratSinglePage() {
                   Lihat Surat Lama
                 </Button>
               </Link>
-            )}
+            )} */}
             {fileUrl && (
               <Button
                 onClick={handleOpenFile}

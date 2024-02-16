@@ -96,7 +96,7 @@ export default function SuratSinglePage() {
 
   const getFileUrl = async () => {
     const response = await axios.get(
-      `/api/surat/download?filepath=${letterData.surat?.path}`,
+      `/api/surat/download?filepath=${letterData?.surat.path}`,
       {
         responseType: "arraybuffer",
       }

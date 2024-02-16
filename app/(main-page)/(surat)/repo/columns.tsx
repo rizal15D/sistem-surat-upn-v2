@@ -15,33 +15,25 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Letter } from "../surat/columns";
 
 export type LetterRepo = {
   id: number;
-  judul: string;
-  jenis_id: number;
-  user_id: number;
-  deskripsi: string;
-  tanggal: Date;
-  path: string;
-  status: {
-    status: string;
-    persetujuan: string;
-  };
-  jenis: {
+  unix_code: string;
+  visible: boolean;
+  indikator: {
     id: number;
-    jenis: string;
-  };
-  nomor_surat: {
-    id: number;
-    nomor_surat: string;
-    periode: {
+    name: string;
+    strategi: {
       id: number;
-      tahun: string;
-      status: string;
+      name: string;
     };
-  }[];
-  user: Users;
+    iku: {
+      id: number;
+      name: string;
+    };
+  };
+  surat: Letter;
 };
 
 export const columns: ColumnDef<LetterRepo>[] = [
@@ -78,7 +70,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
         .includes(value.toLowerCase());
     },
     cell: ({ row }) => {
-      const judul = row.original.judul;
+      const judul = row.original.surat.judul;
       return <div>{judul.split(".")[0].split("-")[0]}</div>;
     },
   },
@@ -95,7 +87,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
       );
     },
     cell: ({ row }) => {
-      const nomorSurat = row.original.nomor_surat;
+      const nomorSurat = row.original.surat.nomor_surat;
       return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
     },
   },
@@ -105,7 +97,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
       <DataTableColumnHeader column={column} title="Pembuat Surat" />
     ),
     cell: ({ row }) => {
-      const user = row.original.user;
+      const user = row.original.surat.user;
       return (
         <div>
           {user.name}, {user.prodi?.name}
@@ -125,7 +117,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
       <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.original.tanggal);
+      const date = new Date(row.original.surat.tanggal);
       const options = {
         weekday: "long" as "long",
         day: "numeric" as "numeric",
@@ -150,7 +142,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
       );
     },
     cell: ({ row }) => {
-      const jenis = row.original.jenis;
+      const jenis = row.original.surat.jenis;
       return <div>{jenis.jenis}</div>;
     },
   },
@@ -162,7 +154,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
 
       const handleDownload = async () => {
         const response = await axios.get(
-          `/api/surat/download?filepath=${letter?.path}`,
+          `/api/surat/download?filepath=${letter?.surat.path}`,
           {
             responseType: "arraybuffer",
           }
@@ -174,7 +166,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
         link.href = fileURL;
         link.setAttribute(
           "download",
-          `${row.original.judul.split(".")[0]}.pdf`
+          `${row.original.surat.judul.split(".")[0]}.pdf`
         );
         document.body.appendChild(link);
         link.click();

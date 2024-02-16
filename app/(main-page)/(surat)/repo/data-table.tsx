@@ -31,6 +31,8 @@ import { LetterRepo } from "./columns";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -84,15 +86,89 @@ DataTableProps<TData, TValue>) {
     },
   });
 
+  const handleDownloadBatch = async () => {
+    const paths = table.getSelectedRowModel().rows.map((row) => {
+      const repo = row.original as LetterRepo;
+      return repo.surat.path;
+    });
+
+    if (paths.length === 0) {
+      alert("Pilih minimal satu surat");
+      return;
+    }
+
+    const { data } = await axios.get(`/api/surat/download`, {
+      responseType: "arraybuffer",
+      headers: {
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+      params: {
+        paths: JSON.stringify(paths),
+      },
+    });
+
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "download.zip");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  const handleDownloadExcel = async () => {
+    const repo_id = table.getSelectedRowModel().rows.map((row) => {
+      const repo = row.original as LetterRepo;
+      return repo.id;
+    });
+
+    if (repo_id.length === 0) {
+      alert("Pilih minimal satu surat");
+      return;
+    }
+
+    const { data } = await axios.get(`/api/surat/download/excel`, {
+      responseType: "arraybuffer",
+      headers: {
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+      params: {
+        repo_id: JSON.stringify(repo_id),
+      },
+    });
+
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "download.xlsx");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div>
       <DataTableToolbar table={table} filterInput="judul" data={filterData} />
-      <div className="flex gap-6">
+      <div className="flex justify-between">
         <DatePickerWithRange
           onDateRangeApply={onDateRangeApply}
           date={date}
           setDate={setDate}
         />
+        <div className="flex justify-end gap-4 text-center font-semibold text-white">
+          <Button
+            onClick={handleDownloadBatch}
+            className="flex gap-2 bg-primary"
+          >
+            <span>Download Zip</span>
+            <p>( {table.getSelectedRowModel().rows.length} )</p>
+          </Button>
+          <Button
+            onClick={handleDownloadExcel}
+            className="flex gap-2 bg-primary"
+          >
+            <p>Download Excel</p>
+            <p>( {table.getSelectedRowModel().rows.length} )</p>
+          </Button>
+        </div>
       </div>
       <div className="rounded-md border mt-4">
         <Table>
