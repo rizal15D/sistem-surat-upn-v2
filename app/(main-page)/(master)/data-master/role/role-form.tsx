@@ -90,15 +90,6 @@ export default function RoleForm({
                 />
                 <label htmlFor="surat-masuk">Persetujuan</label>
               </div>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  name="view_all_repo"
-                  defaultChecked={values?.permision?.view_all_repo}
-                  className="rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                />
-                <label htmlFor="surat-masuk">Lihat Semua Repo</label>
-              </div>
             </div>
 
             <div>
@@ -159,6 +150,15 @@ export default function RoleForm({
                   className="rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                 />
                 <label htmlFor="surat-masuk">Jenis Surat</label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="sikoja"
+                  defaultChecked={values?.permision?.akses_master.sikoja}
+                  className="rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                />
+                <label htmlFor="surat-masuk">Sikoja</label>
               </div>
             </div>
           </div>

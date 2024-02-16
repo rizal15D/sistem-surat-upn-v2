@@ -3,65 +3,40 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 
-import { Role, columns } from "./columns";
+import { IKU, columns } from "./columns";
 import { DataTable } from "./data-table";
 import Modal from "@/components/Modal/Modal";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import RoleForm from "./role-form";
+import IKUForm from "./iku-form";
 import { useToast } from "@/components/ui/use-toast";
-import { useSession } from "next-auth/react";
-import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import { useRouter } from "next/navigation";
 
-async function getData(): Promise<Role[]> {
+async function getData(): Promise<IKU[]> {
   // Fetch data from your API here.
-  const response = await axios.get("/api/role");
+  const response = await axios.get("/api/sikoja/iku");
   return response.data;
 }
 
 export default function DataMasterRolePage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const session = useSession();
-  const user = session.data?.user as User;
-
-  if (!user.jabatan.permision.akses_master.jabatan) {
-    const router = useRouter();
-    router.push("/surat");
-  }
 
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data = [], isLoading: isRoleLoading } = useQuery({
-    queryKey: ["role"],
+  const { data = [], isLoading: isJenisLoading } = useQuery({
+    queryKey: ["iku"],
     queryFn: getData,
   });
 
   const { mutate } = useMutation({
-    mutationFn: async (input: {
-      name: string;
-      jabatan_atas_id: number;
-      buat_surat: boolean;
-      download_surat: boolean;
-      generate_nomor_surat: boolean;
-      upload_tandatangan: boolean;
-      persetujuan: boolean;
-      prodi: boolean;
-      template: boolean;
-      periode: boolean;
-      fakultas: boolean;
-      jabatan: boolean;
-      jenis_surat: boolean;
-      sikoja: boolean;
-    }) => {
+    mutationFn: async (input: { name: string }) => {
       setIsLoading(true);
-      const response = await axios.post(`/api/role/`, { input });
+      const response = await axios.post(`/api/sikoja/iku/`, { input });
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["role"] });
+      queryClient.invalidateQueries({ queryKey: ["iku"] });
       setModalCreateOpen(false);
       toast({
         title: "Berhasil menambahkan data",
@@ -84,27 +59,13 @@ export default function DataMasterRolePage() {
     e.preventDefault();
     const data = {
       name: e.currentTarget.nama.value,
-      jabatan_atas_id: e.currentTarget.jabatan_atas_id.value,
-      // edit permision
-      buat_surat: e.currentTarget.buat_surat.checked,
-      download_surat: e.currentTarget.download_surat.checked,
-      generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
-      upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
-      persetujuan: e.currentTarget.persetujuan.checked,
-      // edit akses master
-      prodi: e.currentTarget.prodi.checked,
-      template: e.currentTarget.template.checked,
-      periode: e.currentTarget.periode.checked,
-      fakultas: e.currentTarget.fakultas.checked,
-      jabatan: e.currentTarget.jabatan.checked,
-      jenis_surat: e.currentTarget.jenis_surat.checked,
-      sikoja: e.currentTarget.sikoja.checked,
     };
 
     if (!data.name) {
       toast({
         title: "Gagal menambah data",
-        description: "Nama tidak boleh kosong",
+        description: "Data tidak boleh kosong",
+        className: "bg-danger text-white",
       });
       return;
     }
@@ -112,7 +73,7 @@ export default function DataMasterRolePage() {
     mutate(data);
   };
 
-  if (isRoleLoading) {
+  if (isJenisLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -124,14 +85,14 @@ export default function DataMasterRolePage() {
     <>
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
-          Data Master Jabatan
+          Data Master IKU
         </h1>
         <Button
           onClick={() => setModalCreateOpen(true)}
           className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
         >
           <PlusIcon className="w-4 h-4 mr-2" />
-          Tambah Jabatan
+          Tambah IKU
         </Button>
       </div>
 
@@ -142,7 +103,7 @@ export default function DataMasterRolePage() {
       </div>
       {modalCreateOpen && (
         <Modal setModalOpen={setModalCreateOpen}>
-          <RoleForm onSubmit={handleCreate} isLoading={isLoading} />
+          <IKUForm onSubmit={handleCreate} isLoading={isLoading} />
         </Modal>
       )}
     </>

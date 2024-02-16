@@ -27,36 +27,17 @@ import {
 } from "@/components/ui/table";
 import { DataTablePagination } from "@/components/DataTableComponents/DataTablePagination";
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
-import { LetterRepo } from "./columns";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import { useSession } from "next-auth/react";
-import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import filterData from "./data";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  filterData: any;
-  onDateRangeApply?: (date: any) => void;
-  date?: any;
-  setDate?: any;
-  prodiData?: any;
-  // prodiId?: number;
-  // setProdiId?: any;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  filterData,
-  onDateRangeApply,
-  date,
-  setDate,
-}: // prodiData,
-// prodiId,
-// setProdiId,
-DataTableProps<TData, TValue>) {
-  const session = useSession();
-  const user = session.data?.user as User;
+}: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -76,7 +57,6 @@ DataTableProps<TData, TValue>) {
     onColumnVisibilityChange: setColumnVisibility,
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    autoResetPageIndex: false,
     state: {
       sorting,
       columnVisibility,
@@ -86,15 +66,8 @@ DataTableProps<TData, TValue>) {
 
   return (
     <div>
-      <DataTableToolbar table={table} filterInput="judul" data={filterData} />
-      <div className="flex gap-6">
-        <DatePickerWithRange
-          onDateRangeApply={onDateRangeApply}
-          date={date}
-          setDate={setDate}
-        />
-      </div>
-      <div className="rounded-md border mt-4">
+      <DataTableToolbar table={table} filterInput="name" data={filterData} />
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

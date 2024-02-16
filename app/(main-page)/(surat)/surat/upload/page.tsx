@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 export default function UploadSuratPage() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const [warningMessage, setWarningMessage] = useState("");
+  const [warningMessage, setWarningMessage] = useState("Input Surat");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 

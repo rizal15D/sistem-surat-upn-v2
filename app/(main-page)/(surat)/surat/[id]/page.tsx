@@ -39,19 +39,22 @@ export default function SuratSinglePage() {
   const user = session.data?.user as User;
   const { toast } = useToast();
   const { id } = useParams();
-  const [warningMessage, setWarningMessage] = useState("");
+  const [warningMessage, setWarningMessage] = useState("Input Surat");
   const [fileUrl, setFileUrl] = useState("");
+  const [strategi_id, setStrategi_id] = useState<string | null>(null);
 
   const [isMenolakLoading, setIsMenolakLoading] = useState(false);
   const [isSetujuLoading, setIsSetujuLoading] = useState(false);
   const [isUploadLoading, setIsUploadLoading] = useState(false);
   const [isOCRLoading, setIsOCRLoading] = useState(false);
   const [isPerbaikanLoading, setIsPerbaikanLoading] = useState(false);
+  const [isTaggingLoading, setIsTaggingLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
+  const [modalTaggingOpen, setModalTaggingOpen] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -124,45 +127,41 @@ export default function SuratSinglePage() {
     return response.data;
   };
 
+  // Get Strategi
+  const isDekan = user?.jabatan.name === "Dekan";
+  const { data: strategiData, isLoading: isStrategiLoading } = useQuery({
+    queryKey: ["strategi"],
+    queryFn: async () => {
+      const response = await axios.get(`/api/sikoja/strategi`, {
+        params: {
+          strategi_id: strategi_id,
+        },
+      });
+
+      return response.data as { id: number; name: string }[];
+    },
+    enabled: !!isDekan,
+  });
+
+  // Get Indikator
+  const { data: indikatorData, isLoading: isIndikatorLoading } = useQuery({
+    queryKey: ["indikator"],
+    queryFn: async () => {
+      const response = await axios.get(`/api/sikoja/indikator`, {
+        params: {
+          strategi_id: strategi_id,
+        },
+      });
+
+      return response.data;
+    },
+    enabled: !!isDekan,
+  });
+
   const { data: komentar, isLoading: isKomentarLoading } = useQuery({
     queryKey: ["komentar", id],
     queryFn: getKomentar,
     enabled: !!letterData?.surat.status.status.includes("Ditolak"),
-  });
-
-  // Buat Komentar
-  const { mutate } = useMutation({
-    mutationFn: async (input: { persetujuan: string; komentar?: string }) => {
-      if (input.komentar) {
-        setIsMenolakLoading(true);
-        await axios.post(`/api/surat/komentar`, {
-          id,
-          input: { komentar: input.komentar },
-        });
-      } else {
-        setIsSetujuLoading(true);
-      }
-      const response = await axios.put(`/api/surat/persetujuan`, { id, input });
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
-      toast({
-        title: "Berhasil",
-        className: "bg-success text-white",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Gagal",
-        className: "bg-danger text-white",
-      });
-    },
-    onSettled: () => {
-      setIsMenolakLoading(false);
-      setIsSetujuLoading(false);
-      setModalMenolakOpen(false);
-    },
   });
 
   const handleDownload = async () => {
@@ -286,9 +285,58 @@ export default function SuratSinglePage() {
   };
 
   // Persetujuan
+  const { mutate: mutatePersetujuan } = useMutation({
+    mutationFn: async (input: {
+      persetujuan: string;
+      indikator_id?: number;
+      komentar?: string;
+    }) => {
+      if (input.komentar) {
+        setIsMenolakLoading(true);
+        await axios.post(`/api/surat/komentar`, {
+          id,
+          input: { komentar: input.komentar },
+        });
+      } else {
+        setIsTaggingLoading(true);
+        setIsSetujuLoading(true);
+      }
+      const response = await axios.put(`/api/surat/persetujuan`, { id, input });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      toast({
+        title: "Berhasil",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsMenolakLoading(false);
+      setIsSetujuLoading(false);
+      setIsTaggingLoading(false);
+      setModalMenolakOpen(false);
+      setModalTaggingOpen(false);
+    },
+  });
+
   const handleSetuju = () => {
     if (user?.jabatan.permision.persetujuan) {
-      mutate({ persetujuan: `Disetujui ${user?.user.jabatan.name}` });
+      if (isDekan) {
+        setModalTaggingOpen(true);
+        return;
+      }
+
+      mutatePersetujuan({
+        persetujuan: `Disetujui ${user?.user.jabatan.name}`,
+        indikator_id: 1,
+      });
     }
   };
 
@@ -296,13 +344,15 @@ export default function SuratSinglePage() {
     e.preventDefault();
 
     if (user?.jabatan.permision.persetujuan) {
-      mutate({
+      mutatePersetujuan({
         persetujuan: `Ditolak ${user?.user.jabatan.name}`,
+        indikator_id: 1,
         komentar: e.currentTarget.komentar.value,
       });
     }
   };
 
+  // OCR
   const { mutate: mutateOCR } = useMutation({
     mutationFn: async () => {
       setIsOCRLoading(true);
@@ -556,15 +606,18 @@ export default function SuratSinglePage() {
                     {letterData?.surat.status.status}
                   </p>
                 </Badge>
-                {!letterData?.surat.status.status.includes("Ditolak") && (
-                  <span className="flex gap-2">
-                    <Progress
-                      className="h-2"
-                      value={letterData?.surat.progressBar}
-                    />
-                    <p className="text-xs">{letterData?.surat.progressBar}%</p>
-                  </span>
-                )}
+                {letterData?.surat.status.status.includes("Daftar Tunggu") ||
+                  (letterData?.surat.status.status.includes("Diproses") && (
+                    <span className="flex gap-2">
+                      <Progress
+                        className="h-2"
+                        value={letterData?.surat.progressBar}
+                      />
+                      <p className="text-xs">
+                        {letterData?.surat.progressBar}%
+                      </p>
+                    </span>
+                  ))}
               </span>
             </div>
             <div className="flex flex-col space-y-1">
@@ -703,6 +756,84 @@ export default function SuratSinglePage() {
           </div>
         </div>
       </div>
+      {modalTaggingOpen && (
+        <Modal setModalOpen={setModalTaggingOpen}>
+          {isStrategiLoading || isIndikatorLoading ? (
+            <div className="flex h-96 items-center justify-center">
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
+            </div>
+          ) : (
+            <form
+              className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
+              onSubmit={(e) => {
+                e.preventDefault();
+                mutatePersetujuan({
+                  persetujuan: `Disetujui ${user?.user.jabatan.name}`,
+                  indikator_id: parseInt(e.currentTarget.indikator_id.value),
+                });
+              }}
+            >
+              <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                <h3 className="font-medium text-black dark:text-white">
+                  Tagging Surat
+                </h3>
+              </div>
+              <div className="p-6.5">
+                <div className="mb-4.5">
+                  <span className="text-title-xs font-medium text-black dark:text-white">
+                    Pilih Strategi
+                  </span>
+                  <select
+                    name="strategi_id"
+                    onChange={(e) => setStrategi_id(e.target.value)}
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  >
+                    <option value="">Pilih Strategi</option>
+                    {strategiData &&
+                      strategiData.map((strategi: any) => (
+                        <option key={strategi.id} value={strategi.id}>
+                          {strategi.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {strategi_id && (
+                  <div className="mb-4.5">
+                    <span className="text-title-xs font-medium text-black dark:text-white">
+                      Pilih Indikator
+                    </span>
+                    <select
+                      name="indikator_id"
+                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    >
+                      {indikatorData.map(
+                        (indikator: any) =>
+                          strategi_id === indikator.strategi_id.toString() && (
+                            <option key={indikator.id} value={indikator.id}>
+                              {indikator.name}
+                            </option>
+                          )
+                      )}
+                    </select>
+                  </div>
+                )}
+
+                <button
+                  className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray disabled:cursor-not-allowed disabled:bg-disabled disabled:text-black"
+                  disabled={!strategi_id}
+                >
+                  {isTaggingLoading ? (
+                    <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+                  ) : (
+                    "Tagging Surat"
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+        </Modal>
+      )}
       {uploadModalOpen && (
         <Modal setModalOpen={setUploadModalOpen}>
           <SuratForm

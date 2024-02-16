@@ -16,9 +16,12 @@ import { useToast } from "@/components/ui/use-toast";
 export default function ListSuratPage() {
   const session = useSession();
   const user = session.data?.user as User;
-  const [prodiId, setProdiId] = useState<number>(
-    user.user.prodi ? user.user.prodi.id : 1
+  const [prodi_id, setProdi_id] = useState<number[]>(
+    user.user.prodi ? [user.user.prodi.id] : []
   );
+  const [indikator_id, setIndikatorId] = useState<number[]>([]);
+  const [strategi_id, setStrategiId] = useState<number[]>([]);
+  const [iku_id, setIkuId] = useState<number[]>([]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -61,25 +64,18 @@ export default function ListSuratPage() {
   });
 
   const { data = [], isLoading } = useQuery({
-    queryKey: ["repo", prodiId, tableDate],
+    queryKey: ["repo", prodi_id, tableDate],
     queryFn: async () => {
-      const response = await axios.get(
-        `/api/surat?startDate=${new Date(
-          tableDate.from.getFullYear(),
-          tableDate.from.getMonth(),
-          tableDate.from.getDate(),
-          0,
-          0,
-          0
-        )}&endDate=${new Date(
-          tableDate.to.getFullYear(),
-          tableDate.to.getMonth(),
-          tableDate.to.getDate(),
-          0,
-          0,
-          0
-        )}&prodi_id=${prodiId}&repo=true`
-      );
+      const response = await axios.get("/api/sikoja/repo", {
+        params: {
+          startDate: tableDate.from.toISOString().split("T")[0],
+          endDate: tableDate.to.toISOString().split("T")[0],
+          prodi_id: JSON.stringify(prodi_id),
+          indikator_id: JSON.stringify(indikator_id),
+          strategi_id: JSON.stringify(strategi_id),
+          iku_id: JSON.stringify(iku_id),
+        },
+      });
 
       const sortedData = response.data.sort(
         (a: LetterRepo, b: LetterRepo) =>
@@ -105,21 +101,6 @@ export default function ListSuratPage() {
       return response.data;
     },
   });
-
-  const allowedProdiData = useMemo(() => {
-    if (prodiData) {
-      const prodiData2 = prodiData.map((prodi: any) => {
-        if (prodi.name === "-") {
-          return { id: prodi.id, name: "TU" };
-        }
-        return prodi;
-      }, []);
-
-      if (user.jabatan.permision.view_all_repo) return prodiData2;
-      return prodiData2.filter((prodi: any) => prodi.id === user.user.prodi.id);
-    }
-    return [];
-  }, [prodiData]);
 
   const filterData = useMemo(() => {
     if (prodiData && jenisData) {
@@ -197,9 +178,7 @@ export default function ListSuratPage() {
             columns={columns}
             data={data}
             filterData={filterData}
-            prodiData={allowedProdiData}
-            prodiId={prodiId}
-            setProdiId={setProdiId}
+            prodiData={prodiData}
             onDateRangeApply={handleOnDateRangeApply}
             date={date}
             setDate={setDate}

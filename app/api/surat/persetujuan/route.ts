@@ -15,6 +15,7 @@ export async function PUT(req: NextRequest) {
       `${process.env.API_URL}/status?surat_id=${id}`,
       {
         persetujuan: input.persetujuan,
+        indikator_id: input.indikator_id,
       },
       {
         headers: {

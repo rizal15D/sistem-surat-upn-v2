@@ -36,7 +36,6 @@ export interface User extends NextAuthUser {
       generate_nomor_surat: boolean;
       upload_tandatangan: boolean;
       persetujuan: boolean;
-      view_all_repo: boolean;
       akses_master: {
         id: number;
         prodi: boolean;
@@ -45,6 +44,7 @@ export interface User extends NextAuthUser {
         fakultas: boolean;
         jabatan: boolean;
         jenis_surat: boolean;
+        sikoja: boolean;
       };
     };
     jabatan_atas: {

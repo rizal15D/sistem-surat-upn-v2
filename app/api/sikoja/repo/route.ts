@@ -1,0 +1,64 @@
+import { getServerSession } from "next-auth";
+import { authOptions, User } from "@/app/api/auth/[...nextauth]/authOptions";
+import axios from "axios";
+import { NextRequest, NextResponse } from "next/server";
+
+export async function GET(req: NextRequest) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  const prodi_idJson = req.nextUrl.searchParams.get("prodi_id");
+  const indikator_idJson = req.nextUrl.searchParams.get("indikator_id");
+  const strategi_idJson = req.nextUrl.searchParams.get("strategi_id");
+  const iku_idJson = req.nextUrl.searchParams.get("iku_id");
+
+  const prodi_id = prodi_idJson ? JSON.parse(prodi_idJson) : [];
+  const indikator_id = indikator_idJson ? JSON.parse(indikator_idJson) : [];
+  const strategi_id = strategi_idJson ? JSON.parse(strategi_idJson) : [];
+  const iku_id = iku_idJson ? JSON.parse(iku_idJson) : [];
+
+  console.log(prodi_id, indikator_id, strategi_id, iku_id);
+
+  const startDateStr = req.nextUrl.searchParams.get("startDate");
+  let startDate: Date | null = null;
+  if (startDateStr) {
+    startDate = new Date(startDateStr);
+  }
+
+  const endDateStr = req.nextUrl.searchParams.get("endDate");
+  let endDate: Date | null = null;
+  if (endDateStr) {
+    endDate = new Date(endDateStr);
+  }
+
+  const formattedStartDate = startDate
+    ? startDate.toISOString().split("T")[0]
+    : null;
+  const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
+
+  if (session) {
+    const { data } = await axios.get(`${process.env.API_URL}/repo`, {
+      headers: {
+        Authorization: `Bearer ${session.user?.accessToken}`,
+        "Content-Type": `application/json`,
+      },
+      params: {
+        startDate: formattedStartDate,
+        endDate: formattedEndDate,
+      },
+      data: {
+        prodi_id: prodi_id,
+        indikator_id: indikator_id,
+        strategi_id: strategi_id,
+        iku_id: iku_id,
+      },
+    });
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}

@@ -4,11 +4,13 @@ import Modal from "./Modal";
 export default function ConfirmationModal({
   setModalOpen,
   onClick,
+  isLoading,
   title,
   message,
 }: {
   setModalOpen: (value: boolean) => void;
   onClick: () => void;
+  isLoading?: boolean;
   title: string;
   message: string;
 }) {
@@ -26,7 +28,11 @@ export default function ConfirmationModal({
               className="bg-danger hover:bg-opacity-90"
               onClick={onClick}
             >
-              Ya
+              {isLoading ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
+              ) : (
+                "Ya"
+              )}
             </Button>
             <Button
               variant="default"
