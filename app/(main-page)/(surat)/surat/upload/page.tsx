@@ -21,6 +21,8 @@ export default function UploadSuratPage() {
       deskripsi: any;
       jenis_id: any;
     }) => {
+      if (isLoading) return;
+
       setIsLoading(true);
       const response = await axios.post(
         `/api/surat`,

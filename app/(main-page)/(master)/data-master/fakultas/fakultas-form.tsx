@@ -31,7 +31,7 @@ export default function FakultasForm({
 
           <div className="mb-4.5">
             <label className="mb-3 block text-black dark:text-white">
-              Jenjang
+              Jenjang<span className="text-meta-1">*</span>
             </label>
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select

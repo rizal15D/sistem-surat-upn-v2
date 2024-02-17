@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/DataTableComponents/DataTableColumnHeader";
 import { useState } from "react";
 import Modal from "@/components/Modal/Modal";
-import RoleForm from "./indikator-form";
 import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { useToast } from "@/components/ui/use-toast";
 import IndikatorForm from "./indikator-form";
@@ -17,8 +16,14 @@ import IndikatorForm from "./indikator-form";
 export type Indikator = {
   id: number;
   name: string;
-  strategi_id: number;
-  iku_id: number;
+  strategi: {
+    id: number;
+    name: string;
+  };
+  iku: {
+    id: number;
+    name: string;
+  };
 };
 
 export const columns: ColumnDef<Indikator>[] = [
@@ -29,16 +34,18 @@ export const columns: ColumnDef<Indikator>[] = [
     ),
   },
   {
-    accessorKey: "strategi_id",
+    accessorKey: "strategi",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Strategi" />
     ),
+    cell: ({ row }) => row.original.strategi.name,
   },
   {
-    accessorKey: "iku_id",
+    accessorKey: "iku",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="IKU" />
     ),
+    cell: ({ row }) => row.original.iku.name,
   },
   {
     id: "actions",
@@ -47,12 +54,16 @@ export const columns: ColumnDef<Indikator>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/sikoja/indikator`, {
             params: {
               indikator_id: indikator.id,
@@ -76,6 +87,9 @@ export const columns: ColumnDef<Indikator>[] = [
             description: error.message,
             className: "bg-danger text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -170,11 +184,12 @@ export const columns: ColumnDef<Indikator>[] = [
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
               onClick={() => {
                 mutateDelete();
               }}
-              title="Hapus indikator surat"
-              message={`Apakah anda yakin ingin menghapus indikator surat ${
+              title="Hapus indikator"
+              message={`Apakah anda yakin ingin menghapus indikator ${
                 indikator.name || "ini"
               }?`}
             />

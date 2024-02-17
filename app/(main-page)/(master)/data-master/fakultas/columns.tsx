@@ -46,12 +46,16 @@ export const columns: ColumnDef<Fakultas>[] = [
       const { toast } = useToast();
       const fakultas = row.original;
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/fakultas`, {
             data: { id: fakultas.id },
           });
@@ -74,6 +78,9 @@ export const columns: ColumnDef<Fakultas>[] = [
             description: error.message,
             className: "bg-error text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -164,6 +171,7 @@ export const columns: ColumnDef<Fakultas>[] = [
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
               onClick={() => {
                 mutateDelete();
               }}

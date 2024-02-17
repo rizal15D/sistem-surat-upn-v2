@@ -81,12 +81,16 @@ export const columns: ColumnDef<Template>[] = [
       const [warningMessage, setWarningMessage] = useState("");
 
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/template`, {
             data: { id: template.id },
           });
@@ -110,6 +114,9 @@ export const columns: ColumnDef<Template>[] = [
             className: "bg-danger text-white",
           });
           setModalDeleteOpen(false);
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -253,6 +260,7 @@ export const columns: ColumnDef<Template>[] = [
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
               onClick={() => mutateDelete()}
               title="Hapus Template"
               message={`Apakah anda yakin ingin menghapus template ${

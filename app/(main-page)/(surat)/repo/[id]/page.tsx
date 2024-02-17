@@ -108,6 +108,8 @@ export default function SuratSinglePage() {
 
   const { mutate: mutateRevisi } = useMutation({
     mutationFn: async (input: { id: any; surat: File }) => {
+      if (isUploadLoading) return;
+
       setIsUploadLoading(true);
       const response = await axios.put(
         `/api/surat/revisi`,

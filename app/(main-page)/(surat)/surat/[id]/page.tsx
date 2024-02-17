@@ -49,6 +49,7 @@ export default function SuratSinglePage() {
   const [isOCRLoading, setIsOCRLoading] = useState(false);
   const [isPerbaikanLoading, setIsPerbaikanLoading] = useState(false);
   const [isTaggingLoading, setIsTaggingLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
@@ -189,6 +190,8 @@ export default function SuratSinglePage() {
   // Upload Surat TTD (Admin Dekan)
   const { mutate: mutateUpload } = useMutation({
     mutationFn: async (input: { id: any; surat: File }) => {
+      if (isUploadLoading) return;
+
       setIsUploadLoading(true);
       const response = await axios.put(
         `/api/surat/`,
@@ -259,6 +262,9 @@ export default function SuratSinglePage() {
   // Delete Surat
   const { mutate: mutateDelete } = useMutation({
     mutationFn: async () => {
+      if (isDeleteLoading) return;
+
+      setIsDeleteLoading(true);
       const response = await axios.delete(`/api/surat`, {
         params: { id },
       });
@@ -278,6 +284,10 @@ export default function SuratSinglePage() {
         className: "bg-danger text-white",
       });
     },
+    onSettled: () => {
+      setIsDeleteLoading(false);
+      setModalDeleteOpen(false);
+    },
   });
 
   const handleDelete = async () => {
@@ -291,6 +301,8 @@ export default function SuratSinglePage() {
       indikator_id?: number;
       komentar?: string;
     }) => {
+      if (isSetujuLoading || isMenolakLoading || isTaggingLoading) return;
+
       if (input.komentar) {
         setIsMenolakLoading(true);
         await axios.post(`/api/surat/komentar`, {
@@ -355,6 +367,8 @@ export default function SuratSinglePage() {
   // OCR
   const { mutate: mutateOCR } = useMutation({
     mutationFn: async () => {
+      if (isOCRLoading) return;
+
       setIsOCRLoading(true);
       const response = await axios.post(`/api/surat/ocr`, {
         surat_id: id,
@@ -392,6 +406,8 @@ export default function SuratSinglePage() {
       surat: File;
       deskripsi: string;
     }) => {
+      if (isPerbaikanLoading) return;
+
       setIsPerbaikanLoading(true);
       const response = await axios.post(
         `/api/surat/perbaikan`,
@@ -807,14 +823,16 @@ export default function SuratSinglePage() {
                       name="indikator_id"
                       className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
                     >
-                      {indikatorData.map(
-                        (indikator: any) =>
-                          strategi_id === indikator.strategi_id.toString() && (
-                            <option key={indikator.id} value={indikator.id}>
-                              {indikator.name}
-                            </option>
-                          )
-                      )}
+                      {indikatorData &&
+                        indikatorData.map(
+                          (indikator: any) =>
+                            strategi_id ===
+                              indikator.strategi_id.toString() && (
+                              <option key={indikator.id} value={indikator.id}>
+                                {indikator.name}
+                              </option>
+                            )
+                        )}
                     </select>
                   </div>
                 )}
@@ -882,6 +900,7 @@ export default function SuratSinglePage() {
       {modalDeleteOpen && (
         <ConfirmationModal
           setModalOpen={setModalDeleteOpen}
+          isLoading={isDeleteLoading}
           title="Hapus Surat"
           message={`Apakah anda yakin ingin menghapus surat ${
             letterData?.surat.judul.split(".")[0]

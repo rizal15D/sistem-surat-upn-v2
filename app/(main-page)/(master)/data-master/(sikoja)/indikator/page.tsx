@@ -14,7 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 async function getData(): Promise<Indikator[]> {
   // Fetch data from your API here.
   const response = await axios.get("/api/sikoja/indikator");
-  return response.data;
+  return response.data.indikator;
 }
 
 export default function DataMasterRolePage() {

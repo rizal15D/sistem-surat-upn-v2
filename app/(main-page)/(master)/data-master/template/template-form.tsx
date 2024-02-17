@@ -95,7 +95,7 @@ export default function TemplateForm({
             </div>
 
             <label className="mb-2.5 block text-black dark:text-white">
-              Judul
+              Judul<span className="text-meta-1">*</span>
             </label>
             <input
               name="judul"
@@ -110,7 +110,7 @@ export default function TemplateForm({
 
           <div className="mb-6">
             <label className="mb-2.5 block text-black dark:text-white">
-              Deskripsi
+              Deskripsi<span className="text-meta-1">*</span>
             </label>
             <textarea
               name="deskripsi"
@@ -125,7 +125,7 @@ export default function TemplateForm({
 
           <div className="mb-4.5">
             <label className="mb-3 block text-black dark:text-white">
-              Jenis
+              Jenis Surat<span className="text-meta-1">*</span>
             </label>
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select

@@ -63,7 +63,7 @@ export default function ProdiForm({
 
           <div>
             <label className="mb-3 block text-black dark:text-white">
-              Fakultas
+              Fakultas<span className="text-meta-1">*</span>
             </label>
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select

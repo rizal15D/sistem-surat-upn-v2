@@ -40,12 +40,16 @@ export const columns: ColumnDef<Prodi>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/prodi`, {
             data: { id: prodi.id },
           });
@@ -67,6 +71,9 @@ export const columns: ColumnDef<Prodi>[] = [
             description: error.message,
             className: "bg-danger text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -147,6 +154,7 @@ export const columns: ColumnDef<Prodi>[] = [
           </div>
           {modalDeleteOpen && (
             <ConfirmationModal
+              isLoading={isDeleteLoading}
               setModalOpen={setModalDeleteOpen}
               onClick={() => {
                 mutateDelete();
