@@ -12,7 +12,6 @@ export async function GET(req: NextRequest) {
   const pathsJSON = req.nextUrl.searchParams.get("paths");
 
   const paths = pathsJSON ? JSON.parse(pathsJSON) : [];
-  console.log(paths);
 
   if (session) {
     const { data } = await axios.post(

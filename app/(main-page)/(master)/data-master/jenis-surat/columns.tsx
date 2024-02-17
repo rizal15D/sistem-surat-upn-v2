@@ -119,7 +119,7 @@ export const columns: ColumnDef<Jenis>[] = [
           kode_jenis: e.currentTarget.kode_jenis.value,
         };
 
-        if (!input.jenis) {
+        if (!input.jenis || input.kode_jenis) {
           toast({
             title: "Gagal mengubah data",
             description: "Data tidak boleh kosong",

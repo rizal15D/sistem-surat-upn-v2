@@ -41,7 +41,6 @@ export default function LoginForm() {
       className: "bg-success text-white",
     });
 
-    console.log("response", response);
     router.push("/surat");
   };
 

@@ -1,6 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { useToast } from "@/components/ui/use-toast";
+import { MixerHorizontalIcon } from "@radix-ui/react-icons";
+import Modal from "@/components/Modal/Modal";
 
 import {
   ColumnDef,
@@ -33,15 +36,17 @@ import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import FilterForm from "./filter-form";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  filterData: any;
+  filterData?: any;
   onDateRangeApply?: (date: any) => void;
   date?: any;
   setDate?: any;
   prodiData?: any;
+  handleFilter?: any;
   // prodiId?: number;
   // setProdiId?: any;
 }
@@ -53,6 +58,7 @@ export function DataTable<TData, TValue>({
   onDateRangeApply,
   date,
   setDate,
+  handleFilter,
 }: // prodiData,
 // prodiId,
 // setProdiId,
@@ -63,6 +69,8 @@ DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+  const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
+  const { toast } = useToast();
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
 
@@ -93,7 +101,11 @@ DataTableProps<TData, TValue>) {
     });
 
     if (paths.length === 0) {
-      alert("Pilih minimal satu surat");
+      toast({
+        title: "Gagal",
+        description: "Tidak ada file",
+        className: "bg-danger text-white",
+      });
       return;
     }
 
@@ -122,7 +134,11 @@ DataTableProps<TData, TValue>) {
     });
 
     if (repo_id.length === 0) {
-      alert("Pilih minimal satu surat");
+      toast({
+        title: "Gagal",
+        description: "Tidak ada file",
+        className: "bg-danger text-white",
+      });
       return;
     }
 
@@ -146,7 +162,7 @@ DataTableProps<TData, TValue>) {
 
   return (
     <div>
-      <DataTableToolbar table={table} filterInput="judul" data={filterData} />
+      <DataTableToolbar table={table} filterInput="judul" />
       <div className="flex justify-between">
         <DatePickerWithRange
           onDateRangeApply={onDateRangeApply}
@@ -167,6 +183,15 @@ DataTableProps<TData, TValue>) {
           >
             <p>Download Excel</p>
             <p>( {table.getSelectedRowModel().rows.length} )</p>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto h-8 text-body lg:flex bg-transparent font-medium focus:outline-none"
+            onClick={() => setIsFilterModalOpen(true)}
+          >
+            <MixerHorizontalIcon className="mr-2 h-4 w-4" />
+            Filter
           </Button>
         </div>
       </div>
@@ -221,6 +246,11 @@ DataTableProps<TData, TValue>) {
         </Table>
       </div>
       <DataTablePagination table={table} />
+      {isFilterModalOpen && (
+        <Modal setModalOpen={setIsFilterModalOpen} className="lg:w-[65%]">
+          <FilterForm onSubmit={handleFilter} />
+        </Modal>
+      )}
     </div>
   );
 }

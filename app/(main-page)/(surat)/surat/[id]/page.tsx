@@ -31,6 +31,7 @@ import ConfirmationModal from "@/components/Modal/ConfirmationModal";
 import { Badge } from "@/components/ui/badge";
 import { Clipboard, EditIcon } from "lucide-react";
 import Link from "next/link";
+import { Indikator } from "@/app/(main-page)/(master)/data-master/(sikoja)/indikator/columns";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -154,7 +155,7 @@ export default function SuratSinglePage() {
         },
       });
 
-      return response.data;
+      return response.data.indikator;
     },
     enabled: !!isDekan,
   });
@@ -347,7 +348,6 @@ export default function SuratSinglePage() {
 
       mutatePersetujuan({
         persetujuan: `Disetujui ${user?.user.jabatan.name}`,
-        indikator_id: 1,
       });
     }
   };
@@ -358,7 +358,7 @@ export default function SuratSinglePage() {
     if (user?.jabatan.permision.persetujuan) {
       mutatePersetujuan({
         persetujuan: `Ditolak ${user?.user.jabatan.name}`,
-        indikator_id: 1,
+        indikator_id: e.currentTarget.indikator_id.value,
         komentar: e.currentTarget.komentar.value,
       });
     }
@@ -826,8 +826,7 @@ export default function SuratSinglePage() {
                       {indikatorData &&
                         indikatorData.map(
                           (indikator: any) =>
-                            strategi_id ===
-                              indikator.strategi_id.toString() && (
+                            indikator.strategi.id == indikator.strategi.id && (
                               <option key={indikator.id} value={indikator.id}>
                                 {indikator.name}
                               </option>

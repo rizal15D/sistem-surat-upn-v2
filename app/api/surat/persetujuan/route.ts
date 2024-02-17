@@ -13,10 +13,7 @@ export async function PUT(req: NextRequest) {
 
     const { data } = await axios.put(
       `${process.env.API_URL}/status?surat_id=${id}`,
-      {
-        persetujuan: input.persetujuan,
-        indikator_id: input.indikator_id,
-      },
+      input,
       {
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,

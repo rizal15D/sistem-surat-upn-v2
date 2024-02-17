@@ -12,8 +12,6 @@ export async function GET(req: NextRequest) {
 
   const repo_id = repo_idJSON ? JSON.parse(repo_idJSON) : [];
 
-  console.log(repo_id, "repo_id");
-
   if (session) {
     const { data } = await axios.post(
       `${process.env.API_URL}/excel`,

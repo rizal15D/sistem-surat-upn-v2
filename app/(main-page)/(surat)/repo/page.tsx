@@ -16,7 +16,9 @@ import { useToast } from "@/components/ui/use-toast";
 export default function ListRepoPage() {
   const session = useSession();
   const user = session.data?.user as User;
-  const [prodi_id, setProdi_id] = useState<number[]>(user.user.prodi ? [] : []);
+  const [prodi_id, setProdi_id] = useState<number[]>(
+    user.user.prodi ? [user.user.prodi.id] : []
+  );
   const [indikator_id, setIndikatorId] = useState<number[]>([]);
   const [strategi_id, setStrategiId] = useState<number[]>([]);
   const [iku_id, setIkuId] = useState<number[]>([]);
@@ -64,7 +66,7 @@ export default function ListRepoPage() {
   const { data = [], isLoading } = useQuery({
     queryKey: [
       "repo",
-      { prodi_id, indikator_id, strategi_id, iku_id },
+      { prodi_id, strategi_id, iku_id, indikator_id },
       tableDate,
     ],
     queryFn: async () => {
@@ -103,18 +105,6 @@ export default function ListRepoPage() {
       return response.data;
     },
   });
-
-  const filterData = useMemo(() => {
-    if (prodiData && jenisData) {
-      return {
-        jenis: jenisData.map((jenis: Jenis) => ({
-          value: [jenis.jenis],
-          label: jenis.jenis,
-        })),
-      };
-    }
-    return {};
-  }, [jenisData]);
 
   const handleOnDateRangeApply = useMemo(
     () => (date: { from: Date; to: Date }) => {
@@ -158,6 +148,61 @@ export default function ListRepoPage() {
     []
   );
 
+  const { mutate: mutateFilter } = useMutation({
+    mutationFn: async (input: {
+      selectedProdi: number[];
+      selectedIku: number[];
+      selectedStrategi: number[];
+      selectedIndikator: number[];
+    }) => {
+      console.log("input", input);
+      const response = await axios.get("/api/sikoja/repo", {
+        params: {
+          prodi_id: JSON.stringify(input.selectedProdi),
+          iku_id: JSON.stringify(input.selectedIku),
+          strategi_id: JSON.stringify(input.selectedStrategi),
+          indikator_id: JSON.stringify(
+            input.selectedIndikator.map((indikator: any) => indikator.value.id)
+          ),
+        },
+      });
+      return response.data.repo;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["repo"],
+      });
+      toast({
+        title: "Berhasil menghapus data",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal menghapus data",
+        description: error.message,
+        className: "bg-danger text-white",
+      });
+    },
+  });
+
+  const handleFilter = async ({
+    prodi_id,
+    iku_id,
+    strategi_id,
+    indikator_id,
+  }: {
+    prodi_id: number[];
+    iku_id: number[];
+    strategi_id: number[];
+    indikator_id: number[];
+  }) => {
+    setProdi_id(prodi_id);
+    setIkuId(iku_id);
+    setStrategiId(strategi_id);
+    setIndikatorId(indikator_id);
+  };
+
   if (isLoading || isJenisLoading || isProdiLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -179,8 +224,8 @@ export default function ListRepoPage() {
           <DataTable
             columns={columns}
             data={data}
-            filterData={filterData}
             prodiData={prodiData}
+            handleFilter={handleFilter}
             onDateRangeApply={handleOnDateRangeApply}
             date={date}
             setDate={setDate}
