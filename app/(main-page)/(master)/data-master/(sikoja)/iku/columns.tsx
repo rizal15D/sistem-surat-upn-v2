@@ -33,12 +33,16 @@ export const columns: ColumnDef<IKU>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/sikoja/iku`, {
             params: {
               iku_id: iku.id,
@@ -62,6 +66,9 @@ export const columns: ColumnDef<IKU>[] = [
             description: error.message,
             className: "bg-danger text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -154,11 +161,12 @@ export const columns: ColumnDef<IKU>[] = [
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
               onClick={() => {
                 mutateDelete();
               }}
-              title="Hapus iku surat"
-              message={`Apakah anda yakin ingin menghapus iku surat ${
+              title="Hapus IKU surat"
+              message={`Apakah anda yakin ingin menghapus IKU ${
                 iku.name || "ini"
               }?`}
             />

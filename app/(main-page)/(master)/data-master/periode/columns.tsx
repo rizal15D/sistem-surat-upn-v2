@@ -64,12 +64,16 @@ export const columns: ColumnDef<Periode>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           if (periode.status) {
             throw new Error("Periode aktif");
           }
@@ -95,6 +99,9 @@ export const columns: ColumnDef<Periode>[] = [
             description: error.message,
             className: "bg-danger text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -218,18 +225,6 @@ export const columns: ColumnDef<Periode>[] = [
               <SwitchIcon className="h-5 w-5" />
             </Button>
           </div>
-          {modalDeleteOpen && (
-            <ConfirmationModal
-              setModalOpen={setModalDeleteOpen}
-              onClick={() => {
-                mutateDelete();
-              }}
-              title="Hapus Periode"
-              message={`Apakah Anda yakin ingin menghapus periode ${
-                periode.tahun || "ini"
-              }?`}
-            />
-          )}
           {modalEditOpen && (
             <Modal setModalOpen={setModalEditOpen}>
               <PeriodeForm
@@ -238,6 +233,19 @@ export const columns: ColumnDef<Periode>[] = [
                 isLoading={isLoading}
               />
             </Modal>
+          )}
+          {modalDeleteOpen && (
+            <ConfirmationModal
+              setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
+              onClick={() => {
+                mutateDelete();
+              }}
+              title="Hapus Periode"
+              message={`Apakah Anda yakin ingin menghapus periode ${
+                periode.tahun || "ini"
+              }?`}
+            />
           )}
         </>
       );

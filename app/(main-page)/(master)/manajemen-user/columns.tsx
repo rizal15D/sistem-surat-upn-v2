@@ -114,7 +114,11 @@ export const columns: ColumnDef<Users>[] = [
       const users = row.original;
       const queryClient = useQueryClient();
       const { toast } = useToast();
+
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+      const [isResetPasswordLoading, setIsResetPasswordLoading] =
+        useState(false);
 
       const [password, setPassword] = useState("");
       const [modalResetPasswordOpen, setModalResetPasswordOpen] =
@@ -156,6 +160,9 @@ export const columns: ColumnDef<Users>[] = [
 
       const { mutate: mutateResetPassword } = useMutation({
         mutationFn: async () => {
+          if (isResetPasswordLoading) return;
+
+          setIsResetPasswordLoading(true);
           const { data } = await axios.put(`/api/users/reset-password`, {
             id: users.id,
           });
@@ -180,10 +187,16 @@ export const columns: ColumnDef<Users>[] = [
             className: "bg-danger text-white",
           });
         },
+        onSettled: () => {
+          setIsResetPasswordLoading(false);
+        },
       });
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/users`, {
             data: {
               id: users.id,
@@ -208,11 +221,10 @@ export const columns: ColumnDef<Users>[] = [
             className: "bg-danger text-white",
           });
         },
+        onSettled: () => {
+          setIsDeleteLoading(false);
+        },
       });
-
-      const handleDelete = () => {
-        mutateDelete();
-      };
 
       return (
         <>
@@ -252,6 +264,7 @@ export const columns: ColumnDef<Users>[] = [
           {modalResetPasswordOpen && (
             <ConfirmationModal
               setModalOpen={setModalResetPasswordOpen}
+              isLoading={isResetPasswordLoading}
               onClick={mutateResetPassword}
               title="Reset Password"
               message={`Apakah anda yakin ingin mereset password user ${users.name} ?`}
@@ -288,6 +301,7 @@ export const columns: ColumnDef<Users>[] = [
           )}
           {modalDeleteOpen && (
             <ConfirmationModal
+              isLoading={isDeleteLoading}
               setModalOpen={setModalDeleteOpen}
               onClick={() => mutateDelete()}
               title="Hapus User"

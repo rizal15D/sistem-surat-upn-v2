@@ -39,12 +39,16 @@ export const columns: ColumnDef<Jenis>[] = [
       const queryClient = useQueryClient();
       const { toast } = useToast();
       const [isLoading, setIsLoading] = useState(false);
+      const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
       const [modalEditOpen, setModalEditOpen] = useState(false);
       const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
 
       const { mutate: mutateDelete } = useMutation({
         mutationFn: async () => {
+          if (isDeleteLoading) return;
+
+          setIsDeleteLoading(true);
           const { data } = await axios.delete(`/api/jenis-surat`, {
             data: { id: jenis.id },
           });
@@ -66,6 +70,9 @@ export const columns: ColumnDef<Jenis>[] = [
             description: error.message,
             className: "bg-danger text-white",
           });
+        },
+        onSettled: () => {
+          setIsDeleteLoading(false);
         },
       });
 
@@ -155,6 +162,7 @@ export const columns: ColumnDef<Jenis>[] = [
           {modalDeleteOpen && (
             <ConfirmationModal
               setModalOpen={setModalDeleteOpen}
+              isLoading={isDeleteLoading}
               onClick={() => {
                 mutateDelete();
               }}
