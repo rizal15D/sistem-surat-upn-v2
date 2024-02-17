@@ -72,7 +72,7 @@ export default function DataMasterRolePage() {
       kode_jenis: e.currentTarget.kode_jenis.value,
     };
 
-    if (!data.jenis) {
+    if (!data.jenis || !data.kode_jenis) {
       toast({
         title: "Gagal menambah data",
         description: "Data tidak boleh kosong",
