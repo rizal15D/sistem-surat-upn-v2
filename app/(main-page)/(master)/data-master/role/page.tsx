@@ -48,6 +48,7 @@ export default function DataMasterRolePage() {
       generate_nomor_surat: boolean;
       upload_tandatangan: boolean;
       persetujuan: boolean;
+      tagging: boolean;
       prodi: boolean;
       template: boolean;
       periode: boolean;
@@ -91,6 +92,7 @@ export default function DataMasterRolePage() {
       generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
       upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
       persetujuan: e.currentTarget.persetujuan.checked,
+      tagging: e.currentTarget.tagging.checked,
       // edit akses master
       prodi: e.currentTarget.prodi.checked,
       template: e.currentTarget.template.checked,

@@ -107,11 +107,7 @@ export default function SuratForm({
           </div>
         </div>
       </div>
-      <div
-        className={`${
-          isAdminDekan ? "lg:col-span-1" : "lg:col-span-2"
-        } sm:col-span-1`}
-      >
+      <div className={`lg:col-span-2 sm:col-span-1`}>
         <div className="container mx-auto py-10 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
@@ -121,47 +117,19 @@ export default function SuratForm({
             </div>
 
             <div className="p-6.5">
-              {!isAdminDekan && (
-                <>
-                  <div className="mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Judul Surat
-                    </label>
-                    <input
-                      type="text"
-                      name="judul"
-                      placeholder="Masukkan judul surat"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    />
-                  </div>
-                  <div className="mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Deksripsi
-                    </label>
-                    <textarea
-                      name="deskripsi"
-                      rows={6}
-                      placeholder="Masukkan deskripsi surat"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    />
-                  </div>
-                  <div className="mb-4.5">
-                    <label className="mb-2.5 block text-black dark:text-white">
-                      Jenis Surat<span className="text-meta-1">*</span>
-                    </label>
-                    <select
-                      name="jenis_id"
-                      className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-                    >
-                      {data.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.jenis}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </>
-              )}
+              <>
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Deksripsi<span className="text-meta-1">*</span>
+                  </label>
+                  <textarea
+                    name="deskripsi"
+                    rows={6}
+                    placeholder="Masukkan deskripsi surat"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                  />
+                </div>
+              </>
 
               <button className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray">
                 {isLoading ? (

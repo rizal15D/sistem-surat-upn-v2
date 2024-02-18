@@ -17,11 +17,13 @@ export default function ListRepoPage() {
   const session = useSession();
   const user = session.data?.user as User;
   const [prodi_id, setProdi_id] = useState<number[]>(
-    user.user.prodi ? [user.user.prodi.id] : []
+    user.user.prodi && user.jabatan.permision.buat_surat
+      ? [user.user.prodi.id]
+      : []
   );
-  const [indikator_id, setIndikatorId] = useState<number[]>([]);
-  const [strategi_id, setStrategiId] = useState<number[]>([]);
-  const [iku_id, setIkuId] = useState<number[]>([]);
+  const [indikator_id, setIndikator_id] = useState<number[]>([]);
+  const [strategi_id, setStrategi_id] = useState<number[]>([]);
+  const [iku_id, setIku_id] = useState<number[]>([]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -148,44 +150,6 @@ export default function ListRepoPage() {
     []
   );
 
-  const { mutate: mutateFilter } = useMutation({
-    mutationFn: async (input: {
-      selectedProdi: number[];
-      selectedIku: number[];
-      selectedStrategi: number[];
-      selectedIndikator: number[];
-    }) => {
-      console.log("input", input);
-      const response = await axios.get("/api/sikoja/repo", {
-        params: {
-          prodi_id: JSON.stringify(input.selectedProdi),
-          iku_id: JSON.stringify(input.selectedIku),
-          strategi_id: JSON.stringify(input.selectedStrategi),
-          indikator_id: JSON.stringify(
-            input.selectedIndikator.map((indikator: any) => indikator.value.id)
-          ),
-        },
-      });
-      return response.data.repo;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["repo"],
-      });
-      toast({
-        title: "Berhasil menghapus data",
-        className: "bg-success text-white",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Gagal menghapus data",
-        description: error.message,
-        className: "bg-danger text-white",
-      });
-    },
-  });
-
   const handleFilter = async ({
     prodi_id,
     iku_id,
@@ -198,9 +162,9 @@ export default function ListRepoPage() {
     indikator_id: number[];
   }) => {
     setProdi_id(prodi_id);
-    setIkuId(iku_id);
-    setStrategiId(strategi_id);
-    setIndikatorId(indikator_id);
+    setIku_id(iku_id);
+    setStrategi_id(strategi_id);
+    setIndikator_id(indikator_id);
   };
 
   if (isLoading || isJenisLoading || isProdiLoading) {

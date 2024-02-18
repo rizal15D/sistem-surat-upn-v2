@@ -27,6 +27,7 @@ export type Role = {
     download_surat: boolean;
     generate_nomor_surat: boolean;
     upload_tandatangan: boolean;
+    tagging: boolean;
     persetujuan: boolean;
     akses_master: {
       id: number;
@@ -112,6 +113,16 @@ export const columns: ColumnDef<Role>[] = [
               )}
             </span>
             <span className="font-bold">Persetujuan</span>
+          </div>
+          <div className="flex gap-2">
+            <span>
+              {role.permision.tagging ? (
+                <CheckIcon className="h-5 w-5 text-success" />
+              ) : (
+                <Cross2Icon className="h-5 w-5 text-danger" />
+              )}
+            </span>
+            <span className="font-bold">Tagging Surat</span>
           </div>
         </div>
       );
@@ -319,6 +330,7 @@ export const columns: ColumnDef<Role>[] = [
           generate_nomor_surat: e.currentTarget.generate_nomor_surat.checked,
           upload_tandatangan: e.currentTarget.upload_tandatangan.checked,
           persetujuan: e.currentTarget.persetujuan.checked,
+          tagging: e.currentTarget.tagging.checked,
           // edit akses master
           prodi: e.currentTarget.prodi.checked,
           template: e.currentTarget.template.checked,

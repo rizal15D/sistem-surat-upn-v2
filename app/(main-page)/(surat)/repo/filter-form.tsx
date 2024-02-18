@@ -102,10 +102,10 @@ export default function FilterForm({
       prodi_id: selectedProdi,
       iku_id: selectedIku,
       strategi_id: selectedStrategi,
-      indikator_id: selectedIndikator,
+      indikator_id: selectedIndikator.map(
+        (indikator: any) => indikator.value.id
+      ),
     };
-
-    console.log(data);
 
     onSubmit(data);
   };

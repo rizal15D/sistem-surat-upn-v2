@@ -70,7 +70,7 @@ export default function SuratSinglePage() {
 
   // Get Data Surat
   const { data: letterData, isLoading: isLetterLoading } = useQuery({
-    queryKey: ["surat", id],
+    queryKey: ["repo", id],
     queryFn: async () => {
       const response = await axios.get(`/api/surat/${id}`);
 
@@ -130,7 +130,8 @@ export default function SuratSinglePage() {
   };
 
   // Get Strategi
-  const isDekan = user?.jabatan.name === "Dekan";
+  const canTagging = user?.jabatan.permision.tagging;
+
   const { data: strategiData, isLoading: isStrategiLoading } = useQuery({
     queryKey: ["strategi"],
     queryFn: async () => {
@@ -142,7 +143,7 @@ export default function SuratSinglePage() {
 
       return response.data as { id: number; name: string }[];
     },
-    enabled: !!isDekan,
+    enabled: canTagging,
   });
 
   // Get Indikator
@@ -157,7 +158,7 @@ export default function SuratSinglePage() {
 
       return response.data.indikator;
     },
-    enabled: !!isDekan,
+    enabled: canTagging,
   });
 
   const { data: komentar, isLoading: isKomentarLoading } = useQuery({
@@ -341,7 +342,7 @@ export default function SuratSinglePage() {
 
   const handleSetuju = () => {
     if (user?.jabatan.permision.persetujuan) {
-      if (isDekan) {
+      if (canTagging) {
         setModalTaggingOpen(true);
         return;
       }
@@ -358,7 +359,6 @@ export default function SuratSinglePage() {
     if (user?.jabatan.permision.persetujuan) {
       mutatePersetujuan({
         persetujuan: `Ditolak ${user?.user.jabatan.name}`,
-        indikator_id: e.currentTarget.indikator_id.value,
         komentar: e.currentTarget.komentar.value,
       });
     }

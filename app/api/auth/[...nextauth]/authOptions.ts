@@ -36,6 +36,7 @@ export interface User extends NextAuthUser {
       generate_nomor_surat: boolean;
       upload_tandatangan: boolean;
       persetujuan: boolean;
+      tagging: boolean;
       akses_master: {
         id: number;
         prodi: boolean;

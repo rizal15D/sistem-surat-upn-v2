@@ -35,13 +35,6 @@ export async function GET(req: NextRequest) {
     : null;
   const formattedEndDate = endDate ? endDate.toISOString().split("T")[0] : null;
 
-  console.log("formattedStartDate", formattedStartDate);
-  console.log("formattedEndDate", formattedEndDate);
-  console.log("prodi_id", prodi_id);
-  console.log("strategi_id", strategi_id);
-  console.log("iku_id", iku_id);
-  console.log("indikator_id", indikator_id);
-
   if (session) {
     const { data } = await axios.post(
       `${process.env.API_URL}/repo/filter`,

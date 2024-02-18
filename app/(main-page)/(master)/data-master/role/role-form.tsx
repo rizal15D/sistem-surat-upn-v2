@@ -90,6 +90,15 @@ export default function RoleForm({
                 />
                 <label htmlFor="surat-masuk">Persetujuan</label>
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="tagging"
+                  defaultChecked={values?.permision?.tagging}
+                  className="rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                />
+                <label htmlFor="surat-masuk">Tagging Surat</label>
+              </div>
             </div>
 
             <div>

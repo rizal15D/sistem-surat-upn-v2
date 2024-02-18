@@ -53,7 +53,7 @@ export default function SuratSinglePage() {
     Open: () => <></>,
     SwitchTheme: () => <></>,
   });
-
+  id;
   // Get Data Surat
   const { data: letterData, isLoading: isLetterLoading } = useQuery({
     queryKey: ["repo", id],
@@ -107,16 +107,16 @@ export default function SuratSinglePage() {
   };
 
   const { mutate: mutateRevisi } = useMutation({
-    mutationFn: async (input: { id: any; surat: File }) => {
+    mutationFn: async (input: { deskripsi: any; surat: File }) => {
       if (isUploadLoading) return;
 
       setIsUploadLoading(true);
-      const response = await axios.put(
-        `/api/surat/revisi`,
+      const response = await axios.post(
+        `/api/surat/pembetulan`,
         {
-          surat_id: id,
+          surat_id: letterData?.surat.id,
           judul: letterData?.surat.judul,
-          deskripsi: letterData?.surat.deskripsi,
+          deskripsi: input.deskripsi,
           surat: input.surat,
         },
         {
@@ -155,7 +155,7 @@ export default function SuratSinglePage() {
     const formData = new FormData(e.currentTarget);
 
     const data = {
-      id,
+      deskripsi: formData.get("deskripsi") as string,
       surat: formData.get("file") as File,
     };
 
@@ -328,9 +328,35 @@ export default function SuratSinglePage() {
                 {letterData?.surat.jenis.jenis}
               </span>
             </div>
+
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                IKU
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {letterData?.indikator.iku.name}
+              </span>
+            </div>
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Strategi
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {letterData?.indikator.strategi.name}
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-col space-y-2 gap-2">
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
+                Indikator
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {letterData?.indikator.name}
+              </span>
+            </div>
+
             <div className="flex flex-col space-y-1">
               <span className="text-title-xs font-medium text-black dark:text-white">
                 Deskripsi
