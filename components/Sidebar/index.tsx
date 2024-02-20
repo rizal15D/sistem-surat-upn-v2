@@ -32,7 +32,8 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
     permissions?.akses_master.jenis_surat ||
     permissions?.akses_master.periode ||
     permissions?.akses_master.prodi ||
-    permissions?.akses_master.template;
+    permissions?.akses_master.template ||
+    permissions?.akses_master.sikoja;
 
   // close on click outside
   useEffect(() => {
@@ -164,6 +165,7 @@ const Sidebar = ({ session, sidebarOpen, setSidebarOpen }: SidebarProps) => {
                 {/* <!-- Menu Item Data Master --> */}
                 <SidebarLinkGroup
                   activeCondition={
+                    //
                     pathname === "/data-master" ||
                     pathname.includes("data-master")
                   }

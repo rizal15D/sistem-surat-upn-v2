@@ -142,7 +142,8 @@ export const columns: ColumnDef<Role>[] = [
         !role.permision.akses_master.periode &&
         !role.permision.akses_master.fakultas &&
         !role.permision.akses_master.jabatan &&
-        !role.permision.akses_master.jenis_surat
+        !role.permision.akses_master.jenis_surat &&
+        !role.permision.akses_master.sikoja
       ) {
         return (
           <div className="flex flex-col">
