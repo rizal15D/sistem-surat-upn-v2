@@ -253,13 +253,13 @@ export const columns: ColumnDef<Users>[] = [
                 <SwitchIcon className="h-5 w-5" />
               )}
             </Button>
-            <Button
+            {/* <Button
               size="sm"
               className="bg-danger hover:bg-opacity-90"
               onClick={() => setModalDeleteOpen(true)}
             >
-              <TrashIcon className="h-5 w-5" />
-            </Button>
+              <TrashIcon className="h-5 w-5" />//tak commit e
+            </Button> */}
           </div>
           {modalResetPasswordOpen && (
             <ConfirmationModal
@@ -299,7 +299,7 @@ export const columns: ColumnDef<Users>[] = [
               </div>
             </Modal>
           )}
-          {modalDeleteOpen && (
+          {/* {modalDeleteOpen && (
             <ConfirmationModal
               isLoading={isDeleteLoading}
               setModalOpen={setModalDeleteOpen}
@@ -309,7 +309,7 @@ export const columns: ColumnDef<Users>[] = [
                 users.name || "ini"
               }?`}
             />
-          )}
+          )}  */}
         </>
       );
     },

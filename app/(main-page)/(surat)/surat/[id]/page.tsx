@@ -503,7 +503,7 @@ export default function SuratSinglePage() {
     letterData?.surat.status.status.includes(
       user?.jabatan.jabatan_atas?.name
     ) &&
-    !letterData?.surat.status.status.includes("Ditolak");
+    !letterData?.surat.status.persetujuan;
 
   const canOCR =
     user?.jabatan.permision.generate_nomor_surat &&
