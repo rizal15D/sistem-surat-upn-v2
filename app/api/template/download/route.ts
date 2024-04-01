@@ -9,6 +9,9 @@ export async function GET(req: NextRequest) {
   } | null;
 
   const filepath = req.nextUrl.searchParams.get("filepath");
+  const pathsJSON = req.nextUrl.searchParams.get("paths");
+
+  const paths = pathsJSON ? JSON.parse(pathsJSON) : [];
   if (!filepath) {
     return NextResponse.json({
       error: "Filepath is required",
@@ -16,13 +19,20 @@ export async function GET(req: NextRequest) {
   }
 
   if (session) {
-    const { data } = await axios.get(
-      `${process.env.API_URL}/download?filepath=${filepath}`,
+    const { data } = await axios.post(
+      // `${process.env.API_URL}/download?filepath=${filepath}`,
+      `${process.env.API_URL}/download`,
+      {
+        paths: paths,
+      },
       {
         responseType: "arraybuffer",
         headers: {
           Authorization: `Bearer ${session.user?.accessToken}`,
           "ngrok-skip-browser-warning": true,
+        },
+        params: {
+          filepath: filepath,
         },
       }
     );
