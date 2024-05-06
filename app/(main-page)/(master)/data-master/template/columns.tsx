@@ -232,14 +232,14 @@ export const columns: ColumnDef<Template>[] = [
       return (
         <>
           <div className="flex items-center space-x-2 text-white">
-            <Button
+            {/* <Button
               variant="default"
               size="sm"
               className="bg-primary hover:bg-opacity-90"
               onClick={() => setModalEditOpen(true)}
             >
               <InfoCircledIcon className="h-5 w-5" />
-            </Button>
+            </Button> */}
             <Button
               variant="destructive"
               size="sm"
