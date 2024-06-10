@@ -172,7 +172,10 @@ export default function SuratSinglePage() {
     link.href = fileUrl;
     link.setAttribute(
       "download",
-      `${letterData?.surat.judul.split(".")[0]}.pdf`
+      `${
+        letterData?.surat.nomor_surat[letterData?.surat.nomor_surat.length - 1]
+          .nomor_surat
+      } - ${letterData?.surat.judul.split(".")[0]}.pdf`
     );
     document.body.appendChild(link);
     link.click();

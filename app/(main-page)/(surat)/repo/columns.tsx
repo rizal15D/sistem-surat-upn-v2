@@ -147,6 +147,36 @@ export const columns: ColumnDef<LetterRepo>[] = [
     },
   },
   {
+    accessorKey: "indikator",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Indikator" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const indikator = row.original.indikator.name;
+      return <div>{indikator}</div>;
+    },
+  },
+  {
+    accessorKey: "strategi",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Strategi" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const strategi = row.original.indikator.strategi.name;
+      return <div>{strategi}</div>;
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as LetterRepo;
@@ -196,5 +226,6 @@ export const columns: ColumnDef<LetterRepo>[] = [
       );
     },
   },
+
   // ...
 ];
