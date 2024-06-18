@@ -3,12 +3,28 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { io } from "socket.io-client";
+import { useSession } from "next-auth/react";
+import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  // let { data: notifikasi } = useQuery({
+  //   queryKey: ["notifikasi"],
+  //   queryFn: async () => {
+  //     const res = await axios.get("/api/notifikasi");
+
+  //     if (res.status === 200) setNotifying(true);
+  //     return res.data;
+  //   },
+  // });
+
+  const session = useSession();
+  const user = session.data?.user as User;
 
   const { data: notifikasi } = useQuery({
     queryKey: ["notifikasi"],
@@ -19,6 +35,20 @@ const DropdownNotification = () => {
       return res.data;
     },
   });
+
+  useEffect(() => {
+    const socket = io(`${process.env.API_URL}`);
+    socket.on("message", (data) => {
+      console.log(data.dataServer);
+      console.log(data.idData);
+      if (user?.jabatan.id === data.idData)
+        if (data.dataServer === "new notifikasi") {
+          queryClient.invalidateQueries({
+            queryKey: ["notifikasi"],
+          });
+        }
+    });
+  }, []);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);

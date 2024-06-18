@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 import LoginForm from "./LoginForm";
+import Socket from "./Socket";
 export const metadata: Metadata = {
   title: "Laman Login | Sistem Surat UPN VJT",
   description: "Sistem Surat UPN Veteran Jawa Timur",
@@ -144,6 +145,7 @@ const LoginPage: React.FC = async () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Selamat datang di Sistem Surat UPN Veteran Jawa Timur
               </h2>
+              <Socket />
               <LoginForm />
             </div>
           </div>
