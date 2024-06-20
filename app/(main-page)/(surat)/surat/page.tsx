@@ -9,9 +9,10 @@ import { DataTable } from "./data-table";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
+import { io } from "socket.io-client";
 
 export default function ListSuratPage() {
   const session = useSession();
@@ -116,6 +117,15 @@ export default function ListSuratPage() {
     return {};
   }, [jenisData]);
 
+  useEffect(() => {
+    // console.log(`${process.env.NEXT_PUBLIC_API_URL}`);
+    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`);
+    socket.emit("message", user?.jabatan.id);
+    socket.on(`message`, (data) => {
+      console.log("data:", data.message);
+    });
+  });
+
   const handleOnDateRangeApply = useMemo(
     () => (date: { from: Date; to: Date }) => {
       if (!date.from && !date.to) {
@@ -168,6 +178,7 @@ export default function ListSuratPage() {
 
   return (
     <>
+      {/* <Socket /> */}
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat

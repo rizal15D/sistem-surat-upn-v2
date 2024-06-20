@@ -36,19 +36,19 @@ const DropdownNotification = () => {
     },
   });
 
-  useEffect(() => {
-    const socket = io(`${process.env.API_URL}`);
-    socket.on("message", (data) => {
-      console.log(data.dataServer);
-      console.log(data.idData);
-      if (user?.jabatan.id === data.idData)
-        if (data.dataServer === "new notifikasi") {
-          queryClient.invalidateQueries({
-            queryKey: ["notifikasi"],
-          });
-        }
-    });
-  }, []);
+  // useEffect(() => {
+  //   const socket = io(`${process.env.API_URL}`);
+  //   socket.on("message", (data) => {
+  //     console.log(data.dataServer);
+  //     console.log(data.idData);
+  //     if (user?.jabatan.id === data.idData)
+  //       if (data.dataServer === "new notifikasi") {
+  //         queryClient.invalidateQueries({
+  //           queryKey: ["notifikasi"],
+  //         });
+  //       }
+  //   });
+  // }, []);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);

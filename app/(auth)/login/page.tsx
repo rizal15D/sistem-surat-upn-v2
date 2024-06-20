@@ -145,7 +145,7 @@ const LoginPage: React.FC = async () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Selamat datang di Sistem Surat UPN Veteran Jawa Timur
               </h2>
-              <Socket />
+              {/* <Socket /> */}
               <LoginForm />
             </div>
           </div>
