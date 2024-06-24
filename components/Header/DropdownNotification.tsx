@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { io } from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import { getSocketData } from "@/app/(auth)/login/SocketData";
+import { SocketData } from "@/app/(auth)/login/SocketData";
 
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -38,19 +38,16 @@ const DropdownNotification = () => {
   });
 
   useEffect(() => {
-    const socket = getSocketData();
+    let socket = SocketData();
 
-    console.log("bwmvpoqe ");
-    socket.on("notif", (data) => {
-      // console.log(data.dataServer);
-      console.log("mqopwkdqp ", data);
-      console.log("sukses update notif");
-      queryClient.invalidateQueries({
-        queryKey: ["notifikasi"],
-      });
-      // if (data == "private new notifikation") {
-
-      // }
+    socket.on("message", (data) => {
+      // console.log("ok[epc", data);
+      // const jabatan_id = parts.pop();
+      if (data == `private new notifikation/${user?.jabatan.id}`) {
+        // console.log("nopqmw");
+        queryClient.invalidateQueries({ queryKey: ["notifikasi"] });
+        // console.log(`tes2`);
+      }
     });
   }, []);
 

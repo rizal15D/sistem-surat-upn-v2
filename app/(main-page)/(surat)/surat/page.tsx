@@ -12,7 +12,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { useEffect, useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
-import { getSocketData } from "@/app/(auth)/login/SocketData";
+import { SocketData } from "@/app/(auth)/login/SocketData";
 
 export default function ListSuratPage() {
   const session = useSession();
@@ -118,12 +118,15 @@ export default function ListSuratPage() {
   }, [jenisData]);
 
   useEffect(() => {
-    const socket = getSocketData();
-    socket.emit("message", user?.jabatan.id);
-    // console.log(`SURAT`, socket);
+    let socket = SocketData();
+    // socket.emit("message", user?.jabatan.id);
+    console.log(`SURAT`);
     socket.on("message", (data) => {
-      // console.log(`tes1 ${data}`);
-      if (data == `private new mail`) {
+      const parts = data.split("/");
+      // const jabatan_id = parts.pop();
+      console.log(`SURAT2  ${data}`);
+      if (data == `private new mail/${user?.jabatan.id}`) {
+        console.log(`SURAT3`);
         queryClient.invalidateQueries({ queryKey: ["surat"] });
         // console.log(`tes2`);
       }

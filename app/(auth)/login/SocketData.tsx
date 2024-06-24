@@ -1,27 +1,26 @@
-import { io, Socket } from "socket.io-client";
-import { DefaultEventsMap } from "socket.io-client/build/typed-events";
+// import { io, Socket } from "socket.io-client";
 
-let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
+// let socket: Socket<DefaultEventsMap, DefaultEventsMap>;
 
-const initializeSocket = (): Socket<DefaultEventsMap, DefaultEventsMap> => {
-  if (!socket) {
-    socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-      // withCredentials: true,
-    });
-  }
-  return socket;
-};
+// const initializeSocket = (): Socket<DefaultEventsMap, DefaultEventsMap> => {
+//   if (!socket) {
+//     socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+//       // withCredentials: true,
+//     });
+//   }
+//   return socket;
+// };
 
-const getSocket = (): Socket<DefaultEventsMap, DefaultEventsMap> => {
-  if (!socket) {
-    throw new Error(
-      "Socket not initialized. Please call initializeSocket first."
-    );
-  }
-  return socket;
-};
+// const getSocket = (): Socket<DefaultEventsMap, DefaultEventsMap> => {
+//   if (!socket) {
+//     throw new Error(
+//       "Socket not initialized. Please call initializeSocket first."
+//     );
+//   }
+//   return socket;
+// };
 
-export { initializeSocket, getSocket };
+// export { initializeSocket, getSocket };
 
 //==========================================
 // import { io, Socket } from "socket.io-client";
@@ -54,30 +53,17 @@ export { initializeSocket, getSocket };
 
 //====================================
 
-// import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 
-// let socket: Socket | null = null;
+const SocketData = () => {
+  let socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+    // Opsi tambahan jika diperlukan
+    // withCredentials: true,
+  });
+  return socket;
+};
 
-// const setSocketData = (): Socket => {
-//   if (!socket) {
-//     socket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-//       // Opsi tambahan jika diperlukan
-//       // withCredentials: true,
-//     });
-//     console.log("opmopve", socket);
-//   }
-//   return socket;
-// };
-
-// const getSocketData = (): Socket => {
-//   console.log("pmwrpow", socket);
-//   if (!socket) {
-//     throw new Error("Socket not initialized. Please call setSocketData first.");
-//   }
-//   return socket;
-// };
-
-// export { setSocketData, getSocketData };
+export { SocketData };
 
 //==============================================
 
