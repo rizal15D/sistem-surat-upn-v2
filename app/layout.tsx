@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import Socket from "./(auth)/login/Socket";
+// import Socket from "./(auth)/login/SocketData";
 
 export const metadata: Metadata = {
   title: "Sistem Surat UPNVJT",

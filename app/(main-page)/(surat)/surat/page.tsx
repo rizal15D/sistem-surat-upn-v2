@@ -12,7 +12,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { useEffect, useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
-import { io } from "socket.io-client";
+import { getSocketData } from "@/app/(auth)/login/SocketData";
 
 export default function ListSuratPage() {
   const session = useSession();
@@ -118,13 +118,36 @@ export default function ListSuratPage() {
   }, [jenisData]);
 
   useEffect(() => {
-    // console.log(`${process.env.NEXT_PUBLIC_API_URL}`);
-    const socket = io(`${process.env.NEXT_PUBLIC_API_URL}`);
+    const socket = getSocketData();
     socket.emit("message", user?.jabatan.id);
-    socket.on(`message`, (data) => {
-      console.log("data:", data.message);
+    // console.log(`SURAT`, socket);
+    socket.on("message", (data) => {
+      // console.log(`tes1 ${data}`);
+      if (data == `private new mail`) {
+        queryClient.invalidateQueries({ queryKey: ["surat"] });
+        // console.log(`tes2`);
+      }
     });
-  });
+    // setTableDate(date);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(`${process.env.NEXT_PUBLIC_API_URL}`);
+  //   const socket = SocketData();
+  //   socket.emit("message", user?.jabatan.id);
+  //   // socket.on("message2", (data) => {
+  //   //   console.log("data:", data);
+  //   // });
+  //   socket.on("message", (data) => {
+  //     console.log("data:", data);
+  //   });
+
+  //   // return () => {
+  //   //   socket.off("message2");
+  //   //   socket.off("message");
+  //   //   socket.disconnect();
+  //   // };
+  // }, []);
 
   const handleOnDateRangeApply = useMemo(
     () => (date: { from: Date; to: Date }) => {
