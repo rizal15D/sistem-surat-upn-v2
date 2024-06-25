@@ -11,6 +11,8 @@ import { SocketData } from "@/app/(auth)/login/SocketData";
 const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
+  const [notifBaru, setNotifBaru] = useState(null);
+  // const [notificationPermission, setNotificationPermission] = useState(null);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -36,11 +38,20 @@ const DropdownNotification = () => {
       return res.data;
     },
   });
+  // console.log("notifikasi ", notifikasi);
+
+  useEffect(() => {
+    if (notifikasi) {
+      console.log("coba1 ");
+      setNotifBaru(notifikasi);
+    }
+  }, [notifikasi]);
 
   useEffect(() => {
     let socket = SocketData();
-
+    // console.log("coba2 ", notifikasi);
     socket.on("message", (data) => {
+      console.log(`notif1`);
       // console.log("ok[epc", data);
       // const jabatan_id = parts.pop();
       if (data == `private new notifikation/${user?.jabatan.id}`) {
@@ -48,8 +59,48 @@ const DropdownNotification = () => {
         queryClient.invalidateQueries({ queryKey: ["notifikasi"] });
         // console.log(`tes2`);
       }
+      Notification.requestPermission().then((perm) => {
+        if (perm === "granted") {
+          console.log("notif2");
+          if (notifikasi) {
+            console.log("notif3 ", notifikasi);
+            notifikasi.forEach((notif: any) => {
+              const notifWeb = new Notification("Sistem Surat", {
+                body: notif.pesan,
+                // data: notif,
+              });
+              notifWeb.onclick = () => {
+                // Mengarahkan ke surat sesuai ID notifikasi
+                // window.location.href = `/surat/${notif.surat.id}`;
+                deleteNotifikasi({
+                  idNotif: notif.id,
+                  idSurat: notif.surat.id,
+                });
+              };
+            });
+          }
+        }
+      });
+      // alert(perm);
     });
-  }, []);
+    Notification.requestPermission();
+  }, [notifikasi]);
+
+  // useEffect(() => {
+  //   Notification.requestPermission().then((perm) => {
+  //     alert(perm);
+  //     if (perm === "granted") {
+  //       if (notifikasi) {
+  //         notifikasi.forEach((notif: any) => {
+  //           new Notification("Sistem Surat", {
+  //             body: "coba",
+  //             // data: notif,
+  //           });
+  //         });
+  //       }
+  //     }
+  //   });
+  // }, []);
 
   // useEffect(() => {
   //   const socket = io(`${process.env.API_URL}`);
