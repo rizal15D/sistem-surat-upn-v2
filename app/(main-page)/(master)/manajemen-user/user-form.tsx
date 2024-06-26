@@ -9,7 +9,7 @@ export default function UserForm({
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   isLoading: boolean;
 }) {
-  const [isProdi, setIsProdi] = useState(false);
+  // const [isProdi, setIsProdi] = useState(false);
 
   const { data: prodi = [], isLoading: isLoadingProdi } = useQuery({
     queryKey: ["prodi"],
@@ -79,12 +79,12 @@ export default function UserForm({
             <div className="relative z-20 bg-white dark:bg-form-input">
               <select
                 name="role_id"
-                onChange={(e) => {
-                  e.target.value ==
-                  role.find((role: any) => role.name == "Prodi").id
-                    ? setIsProdi(true)
-                    : setIsProdi(false);
-                }}
+                // onChange={(e) => {
+                //   e.target.value ==
+                //   role.find((role: any) => role.name == "Prodi").id
+                //     ? setIsProdi(true)
+                //     : setIsProdi(false);
+                // }}
                 className="relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-5 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
               >
                 {role.map((role: any) => (
@@ -151,7 +151,8 @@ export default function UserForm({
             </div>
           </div>
           {/* ) : (
-          <input type="hidden" name="prodi_id" value="1" />)} */}
+          <input type="hidden" name="prodi_id" value="1" />
+          )} */}
           <div className="mb-4.5">
             <label className="mb-3 block text-black dark:text-white">
               Fakultas

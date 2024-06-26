@@ -72,6 +72,12 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 50,
+      },
+    },
   });
 
   return (
