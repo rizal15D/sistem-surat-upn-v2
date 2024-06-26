@@ -127,21 +127,47 @@ export const columns: ColumnDef<Letter>[] = [
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
 
+      let jabatan = "";
+
+      if (statusSurat?.includes("Daftar Tunggu")) {
+        jabatan = statusSurat.slice(14, statusSurat.length);
+      } else if (statusSurat?.includes("Diproses")) {
+        jabatan = statusSurat.slice(9, statusSurat.length);
+      }
+
+      // Create a hexa color based on the jabatan
+      function stringToHex(str: string): string {
+        // Hash function to convert string to a numeric value
+        const hash = str
+          .split("")
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+        // Convert the numeric value to a hexadecimal string
+        return (hash * 57423).toString(16).toUpperCase();
+      }
+
+      // Get the first 6 characters of the hexadecimal string
+      const color = `#${stringToHex(jabatan).slice(0, 6)}`;
+
       return (
         <>
-          <Badge
-            className={`text-white text-center w-full mb-2
-            ${
-              (statusSurat?.includes("Daftar Tunggu") ||
-                statusSurat?.includes("Diproses")) &&
-              "bg-warning"
-            }
+          {color && (
+            <Badge
+              style={{
+                backgroundColor:
+                  statusSurat?.includes("Daftar Tunggu") ||
+                  statusSurat?.includes("Diproses")
+                    ? color
+                    : undefined,
+              }}
+              className={`text-white text-center w-full mb-2
             ${statusSurat?.includes("Ditolak") && "bg-danger"}
             ${statusSurat?.includes("Ditandatangani") && "bg-success"}
             `}
-          >
-            <p className="text-center w-full">{statusSurat}</p>
-          </Badge>
+            >
+              <p className="text-center w-full">{statusSurat}</p>
+            </Badge>
+          )}
           {(statusSurat?.includes("Daftar Tunggu") ||
             statusSurat?.includes("Diproses")) && (
             <span className="flex gap-2 items-center">
