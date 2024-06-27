@@ -55,6 +55,19 @@ export type Letter = {
   }[];
   user: Users;
   progressBar: number;
+  repo: {
+    id: number;
+    unix_code: string;
+    visible: boolean;
+    indikator: {
+      id: number;
+      name: string;
+      strategi: {
+        id: number;
+        name: string;
+      };
+    };
+  }[];
 };
 
 export const columns: ColumnDef<Letter>[] = [
@@ -242,6 +255,62 @@ export const columns: ColumnDef<Letter>[] = [
       return <div>{jenis.jenis}</div>;
     },
   },
+  {
+    accessorKey: "indikator",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Indikator" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      console.log(row.original.repo);
+      const indikator = row.original.repo[0].indikator;
+      console.log(
+        "indikator.name:",
+        indikator ? indikator.name : "indikator not found"
+      );
+      return <div>{indikator ? indikator.name : "-"}</div>;
+    },
+  },
+
+  {
+    accessorKey: "strategi",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Strategi" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const strategi = row.original.repo[0].indikator.strategi;
+      return <div>{strategi ? strategi.name : "-"}</div>;
+    },
+  },
+  // {
+  //   accessorKey: "indikator",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Indikator" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const indikator = row.original.repository.indikator;
+  //     return <div>{indikator ? indikator.name : "-"}</div>;
+  //   },
+  // },
+  // {
+  //   accessorKey: "strategi",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Strategi" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const strategi = row.original.repository.indikator?.strategi;
+  //     return <div>{strategi ? strategi.name : "-"}</div>;
+  //   },
+  // },
   {
     id: "actions",
     cell: ({ row }) => {
