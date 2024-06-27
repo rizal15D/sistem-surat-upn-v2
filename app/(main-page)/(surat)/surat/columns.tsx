@@ -127,12 +127,12 @@ export const columns: ColumnDef<Letter>[] = [
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
 
-      let jabatan = "";
+      let jabatanStatus = "";
 
       if (statusSurat?.includes("Daftar Tunggu")) {
-        jabatan = statusSurat.slice(14, statusSurat.length);
+        jabatanStatus = statusSurat.slice(14, statusSurat.length);
       } else if (statusSurat?.includes("Diproses")) {
-        jabatan = statusSurat.slice(9, statusSurat.length);
+        jabatanStatus = statusSurat.slice(9, statusSurat.length);
       }
 
       // Create a hexa color based on the jabatan
@@ -147,7 +147,7 @@ export const columns: ColumnDef<Letter>[] = [
       }
 
       // Get the first 6 characters of the hexadecimal string
-      const color = `#${stringToHex(jabatan).slice(0, 6)}`;
+      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
 
       return (
         <>
