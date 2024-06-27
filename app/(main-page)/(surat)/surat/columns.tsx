@@ -266,12 +266,9 @@ export const columns: ColumnDef<Letter>[] = [
         .includes(value.toLowerCase());
     },
     cell: ({ row }) => {
-      console.log(row.original.repo);
-      const indikator = row.original.repo[0].indikator;
-      console.log(
-        "indikator.name:",
-        indikator ? indikator.name : "indikator not found"
-      );
+      const repo = row.original.repo;
+      console.log(repo);
+      const indikator = repo && repo.length > 0 ? repo[0].indikator : null;
       return <div>{indikator ? indikator.name : "-"}</div>;
     },
   },
@@ -287,7 +284,11 @@ export const columns: ColumnDef<Letter>[] = [
         .includes(value.toLowerCase());
     },
     cell: ({ row }) => {
-      const strategi = row.original.repo[0].indikator.strategi;
+      const repo = row.original.repo;
+      const strategi =
+        repo && repo.length > 0 && repo[0].indikator
+          ? repo[0].indikator.strategi
+          : null;
       return <div>{strategi ? strategi.name : "-"}</div>;
     },
   },
@@ -296,18 +297,30 @@ export const columns: ColumnDef<Letter>[] = [
   //   header: ({ column }) => (
   //     <DataTableColumnHeader column={column} title="Indikator" />
   //   ),
+  //   filterFn: (row, id, value) => {
+  //     return (row.getValue(id) as string)
+  //       .toLowerCase()
+  //       .includes(value.toLowerCase());
+  //   },
   //   cell: ({ row }) => {
-  //     const indikator = row.original.repository.indikator;
+  //     console.log(row.original.repo);
+  //     const indikator = row.original.repo[0].indikator;
   //     return <div>{indikator ? indikator.name : "-"}</div>;
   //   },
   // },
+
   // {
   //   accessorKey: "strategi",
   //   header: ({ column }) => (
   //     <DataTableColumnHeader column={column} title="Strategi" />
   //   ),
+  //   filterFn: (row, id, value) => {
+  //     return (row.getValue(id) as string)
+  //       .toLowerCase()
+  //       .includes(value.toLowerCase());
+  //   },
   //   cell: ({ row }) => {
-  //     const strategi = row.original.repository.indikator?.strategi;
+  //     const strategi = row.original.repo[0].indikator.strategi;
   //     return <div>{strategi ? strategi.name : "-"}</div>;
   //   },
   // },
