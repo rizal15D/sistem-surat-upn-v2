@@ -126,6 +126,8 @@ export const columns: ColumnDef<Letter>[] = [
       const statusSurat = status?.status;
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
+      let i = 0;
+      let color;
 
       let jabatanStatus = "";
 
@@ -147,7 +149,28 @@ export const columns: ColumnDef<Letter>[] = [
       }
 
       // Get the first 6 characters of the hexadecimal string
-      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      if (i < 5) {
+        switch (i) {
+          case 0:
+            color = `#FFFFFF`;
+            break;
+          case 1:
+            color = `#FF0000`;
+            break;
+          case 2:
+            color = `#00FF00`;
+            break;
+          case 3:
+            color = `#0000FF`;
+            break;
+          case 4:
+            color = `#FFFF00`;
+            break;
+        }
+      } else {
+        color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      }
+      i++;
 
       return (
         <>
