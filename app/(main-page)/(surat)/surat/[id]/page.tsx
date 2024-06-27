@@ -42,6 +42,7 @@ export default function SuratSinglePage() {
   const { id } = useParams();
   const [warningMessage, setWarningMessage] = useState("Input Surat");
   const [fileUrl, setFileUrl] = useState("");
+  // const [strategi_id, setStrategi_id] = useState("");
   const [strategi_id, setStrategi_id] = useState<string | null>(null);
 
   const [isMenolakLoading, setIsMenolakLoading] = useState(false);
@@ -140,11 +141,13 @@ export default function SuratSinglePage() {
           strategi_id: strategi_id,
         },
       });
-
+      // console.log(response.data);
+      // return response.data;
       return response.data as { id: number; name: string }[];
     },
     enabled: canTagging,
   });
+  // console.log(strategiData);
 
   // Get Indikator
   const { data: indikatorData, isLoading: isIndikatorLoading } = useQuery({

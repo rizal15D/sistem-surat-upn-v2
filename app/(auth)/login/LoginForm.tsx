@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Loader from "@/components/common/Loader";
+// import { setSocketData } from "@/app/(auth)/login/SocketData";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -40,6 +41,8 @@ export default function LoginForm() {
       title: "Login berhasil",
       className: "bg-success text-white",
     });
+
+    // setSocketData();
 
     router.push("/surat");
   };

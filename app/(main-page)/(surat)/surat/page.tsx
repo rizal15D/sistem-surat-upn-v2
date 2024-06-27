@@ -9,9 +9,10 @@ import { DataTable } from "./data-table";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
+import { SocketData } from "@/app/(auth)/login/SocketData";
 
 export default function ListSuratPage() {
   const session = useSession();
@@ -116,6 +117,41 @@ export default function ListSuratPage() {
     return {};
   }, [jenisData]);
 
+  useEffect(() => {
+    let socket = SocketData();
+    // socket.emit("message", user?.jabatan.id);
+    console.log(`SURAT`);
+    socket.on("message", (data) => {
+      const parts = data.split("/");
+      // const jabatan_id = parts.pop();
+      console.log(`SURAT2  ${data}`);
+      if (data == `private new mail/${user?.jabatan.id}`) {
+        console.log(`SURAT3`);
+        queryClient.invalidateQueries({ queryKey: ["surat"] });
+        // console.log(`tes2`);
+      }
+    });
+    // setTableDate(date);
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(`${process.env.NEXT_PUBLIC_API_URL}`);
+  //   const socket = SocketData();
+  //   socket.emit("message", user?.jabatan.id);
+  //   // socket.on("message2", (data) => {
+  //   //   console.log("data:", data);
+  //   // });
+  //   socket.on("message", (data) => {
+  //     console.log("data:", data);
+  //   });
+
+  //   // return () => {
+  //   //   socket.off("message2");
+  //   //   socket.off("message");
+  //   //   socket.disconnect();
+  //   // };
+  // }, []);
+
   const handleOnDateRangeApply = useMemo(
     () => (date: { from: Date; to: Date }) => {
       if (!date.from && !date.to) {
@@ -168,6 +204,7 @@ export default function ListSuratPage() {
 
   return (
     <>
+      {/* <Socket /> */}
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat
