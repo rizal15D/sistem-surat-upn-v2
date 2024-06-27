@@ -139,8 +139,6 @@ export const columns: ColumnDef<Letter>[] = [
       const statusSurat = status?.status;
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
-      let i = 0;
-      let color;
 
       let jabatanStatus = "";
 
@@ -160,43 +158,20 @@ export const columns: ColumnDef<Letter>[] = [
         // Convert the numeric value to a hexadecimal string
         return (hash * 57423).toString(16).toUpperCase();
       }
-
-      // Get the first 6 characters of the hexadecimal string
-      if (i < 5) {
-        switch (i) {
-          case 0:
-            color = `#FFFFFF`;
-            break;
-          case 1:
-            color = `#FF0000`;
-            break;
-          case 2:
-            color = `#00FF00`;
-            break;
-          case 3:
-            color = `#0000FF`;
-            break;
-          case 4:
-            color = `#FFFF00`;
-            break;
-        }
-      } else {
-        color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
-      }
-      i++;
+      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
 
       return (
         <>
           {color && (
             <Badge
-              style={{
-                backgroundColor:
-                  statusSurat?.includes("Daftar Tunggu") ||
-                  statusSurat?.includes("Diproses")
-                    ? color
-                    : undefined,
-              }}
               className={`text-white text-center w-full mb-2
+                ${
+                  (statusSurat?.includes("Daftar Tunggu") ||
+                    statusSurat?.includes("Diproses")) &&
+                  (statusSurat?.includes("Admin Dekan")
+                    ? `bg-meta-7`
+                    : "bg-warning")
+                }
             ${statusSurat?.includes("Ditolak") && "bg-danger"}
             ${statusSurat?.includes("Ditandatangani") && "bg-success"}
             `}
@@ -292,38 +267,6 @@ export const columns: ColumnDef<Letter>[] = [
       return <div>{strategi ? strategi.name : "-"}</div>;
     },
   },
-  // {
-  //   accessorKey: "indikator",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Indikator" />
-  //   ),
-  //   filterFn: (row, id, value) => {
-  //     return (row.getValue(id) as string)
-  //       .toLowerCase()
-  //       .includes(value.toLowerCase());
-  //   },
-  //   cell: ({ row }) => {
-  //     console.log(row.original.repo);
-  //     const indikator = row.original.repo[0].indikator;
-  //     return <div>{indikator ? indikator.name : "-"}</div>;
-  //   },
-  // },
-
-  // {
-  //   accessorKey: "strategi",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Strategi" />
-  //   ),
-  //   filterFn: (row, id, value) => {
-  //     return (row.getValue(id) as string)
-  //       .toLowerCase()
-  //       .includes(value.toLowerCase());
-  //   },
-  //   cell: ({ row }) => {
-  //     const strategi = row.original.repo[0].indikator.strategi;
-  //     return <div>{strategi ? strategi.name : "-"}</div>;
-  //   },
-  // },
   {
     id: "actions",
     cell: ({ row }) => {
