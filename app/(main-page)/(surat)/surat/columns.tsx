@@ -126,8 +126,6 @@ export const columns: ColumnDef<Letter>[] = [
       const statusSurat = status?.status;
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
-      let i = 0;
-      let color;
 
       let jabatanStatus = "";
 
@@ -149,41 +147,51 @@ export const columns: ColumnDef<Letter>[] = [
       }
 
       // Get the first 6 characters of the hexadecimal string
-      if (i < 5) {
-        switch (i) {
-          case 0:
-            color = `#FFFFFF`;
-            break;
-          case 1:
-            color = `#FF0000`;
-            break;
-          case 2:
-            color = `#00FF00`;
-            break;
-          case 3:
-            color = `#0000FF`;
-            break;
-          case 4:
-            color = `#FFFF00`;
-            break;
-        }
-      } else {
-        color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
-      }
-      i++;
+      // if (i < 5) {
+      //   switch (i) {
+      //     case 0:
+      //       color = `#00FFFF`;
+      //       break;
+      //     case 1:
+      //       color = `#00FFFF`;
+      //       break;
+      //     case 2:
+      //       color = `#00FF00`;
+      //       break;
+      //     case 3:
+      //       color = `#0000FF`;
+      //       break;
+      //     case 4:
+      //       color = `#FFFF00`;
+      //       break;
+      //   }
+      //   i++;
+      // } else {
+      //   color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      // }
+      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      // color = "#ffff00";
 
       return (
         <>
           {color && (
             <Badge
-              style={{
-                backgroundColor:
-                  statusSurat?.includes("Daftar Tunggu") ||
-                  statusSurat?.includes("Diproses")
-                    ? color
-                    : undefined,
-              }}
+              // style={{
+              //   backgroundColor:
+              //     statusSurat?.includes("Daftar Tunggu") ||
+              //     statusSurat?.includes("Diproses") ||
+              //     !statusSurat?.includes("Admin Dekan")
+              //       ? "bg-warning"
+              //       : undefined,
+              // }}
               className={`text-white text-center w-full mb-2
+                ${
+                  (statusSurat?.includes("Daftar Tunggu") ||
+                    statusSurat?.includes("Diproses")) &&
+                  (statusSurat?.includes("Admin Dekan")
+                    ? `bg-meta-7`
+                    : "bg-warning")
+                }
             ${statusSurat?.includes("Ditolak") && "bg-danger"}
             ${statusSurat?.includes("Ditandatangani") && "bg-success"}
             `}

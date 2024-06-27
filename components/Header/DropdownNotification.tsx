@@ -65,7 +65,7 @@ const DropdownNotification = () => {
           if (notifikasi) {
             console.log("notif3 ", notifikasi);
             notifikasi.forEach((notif: any) => {
-              const notifWeb = new Notification("Sistem Surat", {
+              const notifWeb = new Notification(`${notif.surat.judul}`, {
                 body: notif.pesan,
                 // data: notif,
               });
