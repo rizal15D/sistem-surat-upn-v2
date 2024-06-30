@@ -146,29 +146,6 @@ export const columns: ColumnDef<Letter>[] = [
         return (hash * 57423).toString(16).toUpperCase();
       }
 
-      // Get the first 6 characters of the hexadecimal string
-      // if (i < 5) {
-      //   switch (i) {
-      //     case 0:
-      //       color = `#00FFFF`;
-      //       break;
-      //     case 1:
-      //       color = `#00FFFF`;
-      //       break;
-      //     case 2:
-      //       color = `#00FF00`;
-      //       break;
-      //     case 3:
-      //       color = `#0000FF`;
-      //       break;
-      //     case 4:
-      //       color = `#FFFF00`;
-      //       break;
-      //   }
-      //   i++;
-      // } else {
-      //   color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
-      // }
       const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
       // color = "#ffff00";
 
@@ -176,14 +153,6 @@ export const columns: ColumnDef<Letter>[] = [
         <>
           {color && (
             <Badge
-              // style={{
-              //   backgroundColor:
-              //     statusSurat?.includes("Daftar Tunggu") ||
-              //     statusSurat?.includes("Diproses") ||
-              //     !statusSurat?.includes("Admin Dekan")
-              //       ? "bg-warning"
-              //       : undefined,
-              // }}
               className={`text-white text-center w-full mb-2
                 ${
                   (statusSurat?.includes("Daftar Tunggu") ||
