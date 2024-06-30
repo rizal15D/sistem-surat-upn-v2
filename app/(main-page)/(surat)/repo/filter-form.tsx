@@ -69,8 +69,8 @@ export default function FilterForm({
     if (selectedIndikator.length === 0) return;
     if (selectedStrategi.length === 0 && selectedIku.length === 0) return;
 
-    console.log(selectedIndikator);
-    console.log(selectedStrategi);
+    // console.log(selectedIndikator);
+    // console.log(selectedStrategi);
 
     setSelectedIndikator(
       selectedIndikator.filter((indikator: any) => {

@@ -120,13 +120,13 @@ export default function ListSuratPage() {
   useEffect(() => {
     let socket = SocketData();
     // socket.emit("message", user?.jabatan.id);
-    console.log(`SURAT`);
+    // console.log(`SURAT`);
     socket.on("message", (data) => {
       const parts = data.split("/");
       // const jabatan_id = parts.pop();
-      console.log(`SURAT2  ${data}`);
+      // console.log(`SURAT2  ${data}`);
       if (data == `private new mail/${user?.jabatan.id}`) {
-        console.log(`SURAT3`);
+        // console.log(`SURAT3`);
         queryClient.invalidateQueries({ queryKey: ["surat"] });
         // console.log(`tes2`);
       }
