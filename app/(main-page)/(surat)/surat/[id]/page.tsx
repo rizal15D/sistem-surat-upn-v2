@@ -721,7 +721,7 @@ export default function SuratSinglePage() {
               </div>
             )}
             <div className="flex gap-4 w-full text-white">
-              {canUpload && (
+              {canUpload && fileUrl && (
                 <Button
                   className="flex gap-2 bg-primary w-full"
                   onClick={() => {
@@ -732,7 +732,7 @@ export default function SuratSinglePage() {
                   Upload TTD
                 </Button>
               )}
-              {canDownload && (
+              {canDownload && fileUrl && (
                 <Button
                   className="flex gap-2 bg-primary w-full"
                   onClick={handleDownload}
