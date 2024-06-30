@@ -158,13 +158,7 @@ export const columns: ColumnDef<Letter>[] = [
         // Convert the numeric value to a hexadecimal string
         return (hash * 57423).toString(16).toUpperCase();
       }
-<<<<<<< HEAD
-
       const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
-      // color = "#ffff00";
-=======
-      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
->>>>>>> 434c1b6813ad97c17a8e791adebcbe6b1f833de8
 
       return (
         <>
