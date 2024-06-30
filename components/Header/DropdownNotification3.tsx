@@ -81,37 +81,34 @@ const DropdownNotification = () => {
       console.log(`notif1b`, notifSocket);
       //   console.log("ok[epc", );
       // const jabatan_id = parts.pop();
-    });
-  });
 
-  useEffect(() => {
-    Notification.requestPermission();
-
-    Notification.requestPermission().then((perm) => {
-      console.log(`perm`, perm);
-      if (perm === "granted") {
-        console.log("notif2", notifSocket);
-        if (notifSocket && notifSocket.length > 0) {
-          // setNotifSocket(false);
-          console.log("notif3 ", notifSocket);
-          notifSocket.forEach((notif: any) => {
-            const notifWeb = new Notification(`${notif.surat.judul}`, {
-              body: notif.pesan,
-              // data: notif,
-            });
-            notifWeb.onclick = () => {
-              // Mengarahkan ke surat sesuai ID notifikasi
-              // window.location.href = `/surat/${notif.surat.id}`;
-              deleteNotifikasi({
-                idNotif: notif.id,
-                idSurat: notif.surat.id,
+      Notification.requestPermission().then((perm) => {
+        console.log(`perm`, perm);
+        if (perm === "granted") {
+          console.log("notif2", notifSocket);
+          if (notifSocket) {
+            // setNotifSocket(false);
+            console.log("notif3 ", notifSocket);
+            notifSocket.forEach((notif: any) => {
+              const notifWeb = new Notification(`${notif.surat.judul}`, {
+                body: notif.pesan,
+                // data: notif,
               });
-            };
-          });
+              notifWeb.onclick = () => {
+                // Mengarahkan ke surat sesuai ID notifikasi
+                // window.location.href = `/surat/${notif.surat.id}`;
+                deleteNotifikasi({
+                  idNotif: notif.id,
+                  idSurat: notif.surat.id,
+                });
+              };
+            });
+          }
         }
-      }
+      });
     });
-  }, [notifSocket]);
+    Notification.requestPermission();
+  }, []);
 
   // useEffect(() => {
   //   Notification.requestPermission().then((perm) => {
