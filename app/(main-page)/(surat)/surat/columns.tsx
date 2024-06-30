@@ -55,6 +55,19 @@ export type Letter = {
   }[];
   user: Users;
   progressBar: number;
+  repo: {
+    id: number;
+    unix_code: string;
+    visible: boolean;
+    indikator: {
+      id: number;
+      name: string;
+      strategi: {
+        id: number;
+        name: string;
+      };
+    };
+  }[];
 };
 
 export const columns: ColumnDef<Letter>[] = [
@@ -145,9 +158,13 @@ export const columns: ColumnDef<Letter>[] = [
         // Convert the numeric value to a hexadecimal string
         return (hash * 57423).toString(16).toUpperCase();
       }
+<<<<<<< HEAD
 
       const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
       // color = "#ffff00";
+=======
+      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+>>>>>>> 434c1b6813ad97c17a8e791adebcbe6b1f833de8
 
       return (
         <>
@@ -217,6 +234,43 @@ export const columns: ColumnDef<Letter>[] = [
     cell: ({ row }) => {
       const jenis = row.original.jenis;
       return <div>{jenis.jenis}</div>;
+    },
+  },
+  {
+    accessorKey: "indikator",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Indikator" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const repo = row.original.repo;
+      console.log(repo);
+      const indikator = repo && repo.length > 0 ? repo[0].indikator : null;
+      return <div>{indikator ? indikator.name : "-"}</div>;
+    },
+  },
+
+  {
+    accessorKey: "strategi",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Strategi" />
+    ),
+    filterFn: (row, id, value) => {
+      return (row.getValue(id) as string)
+        .toLowerCase()
+        .includes(value.toLowerCase());
+    },
+    cell: ({ row }) => {
+      const repo = row.original.repo;
+      const strategi =
+        repo && repo.length > 0 && repo[0].indikator
+          ? repo[0].indikator.strategi
+          : null;
+      return <div>{strategi ? strategi.name : "-"}</div>;
     },
   },
   {
