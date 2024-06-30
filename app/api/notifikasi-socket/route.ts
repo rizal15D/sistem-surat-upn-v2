@@ -8,7 +8,6 @@ export async function GET() {
   } | null;
 
   if (session) {
-    // console.log("b2efq");
     const { data } = await axios.get(
       `${process.env.API_URL}/notifikasi/notif-socket`,
       {
@@ -17,8 +16,6 @@ export async function GET() {
         },
       }
     );
-
-    // console.log("api ; ", data);
     return NextResponse.json(data);
   } else {
     return NextResponse.json({

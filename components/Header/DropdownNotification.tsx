@@ -3,7 +3,6 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { io } from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { SocketData } from "@/app/(auth)/login/SocketData";
@@ -12,8 +11,7 @@ const DropdownNotification = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifying, setNotifying] = useState(true);
   const [notifSocket, setNotifSocket] = useState([]);
-  //   let isiNotif: any | null = null;
-  // const [notificationPermission, setNotificationPermission] = useState(null);
+
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -30,78 +28,35 @@ const DropdownNotification = () => {
     },
   });
 
-  //   const { data: notifikasi_socket } = useQuery({
-  //     queryKey: ["notifikasi_socket"],
-  //     queryFn: async () => {
-  //       const res = await axios.get("/api/notifikasi-socket");
-
-  //       console.log("notifikasi socket data", res.data);
-
-  //       //   if (res.status === 200) setNotifSocket(true);
-  //       //   if (res.data) {
-  //       //     isiNotif = res.data;
-  //       //   }
-  //       return res.data;
-  //     },
-  //     // onSuccess: (data) => {
-  //     //     console.log("notifikasi_socket di dalam onSuccess:", data);
-  //     // }
-  //   });
-
-  const delay = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
-
+  //notifikasi dengan socket
   useEffect(() => {
     let socket = SocketData();
-    if (notifSocket) {
-      console.log("notif0 ", notifSocket);
-    }
     socket.on("message", async (data) => {
-      console.log(`data`, data);
-      console.log(`notif1`, notifSocket);
       const notifSocketData = async () => {
-        console.log(`fungsi1`);
         const response = await fetch("/api/notifikasi-socket");
         const dataNotif = await response.json();
-        console.log(`dataNotif`, dataNotif);
         if (dataNotif && dataNotif.length > 0) {
-          console.log("ada");
           setNotifSocket(dataNotif);
         }
       };
 
       await notifSocketData();
-
       if (data == `private new notifikation/${user?.jabatan.id}`) {
-        console.log("update");
-        // queryClient.invalidateQueries({ queryKey: ["notifikasi_socket"] });
         queryClient.invalidateQueries({ queryKey: ["notifikasi"] });
-        // console.log(`tes2`);
       }
-
-      console.log(`notif1b`, notifSocket);
-      //   console.log("ok[epc", );
-      // const jabatan_id = parts.pop();
     });
   });
 
   useEffect(() => {
     Notification.requestPermission();
-
     Notification.requestPermission().then((perm) => {
-      console.log(`perm`, perm);
       if (perm === "granted") {
-        console.log("notif2", notifSocket);
         if (notifSocket && notifSocket.length > 0) {
-          // setNotifSocket(false);
-          console.log("notif3 ", notifSocket);
           notifSocket.forEach((notif: any) => {
             const notifWeb = new Notification(`${notif.surat.judul}`, {
               body: notif.pesan,
-              // data: notif,
             });
             notifWeb.onclick = () => {
-              // Mengarahkan ke surat sesuai ID notifikasi
-              // window.location.href = `/surat/${notif.surat.id}`;
               deleteNotifikasi({
                 idNotif: notif.id,
                 idSurat: notif.surat.id,
@@ -112,36 +67,6 @@ const DropdownNotification = () => {
       }
     });
   }, [notifSocket]);
-
-  // useEffect(() => {
-  //   Notification.requestPermission().then((perm) => {
-  //     alert(perm);
-  //     if (perm === "granted") {
-  //       if (notifikasi) {
-  //         notifikasi.forEach((notif: any) => {
-  //           new Notification("Sistem Surat", {
-  //             body: "coba",
-  //             // data: notif,
-  //           });
-  //         });
-  //       }
-  //     }
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   const socket = io(`${process.env.API_URL}`);
-  //   socket.on("message", (data) => {
-  //     console.log(data.dataServer);
-  //     console.log(data.idData);
-  //     if (user?.jabatan.id === data.idData)
-  //       if (data.dataServer === "new notifikasi") {
-  //         queryClient.invalidateQueries({
-  //           queryKey: ["notifikasi"],
-  //         });
-  //       }
-  //   });
-  // }, []);
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
