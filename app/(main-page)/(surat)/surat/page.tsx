@@ -119,38 +119,14 @@ export default function ListSuratPage() {
 
   useEffect(() => {
     let socket = SocketData();
-    // socket.emit("message", user?.jabatan.id);
-    // console.log(`SURAT`);
     socket.on("message", (data) => {
       const parts = data.split("/");
-      // const jabatan_id = parts.pop();
-      // console.log(`SURAT2  ${data}`);
+
       if (data == `private new mail/${user?.jabatan.id}`) {
-        // console.log(`SURAT3`);
         queryClient.invalidateQueries({ queryKey: ["surat"] });
-        // console.log(`tes2`);
       }
     });
-    // setTableDate(date);
   }, []);
-
-  // useEffect(() => {
-  //   console.log(`${process.env.NEXT_PUBLIC_API_URL}`);
-  //   const socket = SocketData();
-  //   socket.emit("message", user?.jabatan.id);
-  //   // socket.on("message2", (data) => {
-  //   //   console.log("data:", data);
-  //   // });
-  //   socket.on("message", (data) => {
-  //     console.log("data:", data);
-  //   });
-
-  //   // return () => {
-  //   //   socket.off("message2");
-  //   //   socket.off("message");
-  //   //   socket.disconnect();
-  //   // };
-  // }, []);
 
   const handleOnDateRangeApply = useMemo(
     () => (date: { from: Date; to: Date }) => {

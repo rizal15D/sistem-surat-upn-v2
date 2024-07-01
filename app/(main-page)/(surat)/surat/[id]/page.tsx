@@ -58,6 +58,7 @@ export default function SuratSinglePage() {
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
   const [modalTaggingOpen, setModalTaggingOpen] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -113,14 +114,16 @@ export default function SuratSinglePage() {
   useEffect(() => {
     if (letterData) {
       getFileUrl().then((url) => setFileUrl(url));
-
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      queryClient.invalidateQueries({ queryKey: ["repo"] });
+      setIsUpdated(false);
       if (letterData.surat.tampilan) {
         if (!letterData.surat.tampilan[0]?.dibaca) {
           mutateBaca();
         }
       }
     }
-  }, [letterData]);
+  }, [letterData, isUpdated]);
 
   // Get Komentar
   const getKomentar = async () => {
@@ -213,6 +216,7 @@ export default function SuratSinglePage() {
           },
         }
       );
+      setIsUpdated(true);
       return response.data;
     },
     onSuccess: () => {
@@ -276,6 +280,7 @@ export default function SuratSinglePage() {
       const response = await axios.delete(`/api/surat`, {
         params: { id },
       });
+      setIsUpdated(true);
       return response.data;
     },
     onSuccess: () => {
@@ -322,6 +327,7 @@ export default function SuratSinglePage() {
         setIsSetujuLoading(true);
       }
       const response = await axios.put(`/api/surat/persetujuan`, { id, input });
+      setIsUpdated(true);
       return response.data;
     },
     onSuccess: () => {
@@ -428,6 +434,7 @@ export default function SuratSinglePage() {
           },
         }
       );
+      setIsUpdated(true);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["surat"] });
