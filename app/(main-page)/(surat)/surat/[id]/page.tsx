@@ -490,6 +490,23 @@ export default function SuratSinglePage() {
     mutatePerbaikan(data);
   };
 
+  const getBadgeColor = (data: String) => {
+    if (data.includes("Admin Dekan")) {
+      return `rgb(150, 123, 182)`; //ungu
+    }
+    if (data.includes("Daftar Tunggu") || data.includes("Diproses")) {
+      return "rgb(250 204 21)"; // warna pengganti untuk bg-warning
+    }
+
+    if (data.includes("Ditolak")) {
+      return "rgb(239 68 68)"; // warna pengganti untuk bg-danger
+    }
+    if (data.includes("Ditandatangani")) {
+      return "rgb(34 197 94)"; // warna pengganti untuk bg-success
+    }
+    return "rgb(120 113 108)"; // default color
+  };
+
   const canPersetujuan =
     user?.jabatan.permision.persetujuan &&
     // Surat di tangan user
@@ -616,20 +633,15 @@ export default function SuratSinglePage() {
               </span>
               <span className="text-body-xs text-black dark:text-white">
                 <Badge
-                  className={`text-white text-center w-full mb-2
-            ${
-              (letterData?.surat.status.status.includes("Daftar Tunggu") ||
-                letterData?.surat.status.status.includes("Diproses")) &&
-              "bg-warning"
-            }
-            ${
-              letterData?.surat.status.status.includes("Ditolak") && "bg-danger"
-            }
-            ${
-              letterData?.surat.status.status.includes("Ditandatangani") &&
-              "bg-success"
-            }
-            `}
+                  style={{
+                    backgroundColor: getBadgeColor(
+                      letterData?.surat.status.status
+                    ),
+                    color: "white", // mengatur warna teks menjadi putih
+                    textAlign: "center",
+                    width: "100%",
+                    marginBottom: "0.5rem", // menggantikan mb-2
+                  }}
                 >
                   <p className="text-center w-full">
                     {letterData?.surat.status.status}

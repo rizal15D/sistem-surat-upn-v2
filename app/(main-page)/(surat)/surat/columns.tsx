@@ -159,22 +159,25 @@ export const columns: ColumnDef<Letter>[] = [
         return (hash * 57423).toString(16).toUpperCase();
       }
       const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      // const color = `rgb(150, 123, 182)`;
 
       return (
         <>
           {color && (
             <Badge
-              className={`text-white text-center w-full mb-2
-                ${
+              style={{
+                backgroundColor:
                   (statusSurat?.includes("Daftar Tunggu") ||
                     statusSurat?.includes("Diproses")) &&
-                  (statusSurat?.includes("Admin Dekan")
-                    ? `bg-meta-7`
-                    : "bg-warning")
-                }
-            ${statusSurat?.includes("Ditolak") && "bg-danger"}
-            ${statusSurat?.includes("Ditandatangani") && "bg-success"}
-            `}
+                  statusSurat?.includes("Admin Dekan")
+                    ? "rgb(150, 123, 182)"
+                    : statusSurat?.includes("Ditolak")
+                    ? "rgb(239 68 68)" // menggantikan "bg-danger" dengan warna yang sesuai
+                    : statusSurat?.includes("Ditandatangani")
+                    ? "rgb(34 197 94)" // menggantikan "bg-success" dengan warna yang sesuai
+                    : "rgb(250 204 21)", // menggantikan "bg-warning" dengan warna yang sesuai
+                color: "white",
+              }}
             >
               <p className="text-center w-full">{statusSurat}</p>
             </Badge>
