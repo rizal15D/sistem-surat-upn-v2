@@ -36,7 +36,6 @@ const DropdownNotification = () => {
         const response = await fetch("/api/notifikasi-socket");
         const dataNotif = await response.json();
         if (dataNotif && dataNotif.length > 0) {
-          console.log("dataNotif: ", dataNotif);
           setNotifSocket(dataNotif);
         }
       };

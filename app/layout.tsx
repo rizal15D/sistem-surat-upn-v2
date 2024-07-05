@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-// import Socket from "./(auth)/login/SocketData";
 
 export const metadata: Metadata = {
   title: "Sistem Surat UPNVJT",
@@ -17,7 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        {/* <Socket /> */}
         <Toaster />
         {children}
       </body>
