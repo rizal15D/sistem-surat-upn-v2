@@ -12,6 +12,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { useEffect, useMemo, useState } from "react";
 import { Jenis } from "../../(master)/data-master/jenis-surat/columns";
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 import { SocketData } from "@/app/(auth)/login/SocketData";
 
 export default function ListSuratPage() {
@@ -170,6 +171,21 @@ export default function ListSuratPage() {
     []
   );
 
+  const handleDownloadUnsignedZip = async () => {
+    const { data } = await axios.get("/api/surat/download/all-unsigned", {
+      responseType: "arraybuffer",
+      headers: {
+        Authorization: `Bearer ${user.accessToken}`,
+      },
+    });
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "surat.zip");
+    document.body.appendChild(link);
+    link.click();
+  };
+
   if (isLoading || isJenisLoading || isProdiLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -193,6 +209,14 @@ export default function ListSuratPage() {
             <PlusIcon className="w-4 h-4 mr-2" />
             Upload Surat
           </Link>
+        )}
+        {user?.jabatan.permision.upload_tandatangan && (
+          <Button
+            onClick={handleDownloadUnsignedZip}
+            className="inline-flex items-center justify-center rounded-lg bg-primary py-4 px-10 text-center font-medium text-white hover:bg-opacity-90 lg:px-8 xl:px-10"
+          >
+            <span>Download Zip</span>
+          </Button>
         )}
       </div>
 

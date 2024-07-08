@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 
   if (session) {
     const { data } = await axios.post(
-      `${process.env.API_URL}/excel`,
+      `${process.env.API_URL}/download/excel`,
       {
         repo_id: repo_id,
       },
