@@ -179,7 +179,7 @@ export const columns: ColumnDef<Letter>[] = [
                 color: "white",
               }}
             >
-              <p className="text-center w-full">{statusSurat}</p>
+              <p className="text-center w-full rounded-md">{statusSurat}</p>
             </Badge>
           )}
           {(statusSurat?.includes("Daftar Tunggu") ||

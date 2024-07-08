@@ -831,6 +831,7 @@ export default function SuratSinglePage() {
                   >
                     <option value="">Pilih Strategi</option>
                     {strategiData &&
+                      Array.isArray(strategiData) &&
                       strategiData.map((strategi: any) => (
                         <option key={strategi.id} value={strategi.id}>
                           {strategi.name}
