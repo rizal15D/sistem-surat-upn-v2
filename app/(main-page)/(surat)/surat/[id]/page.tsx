@@ -719,7 +719,11 @@ export default function SuratSinglePage() {
 
             {canPersetujuan && (
               <div className="pt-12 flex gap-4 text-white">
-                <Button className="bg-success w-full" onClick={handleSetuju}>
+                <Button
+                  className="bg-success w-full"
+                  onClick={handleSetuju}
+                  disabled={isSetujuLoading || isMenolakLoading}
+                >
                   {isSetujuLoading ? (
                     <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
                   ) : (
@@ -731,6 +735,7 @@ export default function SuratSinglePage() {
                     setModalMenolakOpen(true);
                   }}
                   className="bg-danger w-full"
+                  disabled={isMenolakLoading || isSetujuLoading}
                 >
                   <Cross2Icon className="w-6 h-6" />
                 </Button>
@@ -828,6 +833,7 @@ export default function SuratSinglePage() {
                   >
                     <option value="">Pilih Strategi</option>
                     {strategiData &&
+                      Array.isArray(strategiData) &&
                       strategiData.map((strategi: any) => (
                         <option key={strategi.id} value={strategi.id}>
                           {strategi.name}

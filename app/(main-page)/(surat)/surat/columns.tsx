@@ -18,6 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { ExternalLink } from "lucide-react";
 
 export type Letter = {
   id: number;
@@ -179,7 +180,7 @@ export const columns: ColumnDef<Letter>[] = [
                 color: "white",
               }}
             >
-              <p className="text-center w-full">{statusSurat}</p>
+              <p className="text-center w-full rounded-md">{statusSurat}</p>
             </Badge>
           )}
           {(statusSurat?.includes("Daftar Tunggu") ||
@@ -276,18 +277,68 @@ export const columns: ColumnDef<Letter>[] = [
       const letter = row.original as Letter;
       const router = useRouter();
 
+      const session = useSession();
+      const user = session.data?.user as User;
+
+      const canDownload =
+        user?.jabatan.permision.download_surat &&
+        !user?.jabatan.jabatan_atas &&
+        !letter.status.status.includes("Ditandatangani");
+
+      const getFileUrl = async () => {
+        const response = await axios.get(
+          `/api/surat/download?filepath=${letter.path}`,
+          {
+            responseType: "arraybuffer",
+          }
+        );
+
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+        return fileURL;
+      };
+
+      const handleDownload = async () => {
+        let link = document.createElement("a");
+        link.href = await getFileUrl();
+
+        link.setAttribute(
+          "download",
+          `${
+            letter.nomor_surat[letter.nomor_surat.length - 1]?.nomor_surat
+          } - ${letter.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
         <div className="flex items-center space-x-2">
           <Button
             variant="default"
             size="sm"
-            onClick={() => {
-              router.push(`/surat/${letter.id}`);
+            onClick={(event) => {
+              event.stopPropagation();
+              window.open(`/surat/${letter.id}`, "_blank");
             }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
-            <InfoCircledIcon className="h-5 w-5" />
+            <ExternalLink className="h-5 w-5" />
           </Button>
+          {canDownload && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                handleDownload();
+              }}
+              className="bg-primary hover:bg-opacity-90 text-white"
+            >
+              <DownloadIcon className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       );
     },
