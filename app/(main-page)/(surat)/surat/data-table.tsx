@@ -29,6 +29,7 @@ import { DataTablePagination } from "@/components/DataTableComponents/DataTableP
 import { DataTableToolbar } from "@/components/DataTableComponents/DataTableToolbar";
 import { Letter } from "./columns";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -80,6 +81,8 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  const router = useRouter();
+
   return (
     <div>
       <DataTableToolbar table={table} filterInput="judul" data={filterData} />
@@ -114,12 +117,15 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className={
+                  className={`${
                     (row.original as Letter).tampilan &&
                     !(row.original as Letter).tampilan[0].dibaca
-                      ? "font-bold"
+                      ? "font-bold bg-white"
                       : "bg-disabled"
-                  }
+                  } hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
+                  onClick={() => {
+                    router.push(`/surat/${(row.original as Letter).id}`);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

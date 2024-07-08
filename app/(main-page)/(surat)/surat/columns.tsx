@@ -18,6 +18,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { ExternalLink } from "lucide-react";
 
 export type Letter = {
   id: number;
@@ -317,18 +318,20 @@ export const columns: ColumnDef<Letter>[] = [
           <Button
             variant="default"
             size="sm"
-            onClick={() => {
-              router.push(`/surat/${letter.id}`);
+            onClick={(event) => {
+              event.stopPropagation();
+              window.open(`/surat/${letter.id}`, "_blank");
             }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
-            <InfoCircledIcon className="h-5 w-5" />
+            <ExternalLink className="h-5 w-5" />
           </Button>
           {canDownload && (
             <Button
               variant="default"
               size="sm"
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 handleDownload();
               }}
               className="bg-primary hover:bg-opacity-90 text-white"
