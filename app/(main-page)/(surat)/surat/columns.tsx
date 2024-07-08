@@ -276,6 +276,42 @@ export const columns: ColumnDef<Letter>[] = [
       const letter = row.original as Letter;
       const router = useRouter();
 
+      const session = useSession();
+      const user = session.data?.user as User;
+
+      const canDownload =
+        user?.jabatan.permision.download_surat &&
+        !user?.jabatan.jabatan_atas &&
+        !letter.status.status.includes("Ditandatangani");
+
+      const getFileUrl = async () => {
+        const response = await axios.get(
+          `/api/surat/download?filepath=${letter.path}`,
+          {
+            responseType: "arraybuffer",
+          }
+        );
+
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+        return fileURL;
+      };
+
+      const handleDownload = async () => {
+        let link = document.createElement("a");
+        link.href = await getFileUrl();
+
+        link.setAttribute(
+          "download",
+          `${
+            letter.nomor_surat[letter.nomor_surat.length - 1]?.nomor_surat
+          } - ${letter.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
         <div className="flex items-center space-x-2">
           <Button
@@ -288,6 +324,18 @@ export const columns: ColumnDef<Letter>[] = [
           >
             <InfoCircledIcon className="h-5 w-5" />
           </Button>
+          {canDownload && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => {
+                handleDownload();
+              }}
+              className="bg-primary hover:bg-opacity-90 text-white"
+            >
+              <DownloadIcon className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       );
     },
