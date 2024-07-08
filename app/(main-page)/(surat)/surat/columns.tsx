@@ -171,7 +171,7 @@ export const columns: ColumnDef<Letter>[] = [
                   (statusSurat?.includes("Daftar Tunggu") ||
                     statusSurat?.includes("Diproses")) &&
                   statusSurat?.includes("Admin Dekan")
-                    ? "rgb(150, 123, 182)"
+                    ? "rgb(150, 123, 182)" //ungu
                     : statusSurat?.includes("Ditolak")
                     ? "rgb(239 68 68)" // menggantikan "bg-danger" dengan warna yang sesuai
                     : statusSurat?.includes("Ditandatangani")

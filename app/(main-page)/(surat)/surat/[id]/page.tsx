@@ -144,13 +144,10 @@ export default function SuratSinglePage() {
           strategi_id: strategi_id,
         },
       });
-      // console.log(response.data);
-      // return response.data;
       return response.data as { id: number; name: string }[];
     },
     enabled: canTagging,
   });
-  // console.log(strategiData);
 
   // Get Indikator
   const { data: indikatorData, isLoading: isIndikatorLoading } = useQuery({

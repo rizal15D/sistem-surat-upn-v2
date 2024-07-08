@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions, User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { authOptions, User } from "../../auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,15 +8,16 @@ export async function GET(req: NextRequest) {
     user: User;
   } | null;
 
-  const repo_idJSON = req.nextUrl.searchParams.get("repo_id");
+  const filepath = req.nextUrl.searchParams.get("filepath");
+  const pathsJSON = req.nextUrl.searchParams.get("paths");
 
-  const repo_id = repo_idJSON ? JSON.parse(repo_idJSON) : [];
+  const paths = pathsJSON ? JSON.parse(pathsJSON) : [];
 
   if (session) {
     const { data } = await axios.post(
-      `${process.env.API_URL}/download/excel`,
+      `${process.env.API_URL}/download`,
       {
-        repo_id: repo_id,
+        paths: paths,
       },
       {
         responseType: "arraybuffer",
@@ -24,14 +25,16 @@ export async function GET(req: NextRequest) {
           Authorization: `Bearer ${session.user?.accessToken}`,
           "ngrok-skip-browser-warning": true,
         },
+        params: {
+          filepath: filepath,
+        },
       }
     );
 
     const pdfBuffer = Buffer.from(data, "binary");
     return new NextResponse(pdfBuffer, {
       headers: {
-        "Content-Type":
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "Content-Type": "application/pdf",
       },
     });
   } else {
