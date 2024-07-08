@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Letter } from "../surat/columns";
+import { ExternalLink } from "lucide-react";
 
 export type LetterRepo = {
   id: number;
@@ -208,17 +209,21 @@ export const columns: ColumnDef<LetterRepo>[] = [
           <Button
             variant="default"
             size="sm"
-            onClick={() => {
+            onClick={(event) => {
+              event.stopPropagation();
               router.push(`/repo/${letter.id}`);
             }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
-            <InfoCircledIcon className="h-5 w-5" />
+            <ExternalLink className="h-5 w-5" />
           </Button>
           <Button
             className="bg-primary hover:bg-opacity-90 text-white"
             size="sm"
-            onClick={handleDownload}
+            onClick={(event) => {
+              event.stopPropagation();
+              handleDownload();
+            }}
           >
             <DownloadIcon className="w-5 h-5" />
           </Button>

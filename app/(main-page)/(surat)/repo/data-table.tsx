@@ -37,6 +37,8 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import FilterForm from "./filter-form";
+import { Letter } from "../surat/columns";
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -93,6 +95,8 @@ DataTableProps<TData, TValue>) {
       columnFilters,
     },
   });
+
+  const router = useRouter();
 
   const handleDownloadBatch = async () => {
     const paths = table.getSelectedRowModel().rows.map((row) => {
@@ -221,6 +225,10 @@ DataTableProps<TData, TValue>) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={`hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
+                  onClick={() => {
+                    router.push(`/repo/${(row.original as Letter).id}`);
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
