@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clipboard, EditIcon } from "lucide-react";
 import Link from "next/link";
 import { Indikator } from "@/app/(main-page)/(master)/data-master/(sikoja)/indikator/columns";
+import { SocketData } from "@/app/(auth)/login/SocketData";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -52,6 +53,7 @@ export default function SuratSinglePage() {
   const [isPerbaikanLoading, setIsPerbaikanLoading] = useState(false);
   const [isTaggingLoading, setIsTaggingLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isSuratLoading, setIsSuratLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
@@ -59,6 +61,7 @@ export default function SuratSinglePage() {
   const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
   const [modalTaggingOpen, setModalTaggingOpen] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
+  // const [isUpdatedStatus, setIsUpdatedStatus] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -93,12 +96,34 @@ export default function SuratSinglePage() {
         input,
       });
     },
+
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      queryClient.invalidateQueries({ queryKey: ["repo"] });
     },
   });
 
+  // useEffect(() => {
+  //   let socket = SocketData();
+  //   socket.on("message", (data) => {
+  //     // const parts = data.split("/");
+  //     console.log("posisi1");
+
+  //     if (data == `private new mail/${user?.jabatan.id}`) {
+  //       console.log("posisi2");
+  //       queryClient.invalidateQueries({ queryKey: ["surat"] });
+  //       queryClient.invalidateQueries({ queryKey: ["repo", id] });
+  //     }
+  //   });
+  // }, []);
+
+  // useEffect(() => {
+  //   if (isUpdatedStatus) {
+  //     queryClient.invalidateQueries({ queryKey: ["surat"] });
+  //   }
+  // }, [isUpdatedStatus]);
+
   const getFileUrl = async () => {
+    setIsSuratLoading(true);
     const response = await axios.get(
       `/api/surat/download?filepath=${letterData?.surat.path}`,
       {
@@ -108,6 +133,7 @@ export default function SuratSinglePage() {
 
     const file = new Blob([response.data], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(file);
+    setIsSuratLoading(false);
     return fileURL;
   };
 
@@ -544,7 +570,7 @@ export default function SuratSinglePage() {
     // Surat ditolak
     letterData?.surat.status.status.includes("Ditolak");
 
-  if (isKomentarLoading || isLetterLoading)
+  if (isKomentarLoading || isLetterLoading || isSuratLoading)
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>

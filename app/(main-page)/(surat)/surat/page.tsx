@@ -121,7 +121,7 @@ export default function ListSuratPage() {
   useEffect(() => {
     let socket = SocketData();
     socket.on("message", (data) => {
-      const parts = data.split("/");
+      // const parts = data.split("/");
 
       if (data == `private new mail/${user?.jabatan.id}`) {
         queryClient.invalidateQueries({ queryKey: ["surat"] });
@@ -196,7 +196,6 @@ export default function ListSuratPage() {
 
   return (
     <>
-      {/* <Socket /> */}
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat
