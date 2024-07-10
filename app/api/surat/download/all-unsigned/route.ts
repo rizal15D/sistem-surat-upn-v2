@@ -4,6 +4,8 @@ import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
+  // try {
+  console.log("download all unsigned API");
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
@@ -20,11 +22,24 @@ export async function GET(req: NextRequest) {
         },
       }
     );
-    return new NextResponse(data, {
-      headers: {
-        "Content-Type": "application/octet-stream",
-        "Content-Disposition": "attachment; filename=surat.zip",
-      },
-    });
+    // return new NextResponse(data, {
+    //   headers: {
+    //     "Content-Type": "application/octet-stream",
+    //     "Content-Disposition": "attachment; filename=surat.zip",
+    //   },
+    // });
+    if (data) {
+      const pdfBuffer = Buffer.from(data, "binary");
+      return new NextResponse(pdfBuffer, {
+        headers: {
+          "Content-Type": "application/pdf",
+        },
+      });
+    }
   }
+  // } catch (err) {
+  //   return NextResponse.json({
+  //     error: "Unauthorized",
+  //   });
+  // }
 }
