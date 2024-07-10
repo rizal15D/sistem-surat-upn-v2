@@ -124,6 +124,7 @@ export default function SuratSinglePage() {
 
   const getFileUrl = async () => {
     setIsSuratLoading(true);
+
     const response = await axios.get(
       `/api/surat/download?filepath=${letterData?.surat.path}`,
       {
@@ -141,7 +142,7 @@ export default function SuratSinglePage() {
     if (letterData) {
       getFileUrl().then((url) => setFileUrl(url));
       queryClient.invalidateQueries({ queryKey: ["surat"] });
-      queryClient.invalidateQueries({ queryKey: ["repo"] });
+      queryClient.invalidateQueries({ queryKey: ["repo", id] });
       setIsUpdated(false);
       if (letterData.surat.tampilan) {
         if (!letterData.surat.tampilan[0]?.dibaca) {
@@ -243,6 +244,7 @@ export default function SuratSinglePage() {
       return response.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["repo", id] });
       queryClient.invalidateQueries({ queryKey: ["surat"] });
       setUploadModalOpen(false);
       toast({
