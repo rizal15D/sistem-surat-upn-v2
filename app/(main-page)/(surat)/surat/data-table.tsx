@@ -122,17 +122,19 @@ export function DataTable<TData, TValue>({
                     !(row.original as Letter).tampilan[0].dibaca
                       ? "font-bold bg-white"
                       : "bg-disabled"
-                  } hover:-translate-y-2 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
+                  } hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
                   onClick={() => {
                     router.push(`/surat/${(row.original as Letter).id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      <a href={`/surat/${(row.original as Letter).id}`}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </a>
                     </TableCell>
                   ))}
                 </TableRow>

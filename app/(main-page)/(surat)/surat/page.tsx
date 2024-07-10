@@ -107,8 +107,20 @@ export default function ListSuratPage() {
         })),
         status: [
           {
-            value: ["Daftar Tunggu", "Diproses", "Disetujui"],
-            label: "Diproses",
+            value: ["Diproses TU", "Daftar Tunggu TU"],
+            label: "Di Tata Usaha",
+          },
+          {
+            value: ["Diproses Dekan", "Daftar Tunggu Dekan"],
+            label: "Di Dekan",
+          },
+          {
+            value: [
+              "Diproses Admin Dekan",
+              "Daftar Tunggu Admin Dekan",
+              "BSRE",
+            ],
+            label: "Di Admin Dekan",
           },
           { value: ["Ditandatangani"], label: "Diterima" },
           { value: ["Ditolak"], label: "Ditolak" },

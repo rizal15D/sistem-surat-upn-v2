@@ -19,6 +19,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { ExternalLink } from "lucide-react";
+import { FilterFn } from "@tanstack/react-table";
 
 export type Letter = {
   id: number;
@@ -71,17 +72,26 @@ export type Letter = {
   }[];
 };
 
+const multiColumnFilterFn: FilterFn<Letter> = (row, columnId, filterValue) => {
+  // Concatenate the values from multiple columns into a single string
+  const searchableRowContent = `${row.original.judul} 
+  ${row.original.nomor_surat[0]?.nomor_surat} 
+  ${row.original.user.name} 
+  ${row.original.repo[0]?.indikator.name}
+  ${row.original.repo[0]?.indikator.strategi.name}
+  }`;
+
+  // Perform a case-insensitive comparison
+  return searchableRowContent.toLowerCase().includes(filterValue.toLowerCase());
+};
+
 export const columns: ColumnDef<Letter>[] = [
   {
     accessorKey: "judul",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Judul" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const judul = row.original.judul;
       return <div>{judul.split(".")[0].split("-")[0]}</div>;
@@ -92,13 +102,7 @@ export const columns: ColumnDef<Letter>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nomor Surat" />
     ),
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as { nomor_surat: string })
-        .nomor_surat;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.includes(v))
-      );
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const nomorSurat = row.original.nomor_surat;
       return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
@@ -117,12 +121,7 @@ export const columns: ColumnDef<Letter>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as Users).prodi?.name;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.toLowerCase().includes(v.toLowerCase()))
-      );
-    },
+    filterFn: multiColumnFilterFn,
   },
   {
     accessorKey: "status",
@@ -239,11 +238,7 @@ export const columns: ColumnDef<Letter>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Indikator" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const repo = row.original.repo;
       // console.log(repo);
@@ -257,11 +252,7 @@ export const columns: ColumnDef<Letter>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Strategi" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const repo = row.original.repo;
       const strategi =
