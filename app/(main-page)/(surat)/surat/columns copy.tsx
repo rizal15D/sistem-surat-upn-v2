@@ -124,7 +124,6 @@ export const columns: ColumnDef<Letter>[] = [
       );
     },
   },
-
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -136,35 +135,48 @@ export const columns: ColumnDef<Letter>[] = [
         val.some((v) => rowValue.includes(v))
       );
     },
-
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
 
-      const getBadgeColor = (data: String) => {
-        let color;
-        if (data.includes("BSRE")) color = "rgb(30,144,255)"; // biru
-        else if (data.includes("Admin Dekan"))
-          color = `rgb(150, 123, 182)`; //ungu
-        else if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
-          color = "rgb(250 204 21)"; // warna pengganti untuk bg-warning
-        else if (data.includes("Ditolak"))
-          color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
-        else if (data.includes("Ditandatangani"))
-          color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
-        else color = "rgb(120 113 108)"; // default color
-        return color;
-      };
-      let color = getBadgeColor(statusSurat);
+      let jabatanStatus = "";
+
+      if (statusSurat?.includes("Daftar Tunggu")) {
+        jabatanStatus = statusSurat.slice(14, statusSurat.length);
+      } else if (statusSurat?.includes("Diproses")) {
+        jabatanStatus = statusSurat.slice(9, statusSurat.length);
+      }
+
+      // Create a hexa color based on the jabatan
+      function stringToHex(str: string): string {
+        // Hash function to convert string to a numeric value
+        const hash = str
+          .split("")
+          .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+        // Convert the numeric value to a hexadecimal string
+        return (hash * 57423).toString(16).toUpperCase();
+      }
+      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
+      // const color = `rgb(150, 123, 182)`;
 
       return (
         <>
           {color && (
             <Badge
               style={{
-                backgroundColor: color, // menggantikan "bg-warning" dengan warna yang sesuai
+                backgroundColor:
+                  (statusSurat?.includes("Daftar Tunggu") ||
+                    statusSurat?.includes("Diproses")) &&
+                  statusSurat?.includes("Admin Dekan")
+                    ? "rgb(150, 123, 182)" //ungu
+                    : statusSurat?.includes("Ditolak")
+                    ? "rgb(239 68 68)" // menggantikan "bg-danger" dengan warna yang sesuai
+                    : statusSurat?.includes("Ditandatangani")
+                    ? "rgb(34 197 94)" // menggantikan "bg-success" dengan warna yang sesuai
+                    : "rgb(250 204 21)", // menggantikan "bg-warning" dengan warna yang sesuai
                 color: "white",
               }}
             >

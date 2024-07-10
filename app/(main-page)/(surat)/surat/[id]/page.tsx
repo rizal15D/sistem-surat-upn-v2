@@ -498,15 +498,14 @@ export default function SuratSinglePage() {
   const getBadgeColor = (data: String) => {
     let color;
     if (data.includes("BSRE")) color = "rgb(30,144,255)"; // biru
-    if (data.includes("Admin Dekan")) color = `rgb(150, 123, 182)`; //ungu
-    if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
+    else if (data.includes("Admin Dekan")) color = `rgb(150, 123, 182)`; //ungu
+    else if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
       color = "rgb(250 204 21)"; // warna pengganti untuk bg-warning
-
-    if (data.includes("Ditolak")) color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
-
-    if (data.includes("Ditandatangani")) color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
-
-    color = "rgb(120 113 108)"; // default color
+    else if (data.includes("Ditolak"))
+      color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
+    else if (data.includes("Ditandatangani"))
+      color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
+    else color = "rgb(120 113 108)"; // default color
     return color;
   };
 
