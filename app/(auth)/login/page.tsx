@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 import LoginForm from "./LoginForm";
-// import Socket from "./Socket";
 export const metadata: Metadata = {
   title: "Laman Login | Sistem Surat UPN VJT",
   description: "Sistem Surat UPN Veteran Jawa Timur",

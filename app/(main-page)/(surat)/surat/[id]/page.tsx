@@ -102,26 +102,6 @@ export default function SuratSinglePage() {
     },
   });
 
-  // useEffect(() => {
-  //   let socket = SocketData();
-  //   socket.on("message", (data) => {
-  //     // const parts = data.split("/");
-  //     console.log("posisi1");
-
-  //     if (data == `private new mail/${user?.jabatan.id}`) {
-  //       console.log("posisi2");
-  //       queryClient.invalidateQueries({ queryKey: ["surat"] });
-  //       queryClient.invalidateQueries({ queryKey: ["repo", id] });
-  //     }
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   if (isUpdatedStatus) {
-  //     queryClient.invalidateQueries({ queryKey: ["surat"] });
-  //   }
-  // }, [isUpdatedStatus]);
-
   const getFileUrl = async () => {
     setIsSuratLoading(true);
 
@@ -516,20 +496,18 @@ export default function SuratSinglePage() {
   };
 
   const getBadgeColor = (data: String) => {
-    if (data.includes("Admin Dekan")) {
-      return `rgb(150, 123, 182)`; //ungu
-    }
-    if (data.includes("Daftar Tunggu") || data.includes("Diproses")) {
-      return "rgb(250 204 21)"; // warna pengganti untuk bg-warning
-    }
+    let color;
+    if (data.includes("BSRE")) color = "rgb(30,144,255)"; // biru
+    if (data.includes("Admin Dekan")) color = `rgb(150, 123, 182)`; //ungu
+    if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
+      color = "rgb(250 204 21)"; // warna pengganti untuk bg-warning
 
-    if (data.includes("Ditolak")) {
-      return "rgb(239 68 68)"; // warna pengganti untuk bg-danger
-    }
-    if (data.includes("Ditandatangani")) {
-      return "rgb(34 197 94)"; // warna pengganti untuk bg-success
-    }
-    return "rgb(120 113 108)"; // default color
+    if (data.includes("Ditolak")) color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
+
+    if (data.includes("Ditandatangani")) color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
+
+    color = "rgb(120 113 108)"; // default color
+    return color;
   };
 
   const canPersetujuan =

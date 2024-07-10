@@ -8,10 +8,7 @@ export async function GET(req: NextRequest) {
     const session = (await getServerSession(authOptions)) as {
       user: User;
     } | null;
-    console.log("posisi1");
     if (session) {
-      console.log("posisi2");
-
       const { data } = await axios.post(
         `${process.env.API_URL}/download/unsigned`,
         {},
@@ -24,7 +21,6 @@ export async function GET(req: NextRequest) {
           },
         }
       );
-      console.log("posisi3");
 
       const pdfBuffer = Buffer.from(data, "binary");
       return new NextResponse(pdfBuffer, {
