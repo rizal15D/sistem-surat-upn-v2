@@ -94,6 +94,12 @@ DataTableProps<TData, TValue>) {
       columnVisibility,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 50,
+      },
+    },
   });
 
   const router = useRouter();

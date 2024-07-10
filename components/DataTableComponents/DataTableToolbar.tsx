@@ -24,7 +24,7 @@ export function DataTableToolbar<TData>({
         <div className="relative">
           <MagnifyingGlassIcon className="absolute left-3 bottom-1/4 h-5 w-5 text-gray-500 dark:text-gray-400" />
           <Input
-            placeholder={`Filter ${filterInput}...`}
+            placeholder={`Cari...`}
             value={
               (table.getColumn(filterInput)?.getFilterValue() as string) ?? ""
             }

@@ -17,6 +17,7 @@ import { User } from "@/app/api/auth/[...nextauth]/authOptions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Letter } from "../surat/columns";
 import { ExternalLink } from "lucide-react";
+import { FilterFn } from "@tanstack/react-table";
 
 export type LetterRepo = {
   id: number;
@@ -35,6 +36,23 @@ export type LetterRepo = {
     };
   };
   surat: Letter;
+};
+
+const multiColumnFilterFn: FilterFn<LetterRepo> = (
+  row,
+  columnId,
+  filterValue
+) => {
+  // Concatenate the values from multiple columns into a single string
+  const searchableRowContent = `${row.original.surat.judul} 
+  ${row.original.surat.nomor_surat[0]?.nomor_surat} 
+  ${row.original.surat.user.name} 
+  ${row.original.indikator.name}
+  ${row.original.indikator.strategi.name}
+  }`;
+
+  // Perform a case-insensitive comparison
+  return searchableRowContent.toLowerCase().includes(filterValue.toLowerCase());
 };
 
 export const columns: ColumnDef<LetterRepo>[] = [
@@ -65,11 +83,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Judul" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const judul = row.original.surat.judul;
       return <div>{judul.split(".")[0].split("-")[0]}</div>;
@@ -80,13 +94,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nomor Surat" />
     ),
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as { nomor_surat: string })
-        .nomor_surat;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.includes(v))
-      );
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const nomorSurat = row.original.surat.nomor_surat;
       return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
@@ -105,12 +113,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as Users).prodi?.name;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.toLowerCase().includes(v.toLowerCase()))
-      );
-    },
+    filterFn: multiColumnFilterFn,
   },
   {
     accessorKey: "tanggal",
@@ -152,11 +155,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Indikator" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const indikator = row.original.indikator.name;
       return <div>{indikator}</div>;
@@ -167,11 +166,7 @@ export const columns: ColumnDef<LetterRepo>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Strategi" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const strategi = row.original.indikator.strategi.name;
       return <div>{strategi}</div>;
