@@ -183,19 +183,22 @@ export default function ListSuratPage() {
     []
   );
 
-  const handleDownloadUnsignedZip = async () => {
+  const handleDownloadUnsignedZip = async (): Promise<void> => {
     const { data } = await axios.get("/api/surat/download/all-unsigned", {
       responseType: "arraybuffer",
       headers: {
         Authorization: `Bearer ${user.accessToken}`,
       },
     });
-    const url = window.URL.createObjectURL(new Blob([data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "surat.zip");
-    document.body.appendChild(link);
-    link.click();
+
+    if (data) {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "download.zip");
+      document.body.appendChild(link);
+      link.click();
+    }
   };
 
   if (isLoading || isJenisLoading || isProdiLoading) {
