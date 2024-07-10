@@ -717,7 +717,7 @@ export default function SuratSinglePage() {
               </div>
             )}
 
-            {canPersetujuan && !fileUrl && (
+            {canPersetujuan && fileUrl && (
               <div className="pt-12 flex gap-4 text-white">
                 <Button
                   className="bg-success w-full"
