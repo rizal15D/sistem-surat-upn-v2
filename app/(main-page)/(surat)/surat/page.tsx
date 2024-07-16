@@ -191,7 +191,16 @@ export default function ListSuratPage() {
       },
     });
 
-    if (data) {
+    if (
+      data.byteLength === 22
+    ) {
+      toast({
+        title: "Tidak ada file untuk diunduh",
+        description: "Tidak ada surat yang belum ditandatangani.",
+        className: "bg-warning text-white",
+      });
+    }
+     else {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
       link.href = url;

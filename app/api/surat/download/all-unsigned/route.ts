@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   // try {
-  console.log("download all unsigned API");
   const session = (await getServerSession(authOptions)) as {
     user: User;
   } | null;
