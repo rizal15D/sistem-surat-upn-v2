@@ -98,7 +98,7 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
-    accessorKey: "nomor_surat",
+    accessorKey: "nomor surat",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nomor Surat" />
     ),
@@ -109,9 +109,9 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
-    accessorKey: "user",
+    accessorKey: "pembuat",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Pembuat Surat" />
+      <DataTableColumnHeader column={column} title="Pembuat" />
     ),
     cell: ({ row }) => {
       const user = row.original.user;
@@ -298,6 +298,7 @@ export const columns: ColumnDef<Letter>[] = [
             variant="default"
             size="sm"
             onClick={(event) => {
+              event.preventDefault();
               event.stopPropagation();
               window.open(`/surat/${letter.id}`, "_blank");
             }}
@@ -310,6 +311,7 @@ export const columns: ColumnDef<Letter>[] = [
               variant="default"
               size="sm"
               onClick={(event) => {
+                event.preventDefault();
                 event.stopPropagation();
                 handleDownload();
               }}

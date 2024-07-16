@@ -120,16 +120,19 @@ export function DataTable<TData, TValue>({
                   className={`${
                     (row.original as Letter).tampilan &&
                     !(row.original as Letter).tampilan[0].dibaca
-                      ? "font-bold bg-white"
+                      ? "font-bold bg-whit"
                       : "bg-disabled"
-                  } hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
+                  } h-full w-full hover:-translate-y-1 hover:shadow-xl transition-all cursor-pointer pointer-event-auto`}
                   onClick={() => {
                     router.push(`/surat/${(row.original as Letter).id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      <a href={`/surat/${(row.original as Letter).id}`}>
+                    <TableCell key={cell.id} className="h-full w-full">
+                      <a
+                        href={`/surat/${(row.original as Letter).id}`}
+                        className="h-full w-full"
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
