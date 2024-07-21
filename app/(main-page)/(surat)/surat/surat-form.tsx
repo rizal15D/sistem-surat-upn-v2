@@ -66,7 +66,7 @@ export default function SuratForm({
     <form
       className={`grid sm:grid-cols-1 ${
         isModal ? "lg:grid-cols-1" : "lg:grid-cols-5"
-      } gap-10 w-full`}
+      } gap-1 w-full`}
       onSubmit={onSubmit}
     >
       <div
@@ -74,17 +74,17 @@ export default function SuratForm({
           isModal ? "lg:col-span-1" : "lg:col-span-3"
         } sm:col-span-1 row-span-1`}
       >
-        <div className="container mx-auto py-10 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+        <div className="container mx-auto py-3 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
           <div>
             <label className="mb-3 block text-black dark:text-white">
               Upload PDF Surat
             </label>
             {selectedFile && (
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-                <div className="h-[100vh] mb-4">
+                <div className="h-[40vh] mb-4">
                   <Viewer
                     fileUrl={selectedFile}
-                    defaultScale={SpecialZoomLevel.PageFit}
+                    defaultScale={SpecialZoomLevel.ActualSize}
                   />
                 </div>
               </Worker>
@@ -120,7 +120,7 @@ export default function SuratForm({
           isModal ? "lg:col-span-1" : "lg:col-span-2"
         } sm:col-span-1`}
       >
-        <div className="container mx-auto py-10 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
+        <div className="container mx-auto py-3 rounded-sm border border-stroke bg-white px-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5">
           <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
               <h3 className="font-medium text-black dark:text-white">

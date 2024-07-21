@@ -18,6 +18,7 @@ import { SocketData } from "@/app/(auth)/login/SocketData";
 export default function ListSuratPage() {
   const session = useSession();
   const user = session.data?.user as User;
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -131,6 +132,7 @@ export default function ListSuratPage() {
   }, [jenisData]);
 
   useEffect(() => {
+    console.log(user);
     let socket = SocketData();
     socket.on("message", (data) => {
       // const parts = data.split("/");
@@ -191,16 +193,13 @@ export default function ListSuratPage() {
       },
     });
 
-    if (
-      data.byteLength === 22
-    ) {
+    if (data.byteLength === 22) {
       toast({
         title: "Tidak ada file untuk diunduh",
         description: "Tidak ada surat yang belum ditandatangani.",
         className: "bg-warning text-white",
       });
-    }
-     else {
+    } else {
       const url = window.URL.createObjectURL(new Blob([data]));
       const link = document.createElement("a");
       link.href = url;

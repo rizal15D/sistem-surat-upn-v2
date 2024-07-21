@@ -75,7 +75,7 @@ export default function SuratSinglePage() {
 
   // Get Data Surat
   const { data: letterData, isLoading: isLetterLoading } = useQuery({
-    queryKey: ["repo", id],
+    queryKey: ["surat", id],
     queryFn: async () => {
       const response = await axios.get(`/api/surat/${id}`);
 
@@ -98,7 +98,7 @@ export default function SuratSinglePage() {
     },
 
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["repo"] });
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
     },
   });
 
@@ -121,7 +121,7 @@ export default function SuratSinglePage() {
   useEffect(() => {
     if (letterData) {
       getFileUrl().then((url) => setFileUrl(url));
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      queryClient.invalidateQueries({ queryKey: ["surat", id] });
       queryClient.invalidateQueries({ queryKey: ["repo", id] });
       setIsUpdated(false);
       if (letterData.surat.tampilan) {
@@ -225,7 +225,7 @@ export default function SuratSinglePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["repo", id] });
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      queryClient.invalidateQueries({ queryKey: ["surat", id] });
       setUploadModalOpen(false);
       toast({
         title: "Berhasil",
