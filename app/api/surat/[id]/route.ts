@@ -27,3 +27,31 @@ export async function GET(req: NextRequest, context: any) {
     });
   }
 }
+
+export async function DELETE(req: NextRequest, context: any) {
+  const session = (await getServerSession(authOptions)) as {
+    user: User;
+  } | null;
+
+  const { id } = context.params;
+
+  if (session) {
+    const { data } = await axios.delete(
+      `${process.env.API_URL}/daftar-surat/hide`,
+      {
+        headers: {
+          Authorization: `Bearer ${session.user?.accessToken}`,
+        },
+        data: {
+          surat_id: id,
+        },
+      }
+    );
+
+    return NextResponse.json(data);
+  } else {
+    return NextResponse.json({
+      error: "Unauthorized",
+    });
+  }
+}

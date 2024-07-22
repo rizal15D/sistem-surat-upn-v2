@@ -149,6 +149,15 @@ const LoginPage: React.FC = async () => {
           </div>
         </div>
       </div>
+      {/* <div className="h-screen w-screen">
+        <Image
+          src="/images/product/product-01.png"
+          alt="Logo UPN VJT"
+          width={500}
+          height={500}
+        />
+        test
+      </div> */}
     </>
   );
 };

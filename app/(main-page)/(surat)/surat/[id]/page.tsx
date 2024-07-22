@@ -60,6 +60,7 @@ export default function SuratSinglePage() {
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
   const [modalTaggingOpen, setModalTaggingOpen] = useState(false);
+  const [modalSetujuOpen, setModalSetujuOpen] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
   // const [isUpdatedStatus, setIsUpdatedStatus] = useState(false);
 
@@ -132,14 +133,6 @@ export default function SuratSinglePage() {
     }
   }, [letterData, isUpdated]);
 
-  // Get Komentar
-  const getKomentar = async () => {
-    const response = await axios.get(`/api/surat/komentar`, {
-      params: { id },
-    });
-    return response.data;
-  };
-
   // Get Strategi
   const canTagging = user?.jabatan.permision.tagging;
 
@@ -169,12 +162,6 @@ export default function SuratSinglePage() {
       return response.data.indikator;
     },
     enabled: canTagging,
-  });
-
-  const { data: komentar, isLoading: isKomentarLoading } = useQuery({
-    queryKey: ["komentar", id],
-    queryFn: getKomentar,
-    enabled: !!letterData?.surat.status.status.includes("Ditolak"),
   });
 
   const handleDownload = async () => {
@@ -289,8 +276,36 @@ export default function SuratSinglePage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
       router.push("/surat");
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      toast({
+        title: "Berhasil menghapus surat",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus surat",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsDeleteLoading(false);
+      setModalDeleteOpen(false);
+    },
+  });
+
+  const { mutate: mutateHide } = useMutation({
+    mutationFn: async () => {
+      if (isDeleteLoading) return;
+
+      setIsDeleteLoading(true);
+      const response = await axios.delete(`/api/surat/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      router.push("/surat");
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
       toast({
         title: "Berhasil menghapus surat",
         className: "bg-success text-white",
@@ -309,7 +324,7 @@ export default function SuratSinglePage() {
   });
 
   const handleDelete = async () => {
-    await mutateDelete();
+    letterData?.surat.nomor_surat.length > 0 ? mutateHide() : mutateDelete();
   };
 
   // Persetujuan
@@ -530,12 +545,7 @@ export default function SuratSinglePage() {
   const canDelete =
     // User yang mempunyai surat
     user?.jabatan.name === letterData?.surat.user?.jabatan.name &&
-    user?.user.prodi?.name === letterData?.surat.user?.prodi?.name &&
-    // Surat masih di tangan atasan
-    letterData?.surat.status.status.includes(
-      user?.jabatan.jabatan_atas?.name
-    ) &&
-    !letterData?.surat.status.persetujuan;
+    user?.user.prodi?.name === letterData?.surat.user?.prodi?.name;
 
   const canOCR =
     user?.jabatan.permision.generate_nomor_surat &&
@@ -549,7 +559,7 @@ export default function SuratSinglePage() {
     // Surat ditolak
     letterData?.surat.status.status.includes("Ditolak");
 
-  if (isKomentarLoading || isLetterLoading || isSuratLoading)
+  if (isLetterLoading || isSuratLoading)
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -711,13 +721,23 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {komentar?.komentar && (
+            {letterData?.surat.komentar.length > 0 && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
                 </span>
                 <span className="text-body-xs text-black dark:text-white">
-                  {komentar.komentar.komentar}
+                  {letterData?.surat.komentar.map((komentar: any) => {
+                    return (
+                      <p className="text-black dark:text-white">
+                        {komentar.komentar}
+                        {komentar !==
+                          letterData?.surat.komentar[
+                            letterData?.surat.komentar.length - 1
+                          ] && ", "}
+                      </p>
+                    );
+                  })}
                 </span>
               </div>
             )}
@@ -726,7 +746,7 @@ export default function SuratSinglePage() {
               <div className="pt-12 flex gap-4 text-white">
                 <Button
                   className="bg-success w-full"
-                  onClick={handleSetuju}
+                  onClick={() => setModalSetujuOpen(true)}
                   disabled={isSetujuLoading || isMenolakLoading}
                 >
                   {isSetujuLoading ? (
@@ -928,6 +948,17 @@ export default function SuratSinglePage() {
             </form>
           </div>
         </Modal>
+      )}
+      {modalSetujuOpen && (
+        <ConfirmationModal
+          setModalOpen={setModalSetujuOpen}
+          isLoading={isSetujuLoading}
+          title="Setujui Surat"
+          message={`Apakah anda yakin ingin menyetujui surat ${
+            letterData?.surat.judul.split(".")[0]
+          }?`}
+          onClick={handleSetuju}
+        />
       )}
       {modalDeleteOpen && (
         <ConfirmationModal
