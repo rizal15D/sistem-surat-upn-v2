@@ -229,7 +229,6 @@ export const columns: ColumnDef<Letter>[] = [
     filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const repo = row.original.repo;
-      // console.log(repo);
       const indikator = repo && repo.length > 0 ? repo[0].indikator : null;
       return <div>{indikator ? indikator.name : "-"}</div>;
     },

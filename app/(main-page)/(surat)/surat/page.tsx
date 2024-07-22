@@ -132,7 +132,6 @@ export default function ListSuratPage() {
   }, [jenisData]);
 
   useEffect(() => {
-    console.log(user);
     let socket = SocketData();
     socket.on("message", (data) => {
       // const parts = data.split("/");
