@@ -45,7 +45,7 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin} className="flex gap-2">
+    <form method="post" onSubmit={handleLogin} className="flex gap-2">
       <div className="mb-4">
         <div className="relative">
           <input
