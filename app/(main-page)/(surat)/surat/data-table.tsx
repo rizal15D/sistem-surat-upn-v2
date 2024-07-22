@@ -81,6 +81,27 @@ export function DataTable<TData, TValue>({
     },
   });
 
+  React.useEffect(() => {
+    if (localStorage.getItem("visibleColumnIds") === null) {
+      const columIds = table.getAllColumns().map((column) => column.id);
+      localStorage.setItem("visibleColumnIds", JSON.stringify(columIds));
+    }
+    const allHideableColumnIds = table
+      .getAllColumns()
+      .filter((column) => column.getCanHide())
+      .map((column) => column.id);
+    const savedColumnIds: string[] = JSON.parse(
+      localStorage.getItem("visibleColumnIds") || "[]"
+    ) as string[];
+    const initialColumnVisibility: VisibilityState =
+      allHideableColumnIds.reduce((visibilityState, columnId) => {
+        visibilityState[columnId] = savedColumnIds.includes(columnId);
+        return visibilityState;
+      }, {} as VisibilityState);
+
+    setColumnVisibility(initialColumnVisibility);
+  }, []);
+
   const router = useRouter();
 
   return (

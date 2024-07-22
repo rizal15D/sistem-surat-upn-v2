@@ -50,7 +50,19 @@ export function DataTableViewOptions<TData>({
                 key={column.id}
                 className="capitalize"
                 checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                onCheckedChange={(value) => {
+                  column.toggleVisibility(!!value);
+                  // save to localstorage
+                  localStorage.setItem(
+                    "visibleColumnIds",
+                    JSON.stringify(
+                      table
+                        .getAllColumns()
+                        .filter((column) => column.getIsVisible())
+                        .map((column) => column.id)
+                    )
+                  );
+                }}
               >
                 {column.id}
               </DropdownMenuCheckboxItem>
