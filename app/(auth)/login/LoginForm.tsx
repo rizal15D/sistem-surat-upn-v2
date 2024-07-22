@@ -45,17 +45,14 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleLogin}>
+    <form onSubmit={handleLogin} className="flex gap-2">
       <div className="mb-4">
-        <label className="mb-2.5 block font-medium text-black dark:text-white">
-          Email
-        </label>
         <div className="relative">
           <input
             name="email"
             type="text"
-            placeholder="Masukkan email anda.."
-            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            placeholder="Email"
+            className="w-full rounded-lg border border-stroke border-black bg-white py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
           />
 
           <span className="absolute right-4 top-4">
@@ -79,15 +76,12 @@ export default function LoginForm() {
       </div>
 
       <div className="mb-6">
-        <label className="mb-2.5 block font-medium text-black dark:text-white">
-          Password
-        </label>
         <div className="relative">
           <input
             name="password"
             type="password"
-            placeholder="Masukkan password anda.."
-            className="w-full rounded-lg border border-stroke bg-transparent py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+            placeholder="Password"
+            className="w-full rounded-lg border border-stroke border-black bg-white py-4 pl-6 pr-10 outline-none focus:border-primary focus-visible:shadow-none dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
           />
 
           <span className="absolute right-4 top-4">
