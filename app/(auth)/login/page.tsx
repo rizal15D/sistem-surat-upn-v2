@@ -152,13 +152,13 @@ const LoginPage: React.FC = async () => {
           </div>
         </div>
       </div> */}
-      <div className="absolute flex items-center right-2 h-full pt-4">
+      <div className="absolute flex items-center right-2 h-full pt-16 hidden md:block">
         <Image src={Ikon} alt="Ikon" width={650} height={650} quality={100} />
       </div>
-      <div className="absolute top-12 left-8">
+      <div className="absolute top-16 md:left-8 flex justify-center w-screen sm:w-[50%] sm:items-start sm:justify-start">
         <Image src={Logo} alt="Logo" width={200} height={200} quality={100} />
       </div>
-      <div className="absolute left-8 h-full flex items-center pt-8">
+      <div className="absolute md:left-8 h-full flex items-center justify-center md:justify-start pt-12 px-2">
         <div className="flex flex-col">
           <Image src={Teks} alt="Teks" width={500} height={500} quality={100} />
           <div className="w-full mt-4">

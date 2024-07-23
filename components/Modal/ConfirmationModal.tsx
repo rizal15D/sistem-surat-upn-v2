@@ -4,12 +4,14 @@ import Modal from "./Modal";
 export default function ConfirmationModal({
   setModalOpen,
   onClick,
+  className,
   isLoading,
   title,
   message,
 }: {
   setModalOpen: (value: boolean) => void;
   onClick: () => void;
+  className?: string;
   isLoading?: boolean;
   title: string;
   message: string;
