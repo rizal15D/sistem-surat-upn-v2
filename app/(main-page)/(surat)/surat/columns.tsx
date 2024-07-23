@@ -18,6 +18,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { User } from "@/app/api/auth/[...nextauth]/authOptions";
+import { ExternalLink } from "lucide-react";
+import { FilterFn } from "@tanstack/react-table";
 
 export type Letter = {
   id: number;
@@ -70,43 +72,46 @@ export type Letter = {
   }[];
 };
 
+const multiColumnFilterFn: FilterFn<Letter> = (row, columnId, filterValue) => {
+  // Concatenate the values from multiple columns into a single string
+  const searchableRowContent = `${row.original.judul} 
+  ${row.original.nomor_surat[0]?.nomor_surat} 
+  ${row.original.user.name} 
+  ${row.original.repo[0]?.indikator.name}
+  ${row.original.repo[0]?.indikator.strategi.name}
+  }`;
+
+  // Perform a case-insensitive comparison
+  return searchableRowContent.toLowerCase().includes(filterValue.toLowerCase());
+};
+
 export const columns: ColumnDef<Letter>[] = [
   {
     accessorKey: "judul",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Judul" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const judul = row.original.judul;
       return <div>{judul.split(".")[0].split("-")[0]}</div>;
     },
   },
   {
-    accessorKey: "nomor_surat",
+    accessorKey: "nomor surat",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Nomor Surat" />
     ),
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as { nomor_surat: string })
-        .nomor_surat;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.includes(v))
-      );
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const nomorSurat = row.original.nomor_surat;
       return <div>{nomorSurat[0] ? nomorSurat[0]?.nomor_surat : "-"}</div>;
     },
   },
   {
-    accessorKey: "user",
+    accessorKey: "pembuat",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Pembuat Surat" />
+      <DataTableColumnHeader column={column} title="Pembuat" />
     ),
     cell: ({ row }) => {
       const user = row.original.user;
@@ -116,13 +121,9 @@ export const columns: ColumnDef<Letter>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      const rowValue = (row.getValue(id) as Users).prodi?.name;
-      return value.some((val: string[]) =>
-        val.some((v) => rowValue.toLowerCase().includes(v.toLowerCase()))
-      );
-    },
+    filterFn: multiColumnFilterFn,
   },
+
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -134,52 +135,39 @@ export const columns: ColumnDef<Letter>[] = [
         val.some((v) => rowValue.includes(v))
       );
     },
+
     cell: ({ row }) => {
       const status = row.original.status;
       const statusSurat = status?.status;
       const progressBar = row.original.progressBar;
       const tampilan = row.original.tampilan;
 
-      let jabatanStatus = "";
-
-      if (statusSurat?.includes("Daftar Tunggu")) {
-        jabatanStatus = statusSurat.slice(14, statusSurat.length);
-      } else if (statusSurat?.includes("Diproses")) {
-        jabatanStatus = statusSurat.slice(9, statusSurat.length);
-      }
-
-      // Create a hexa color based on the jabatan
-      function stringToHex(str: string): string {
-        // Hash function to convert string to a numeric value
-        const hash = str
-          .split("")
-          .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
-        // Convert the numeric value to a hexadecimal string
-        return (hash * 57423).toString(16).toUpperCase();
-      }
-      const color = `#${stringToHex(jabatanStatus).slice(0, 6)}`;
-      // const color = `rgb(150, 123, 182)`;
+      const getBadgeColor = (data: String) => {
+        let color;
+        if (data.includes("BSRE")) color = "rgb(30,144,255)"; // biru
+        else if (data.includes("Admin Dekan"))
+          color = `rgb(150, 123, 182)`; //ungu
+        else if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
+          color = "rgb(250 204 21)"; // warna pengganti untuk bg-warning
+        else if (data.includes("Ditolak"))
+          color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
+        else if (data.includes("Ditandatangani"))
+          color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
+        else color = "rgb(120 113 108)"; // default color
+        return color;
+      };
+      let color = getBadgeColor(statusSurat);
 
       return (
         <>
           {color && (
             <Badge
               style={{
-                backgroundColor:
-                  (statusSurat?.includes("Daftar Tunggu") ||
-                    statusSurat?.includes("Diproses")) &&
-                  statusSurat?.includes("Admin Dekan")
-                    ? "rgb(150, 123, 182)" //ungu
-                    : statusSurat?.includes("Ditolak")
-                    ? "rgb(239 68 68)" // menggantikan "bg-danger" dengan warna yang sesuai
-                    : statusSurat?.includes("Ditandatangani")
-                    ? "rgb(34 197 94)" // menggantikan "bg-success" dengan warna yang sesuai
-                    : "rgb(250 204 21)", // menggantikan "bg-warning" dengan warna yang sesuai
+                backgroundColor: color, // menggantikan "bg-warning" dengan warna yang sesuai
                 color: "white",
               }}
             >
-              <p className="text-center w-full">{statusSurat}</p>
+              <p className="text-center w-full rounded-md">{statusSurat}</p>
             </Badge>
           )}
           {(statusSurat?.includes("Daftar Tunggu") ||
@@ -238,14 +226,9 @@ export const columns: ColumnDef<Letter>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Indikator" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const repo = row.original.repo;
-      // console.log(repo);
       const indikator = repo && repo.length > 0 ? repo[0].indikator : null;
       return <div>{indikator ? indikator.name : "-"}</div>;
     },
@@ -256,11 +239,7 @@ export const columns: ColumnDef<Letter>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Strategi" />
     ),
-    filterFn: (row, id, value) => {
-      return (row.getValue(id) as string)
-        .toLowerCase()
-        .includes(value.toLowerCase());
-    },
+    filterFn: multiColumnFilterFn,
     cell: ({ row }) => {
       const repo = row.original.repo;
       const strategi =
@@ -276,18 +255,70 @@ export const columns: ColumnDef<Letter>[] = [
       const letter = row.original as Letter;
       const router = useRouter();
 
+      const session = useSession();
+      const user = session.data?.user as User;
+
+      const canDownload =
+        user?.jabatan.permision.download_surat &&
+        !user?.jabatan.jabatan_atas &&
+        !letter.status.status.includes("Ditandatangani");
+
+      const getFileUrl = async () => {
+        const response = await axios.get(
+          `/api/surat/download?filepath=${letter.path}`,
+          {
+            responseType: "arraybuffer",
+          }
+        );
+
+        const file = new Blob([response.data], { type: "application/pdf" });
+        const fileURL = URL.createObjectURL(file);
+        return fileURL;
+      };
+
+      const handleDownload = async () => {
+        let link = document.createElement("a");
+        link.href = await getFileUrl();
+
+        link.setAttribute(
+          "download",
+          `${
+            letter.nomor_surat[letter.nomor_surat.length - 1]?.nomor_surat
+          } - ${letter.judul.split(".")[0]}.pdf`
+        );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      };
+
       return (
         <div className="flex items-center space-x-2">
           <Button
             variant="default"
             size="sm"
-            onClick={() => {
-              router.push(`/surat/${letter.id}`);
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              window.open(`/surat/${letter.id}`, "_blank");
             }}
             className="bg-primary hover:bg-opacity-90 text-white"
           >
-            <InfoCircledIcon className="h-5 w-5" />
+            <ExternalLink className="h-5 w-5" />
           </Button>
+          {canDownload && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                handleDownload();
+              }}
+              className="bg-primary hover:bg-opacity-90 text-white"
+            >
+              <DownloadIcon className="h-5 w-5" />
+            </Button>
+          )}
         </div>
       );
     },

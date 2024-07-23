@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Clipboard, EditIcon } from "lucide-react";
 import Link from "next/link";
 import { Indikator } from "@/app/(main-page)/(master)/data-master/(sikoja)/indikator/columns";
+import { SocketData } from "@/app/(auth)/login/SocketData";
 
 export default function SuratSinglePage() {
   const queryClient = useQueryClient();
@@ -52,13 +53,16 @@ export default function SuratSinglePage() {
   const [isPerbaikanLoading, setIsPerbaikanLoading] = useState(false);
   const [isTaggingLoading, setIsTaggingLoading] = useState(false);
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [isSuratLoading, setIsSuratLoading] = useState(false);
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [modalMenolakOpen, setModalMenolakOpen] = useState(false);
   const [modalDeleteOpen, setModalDeleteOpen] = useState(false);
   const [modalPerbaikanOpen, setModalPerbaikanOpen] = useState(false);
   const [modalTaggingOpen, setModalTaggingOpen] = useState(false);
+  const [modalSetujuOpen, setModalSetujuOpen] = useState(false);
   const [isUpdated, setIsUpdated] = useState(false);
+  // const [isUpdatedStatus, setIsUpdatedStatus] = useState(false);
 
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
@@ -72,7 +76,7 @@ export default function SuratSinglePage() {
 
   // Get Data Surat
   const { data: letterData, isLoading: isLetterLoading } = useQuery({
-    queryKey: ["repo", id],
+    queryKey: ["surat", id],
     queryFn: async () => {
       const response = await axios.get(`/api/surat/${id}`);
 
@@ -93,12 +97,15 @@ export default function SuratSinglePage() {
         input,
       });
     },
+
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["surat"] });
     },
   });
 
   const getFileUrl = async () => {
+    setIsSuratLoading(true);
+
     const response = await axios.get(
       `/api/surat/download?filepath=${letterData?.surat.path}`,
       {
@@ -108,14 +115,15 @@ export default function SuratSinglePage() {
 
     const file = new Blob([response.data], { type: "application/pdf" });
     const fileURL = URL.createObjectURL(file);
+    setIsSuratLoading(false);
     return fileURL;
   };
 
   useEffect(() => {
     if (letterData) {
       getFileUrl().then((url) => setFileUrl(url));
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
-      queryClient.invalidateQueries({ queryKey: ["repo"] });
+      queryClient.invalidateQueries({ queryKey: ["surat", id] });
+      queryClient.invalidateQueries({ queryKey: ["repo", id] });
       setIsUpdated(false);
       if (letterData.surat.tampilan) {
         if (!letterData.surat.tampilan[0]?.dibaca) {
@@ -124,14 +132,6 @@ export default function SuratSinglePage() {
       }
     }
   }, [letterData, isUpdated]);
-
-  // Get Komentar
-  const getKomentar = async () => {
-    const response = await axios.get(`/api/surat/komentar`, {
-      params: { id },
-    });
-    return response.data;
-  };
 
   // Get Strategi
   const canTagging = user?.jabatan.permision.tagging;
@@ -162,12 +162,6 @@ export default function SuratSinglePage() {
       return response.data.indikator;
     },
     enabled: canTagging,
-  });
-
-  const { data: komentar, isLoading: isKomentarLoading } = useQuery({
-    queryKey: ["komentar", id],
-    queryFn: getKomentar,
-    enabled: !!letterData?.surat.status.status.includes("Ditolak"),
   });
 
   const handleDownload = async () => {
@@ -217,7 +211,8 @@ export default function SuratSinglePage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      queryClient.invalidateQueries({ queryKey: ["repo", id] });
+      queryClient.invalidateQueries({ queryKey: ["surat", id] });
       setUploadModalOpen(false);
       toast({
         title: "Berhasil",
@@ -281,8 +276,36 @@ export default function SuratSinglePage() {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["surat"] });
       router.push("/surat");
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
+      toast({
+        title: "Berhasil menghapus surat",
+        className: "bg-success text-white",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Gagal menghapus surat",
+        className: "bg-danger text-white",
+      });
+    },
+    onSettled: () => {
+      setIsDeleteLoading(false);
+      setModalDeleteOpen(false);
+    },
+  });
+
+  const { mutate: mutateHide } = useMutation({
+    mutationFn: async () => {
+      if (isDeleteLoading) return;
+
+      setIsDeleteLoading(true);
+      const response = await axios.delete(`/api/surat/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      router.push("/surat");
+      queryClient.invalidateQueries({ queryKey: ["surat"] });
       toast({
         title: "Berhasil menghapus surat",
         className: "bg-success text-white",
@@ -301,7 +324,7 @@ export default function SuratSinglePage() {
   });
 
   const handleDelete = async () => {
-    await mutateDelete();
+    letterData?.surat.nomor_surat.length > 0 ? mutateHide() : mutateDelete();
   };
 
   // Persetujuan
@@ -488,20 +511,17 @@ export default function SuratSinglePage() {
   };
 
   const getBadgeColor = (data: String) => {
-    if (data.includes("Admin Dekan")) {
-      return `rgb(150, 123, 182)`; //ungu
-    }
-    if (data.includes("Daftar Tunggu") || data.includes("Diproses")) {
-      return "rgb(250 204 21)"; // warna pengganti untuk bg-warning
-    }
-
-    if (data.includes("Ditolak")) {
-      return "rgb(239 68 68)"; // warna pengganti untuk bg-danger
-    }
-    if (data.includes("Ditandatangani")) {
-      return "rgb(34 197 94)"; // warna pengganti untuk bg-success
-    }
-    return "rgb(120 113 108)"; // default color
+    let color;
+    if (data.includes("BSRE")) color = "rgb(30,144,255)"; // biru
+    else if (data.includes("Admin Dekan")) color = `rgb(150, 123, 182)`; //ungu
+    else if (data.includes("Daftar Tunggu") || data.includes("Diproses"))
+      color = "rgb(250 204 21)"; // warna pengganti untuk bg-warning
+    else if (data.includes("Ditolak"))
+      color = "rgb(239 68 68)"; // warna pengganti untuk bg-danger
+    else if (data.includes("Ditandatangani"))
+      color = "rgb(34 197 94)"; // warna pengganti untuk bg-success
+    else color = "rgb(120 113 108)"; // default color
+    return color;
   };
 
   const canPersetujuan =
@@ -525,12 +545,7 @@ export default function SuratSinglePage() {
   const canDelete =
     // User yang mempunyai surat
     user?.jabatan.name === letterData?.surat.user?.jabatan.name &&
-    user?.user.prodi?.name === letterData?.surat.user?.prodi?.name &&
-    // Surat masih di tangan atasan
-    letterData?.surat.status.status.includes(
-      user?.jabatan.jabatan_atas?.name
-    ) &&
-    !letterData?.surat.status.persetujuan;
+    user?.user.prodi?.name === letterData?.surat.user?.prodi?.name;
 
   const canOCR =
     user?.jabatan.permision.generate_nomor_surat &&
@@ -544,7 +559,7 @@ export default function SuratSinglePage() {
     // Surat ditolak
     letterData?.surat.status.status.includes("Ditolak");
 
-  if (isKomentarLoading || isLetterLoading)
+  if (isLetterLoading || isSuratLoading)
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
@@ -706,20 +721,34 @@ export default function SuratSinglePage() {
               </span>
             </div>
 
-            {komentar?.komentar && (
+            {letterData?.surat.komentar.length > 0 && (
               <div className="flex flex-col space-y-1">
                 <span className="text-title-xs font-medium text-black dark:text-white">
                   Alasan Penolakan
                 </span>
                 <span className="text-body-xs text-black dark:text-white">
-                  {komentar.komentar.komentar}
+                  {letterData?.surat.komentar.map((komentar: any) => {
+                    return (
+                      <p className="text-black dark:text-white">
+                        {komentar.komentar}
+                        {komentar !==
+                          letterData?.surat.komentar[
+                            letterData?.surat.komentar.length - 1
+                          ] && ", "}
+                      </p>
+                    );
+                  })}
                 </span>
               </div>
             )}
 
-            {canPersetujuan && (
+            {canPersetujuan && fileUrl && (
               <div className="pt-12 flex gap-4 text-white">
-                <Button className="bg-success w-full" onClick={handleSetuju}>
+                <Button
+                  className="bg-success w-full"
+                  onClick={() => setModalSetujuOpen(true)}
+                  disabled={isSetujuLoading || isMenolakLoading}
+                >
                   {isSetujuLoading ? (
                     <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
                   ) : (
@@ -731,6 +760,7 @@ export default function SuratSinglePage() {
                     setModalMenolakOpen(true);
                   }}
                   className="bg-danger w-full"
+                  disabled={isMenolakLoading || isSetujuLoading}
                 >
                   <Cross2Icon className="w-6 h-6" />
                 </Button>
@@ -828,6 +858,7 @@ export default function SuratSinglePage() {
                   >
                     <option value="">Pilih Strategi</option>
                     {strategiData &&
+                      Array.isArray(strategiData) &&
                       strategiData.map((strategi: any) => (
                         <option key={strategi.id} value={strategi.id}>
                           {strategi.name}
@@ -917,6 +948,17 @@ export default function SuratSinglePage() {
             </form>
           </div>
         </Modal>
+      )}
+      {modalSetujuOpen && (
+        <ConfirmationModal
+          setModalOpen={setModalSetujuOpen}
+          isLoading={isSetujuLoading}
+          title="Setujui Surat"
+          message={`Apakah anda yakin ingin menyetujui surat ${
+            letterData?.surat.judul.split(".")[0]
+          }?`}
+          onClick={handleSetuju}
+        />
       )}
       {modalDeleteOpen && (
         <ConfirmationModal

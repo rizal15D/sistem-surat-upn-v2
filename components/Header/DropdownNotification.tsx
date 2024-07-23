@@ -35,10 +35,8 @@ const DropdownNotification = () => {
       const notifSocketData = async () => {
         const response = await fetch("/api/notifikasi-socket");
         const dataNotif = await response.json();
-        console.log(dataNotif);
         if (dataNotif && dataNotif.length > 0) {
           setNotifSocket(dataNotif);
-          console.log("masuk");
         }
       };
 

@@ -18,6 +18,7 @@ import { SocketData } from "@/app/(auth)/login/SocketData";
 export default function ListSuratPage() {
   const session = useSession();
   const user = session.data?.user as User;
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -107,8 +108,20 @@ export default function ListSuratPage() {
         })),
         status: [
           {
-            value: ["Daftar Tunggu", "Diproses", "Disetujui"],
-            label: "Diproses",
+            value: ["Diproses TU", "Daftar Tunggu TU"],
+            label: "Di Tata Usaha",
+          },
+          {
+            value: ["Diproses Dekan", "Daftar Tunggu Dekan"],
+            label: "Di Dekan",
+          },
+          {
+            value: [
+              "Diproses Admin Dekan",
+              "Daftar Tunggu Admin Dekan",
+              "BSRE",
+            ],
+            label: "Di Admin Dekan",
           },
           { value: ["Ditandatangani"], label: "Diterima" },
           { value: ["Ditolak"], label: "Ditolak" },
@@ -121,7 +134,7 @@ export default function ListSuratPage() {
   useEffect(() => {
     let socket = SocketData();
     socket.on("message", (data) => {
-      const parts = data.split("/");
+      // const parts = data.split("/");
 
       if (data == `private new mail/${user?.jabatan.id}`) {
         queryClient.invalidateQueries({ queryKey: ["surat"] });
@@ -171,19 +184,28 @@ export default function ListSuratPage() {
     []
   );
 
-  const handleDownloadUnsignedZip = async () => {
+  const handleDownloadUnsignedZip = async (): Promise<void> => {
     const { data } = await axios.get("/api/surat/download/all-unsigned", {
       responseType: "arraybuffer",
       headers: {
         Authorization: `Bearer ${user.accessToken}`,
       },
     });
-    const url = window.URL.createObjectURL(new Blob([data]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "surat.zip");
-    document.body.appendChild(link);
-    link.click();
+
+    if (data.byteLength === 22) {
+      toast({
+        title: "Tidak ada file untuk diunduh",
+        description: "Tidak ada surat yang belum ditandatangani.",
+        className: "bg-warning text-white",
+      });
+    } else {
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "download.zip");
+      document.body.appendChild(link);
+      link.click();
+    }
   };
 
   if (isLoading || isJenisLoading || isProdiLoading) {
@@ -196,7 +218,6 @@ export default function ListSuratPage() {
 
   return (
     <>
-      {/* <Socket /> */}
       <div className="w-full flex justify-between items-center pb-4">
         <h1 className="text-title-md2 font-semibold text-black dark:text-white">
           Daftar Surat

@@ -5,7 +5,14 @@ export default function AuthLayout({
 }) {
   return (
     <main>
-      <div className="flex items-center justify-center h-screen w-screen p-4 md:p-6 2xl:p-10">
+      <div
+        className={`h-screen w-screen relative`}
+        style={{
+          backgroundImage: `url(/images/auth/background.jpg)`,
+          backgroundSize: `100% 100%`,
+          backgroundPosition: `center`,
+        }}
+      >
         {children}
       </div>
     </main>

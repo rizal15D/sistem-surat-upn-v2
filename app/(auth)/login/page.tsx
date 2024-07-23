@@ -3,17 +3,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { Metadata } from "next";
 import LoginForm from "./LoginForm";
-// import Socket from "./Socket";
 export const metadata: Metadata = {
   title: "Laman Login | Sistem Surat UPN VJT",
   description: "Sistem Surat UPN Veteran Jawa Timur",
   // other metadata
 };
+import Ikon from "@/public/images/auth/Ikon.png";
+import Logo from "@/public/images/auth/Logo.png";
+import Teks from "@/public/images/auth/Teks.png";
 
 const LoginPage: React.FC = async () => {
   return (
     <>
-      <div className="h-[95%] w-[95%] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+      {/* <div className="h-[95%] w-[95%] rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="h-full w-full flex flex-wrap items-center justify-center">
           <div className="xl:w-1/2 xl:block hidden">
             <div className="flex justify-center items-center">
@@ -145,9 +147,22 @@ const LoginPage: React.FC = async () => {
               <h2 className="mb-9 text-2xl font-bold text-black dark:text-white sm:text-title-xl2">
                 Selamat datang di Sistem Surat UPN Veteran Jawa Timur
               </h2>
-              {/* <Socket /> */}
               <LoginForm />
             </div>
+          </div>
+        </div>
+      </div> */}
+      <div className="absolute flex items-center right-2 h-full pt-4">
+        <Image src={Ikon} alt="Ikon" width={650} height={650} quality={100} />
+      </div>
+      <div className="absolute top-12 left-8">
+        <Image src={Logo} alt="Logo" width={200} height={200} quality={100} />
+      </div>
+      <div className="absolute left-8 h-full flex items-center pt-8">
+        <div className="flex flex-col">
+          <Image src={Teks} alt="Teks" width={500} height={500} quality={100} />
+          <div className="w-full mt-4">
+            <LoginForm />
           </div>
         </div>
       </div>
