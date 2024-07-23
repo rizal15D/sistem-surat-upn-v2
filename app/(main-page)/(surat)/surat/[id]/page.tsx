@@ -352,6 +352,8 @@ export default function SuratSinglePage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["surat"] });
+      setModalSetujuOpen(false);
+      setModalTaggingOpen(false);
       toast({
         title: "Berhasil",
         className: "bg-success text-white",
@@ -746,7 +748,11 @@ export default function SuratSinglePage() {
               <div className="pt-12 flex gap-4 text-white">
                 <Button
                   className="bg-success w-full"
-                  onClick={() => setModalSetujuOpen(true)}
+                  onClick={() => {
+                    if (user?.jabatan.permision.tagging)
+                      setModalTaggingOpen(true);
+                    else setModalSetujuOpen(true);
+                  }}
                   disabled={isSetujuLoading || isMenolakLoading}
                 >
                   {isSetujuLoading ? (
@@ -796,21 +802,6 @@ export default function SuratSinglePage() {
                   Hapus
                 </Button>
               )}
-              {/* {canOCR && (
-                <Button
-                  className="flex gap-2 bg-primary w-full"
-                  onClick={() => mutateOCR()}
-                >
-                  {isOCRLoading ? (
-                    <div className="h-6 w-6 animate-spin rounded-full border-4 border-solid border-white border-t-transparent"></div>
-                  ) : (
-                    <>
-                      <Clipboard className="w-6 h-6" />
-                      Tempel Nomor Surat
-                    </>
-                  )}
-                </Button>
-              )} */}
               {canPerbaikan && (
                 <Button
                   className="bg-warning w-full"
@@ -835,6 +826,7 @@ export default function SuratSinglePage() {
               className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
               onSubmit={(e) => {
                 e.preventDefault();
+                
                 mutatePersetujuan({
                   persetujuan: `Disetujui ${user?.user.jabatan.name}`,
                   indikator_id: parseInt(e.currentTarget.indikator_id.value),
