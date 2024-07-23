@@ -378,10 +378,10 @@ export default function SuratSinglePage() {
     if (user?.jabatan.permision.persetujuan) {
       if (canTagging) {
         setModalTaggingOpen(true);
-        setModalSetujuOpen(false);
+        // setModalSetujuOpen(false);
         return;
       }
-      setModalSetujuOpen(false);
+      // setModalSetujuOpen(false);
 
       mutatePersetujuan({
         persetujuan: `Disetujui ${user?.user.jabatan.name}`,
@@ -828,7 +828,7 @@ export default function SuratSinglePage() {
               className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
               onSubmit={(e) => {
                 e.preventDefault();
-                
+
                 mutatePersetujuan({
                   persetujuan: `Disetujui ${user?.user.jabatan.name}`,
                   indikator_id: parseInt(e.currentTarget.indikator_id.value),
