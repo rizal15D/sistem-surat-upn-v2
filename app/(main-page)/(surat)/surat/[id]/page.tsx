@@ -376,8 +376,10 @@ export default function SuratSinglePage() {
     if (user?.jabatan.permision.persetujuan) {
       if (canTagging) {
         setModalTaggingOpen(true);
+        setModalSetujuOpen(false);
         return;
       }
+      setModalSetujuOpen(false);
 
       mutatePersetujuan({
         persetujuan: `Disetujui ${user?.user.jabatan.name}`,

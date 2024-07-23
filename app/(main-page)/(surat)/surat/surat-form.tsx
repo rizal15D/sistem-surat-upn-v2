@@ -81,7 +81,7 @@ export default function SuratForm({
             </label>
             {selectedFile && (
               <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.js">
-                <div className="h-[40vh] mb-4">
+                <div className={`${isModal ? "h-[40vh]" : "h-[61vh]"} mb-4`}>
                   <Viewer
                     fileUrl={selectedFile}
                     defaultScale={SpecialZoomLevel.ActualSize}
