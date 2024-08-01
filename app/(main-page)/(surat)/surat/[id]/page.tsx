@@ -64,6 +64,8 @@ export default function SuratSinglePage() {
   const [isUpdated, setIsUpdated] = useState(false);
   // const [isUpdatedStatus, setIsUpdatedStatus] = useState(false);
 
+  const [catatanIKU, setCatatanIKU] = useState<string>("");
+
   const toolbarPluginInstance = toolbarPlugin({});
   const { renderDefaultToolbar, Toolbar } = toolbarPluginInstance;
   const transform: TransformToolbarSlot = (slot: ToolbarSlot) => ({
@@ -333,6 +335,7 @@ export default function SuratSinglePage() {
       persetujuan: string;
       indikator_id?: number;
       komentar?: string;
+      catatanIKU?: string;
     }) => {
       if (isSetujuLoading || isMenolakLoading || isTaggingLoading) return;
 
@@ -843,12 +846,13 @@ export default function SuratSinglePage() {
           ) : (
             <form
               className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark"
-              onSubmit={(e) => {
+              onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
 
                 mutatePersetujuan({
                   persetujuan: `Disetujui ${user?.user.jabatan.name}`,
                   indikator_id: parseInt(e.currentTarget.indikator_id.value),
+                  catatanIKU: catatanIKU,
                 });
               }}
             >
@@ -899,6 +903,20 @@ export default function SuratSinglePage() {
                     </select>
                   </div>
                 )}
+
+                <div className="mb-4.5">
+                  <label className="mb-2.5 block text-black dark:text-white">
+                    Catatan IKU<span className="text-meta-1">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="catatanIKU"
+                    placeholder="catatan IKU"
+                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 font-medium outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                    value={catatanIKU}
+                    onChange={(e) => setCatatanIKU(e.target.value)}
+                  />
+                </div>
 
                 <button
                   className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray disabled:cursor-not-allowed disabled:bg-disabled disabled:text-black"

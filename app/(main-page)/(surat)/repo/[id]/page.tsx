@@ -359,6 +359,15 @@ export default function SuratSinglePage() {
 
             <div className="flex flex-col space-y-1">
               <span className="text-title-xs font-medium text-black dark:text-white">
+                Catatan IKU
+              </span>
+              <span className="text-body-xs text-black dark:text-white">
+                {letterData?.catatan}
+              </span>
+            </div>
+
+            <div className="flex flex-col space-y-1">
+              <span className="text-title-xs font-medium text-black dark:text-white">
                 Deskripsi
               </span>
               <span className="text-body-xs text-black dark:text-white">

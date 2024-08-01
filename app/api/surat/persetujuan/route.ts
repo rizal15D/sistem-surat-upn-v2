@@ -9,7 +9,14 @@ export async function PUT(req: NextRequest) {
   } | null;
 
   if (session) {
-    const { id, input } = await req.json();
+    let { id, input } = await req.json();
+    console.log("pnowvv", input);
+
+    // input = {
+    //   persetujuan: input.persetujuan,
+    //   indikator_id: input.indikator_id,
+    //   catatanIKU: input.catatanIKU,
+    // };
 
     const { data } = await axios.put(
       `${process.env.API_URL}/status?surat_id=${id}`,

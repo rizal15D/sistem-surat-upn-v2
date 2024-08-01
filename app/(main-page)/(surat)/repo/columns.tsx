@@ -23,6 +23,7 @@ export type LetterRepo = {
   id: number;
   unix_code: string;
   visible: boolean;
+  catatan: string;
   indikator: {
     id: number;
     name: string;
