@@ -745,6 +745,23 @@ export default function SuratSinglePage() {
                 </span>
               </div>
             )}
+            {letterData?.riwayat.length > 0 && (
+              <div className="flex flex-col space-y-1">
+                <span className="text-title-xs font-medium text-black dark:text-white">
+                  Riwayat
+                </span>
+                <span className="text-body-xs text-black dark:text-white">
+                  {letterData?.riwayat.map((riwayat: any) => {
+                    return (
+                      <p className="text-black dark:text-white">
+                        {riwayat.perbaikan}
+                        {riwayat !== letterData?.riwayat.perbaikan && ", "}
+                      </p>
+                    );
+                  })}
+                </span>
+              </div>
+            )}
 
             {canPersetujuan && fileUrl && (
               <div className="pt-12 flex gap-4 text-white">
