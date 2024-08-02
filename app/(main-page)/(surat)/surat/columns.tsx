@@ -61,6 +61,7 @@ export type Letter = {
     id: number;
     unix_code: string;
     visible: boolean;
+    catatan: string;
     indikator: {
       id: number;
       name: string;
@@ -247,6 +248,19 @@ export const columns: ColumnDef<Letter>[] = [
           ? repo[0].indikator.strategi
           : null;
       return <div>{strategi ? strategi.name : "-"}</div>;
+    },
+  },
+  {
+    accessorKey: "catatan",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Catatan IKU" />
+    ),
+    filterFn: multiColumnFilterFn,
+    cell: ({ row }) => {
+      const repo = row.original.repo;
+      const catatan =
+        repo && repo.length > 0 && repo[0].indikator ? repo[0].catatan : null;
+      return <div>{catatan ? catatan : "-"}</div>;
     },
   },
   {

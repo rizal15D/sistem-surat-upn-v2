@@ -174,6 +174,17 @@ export const columns: ColumnDef<LetterRepo>[] = [
     },
   },
   {
+    accessorKey: "catatan",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Catatan IKU" />
+    ),
+    filterFn: multiColumnFilterFn,
+    cell: ({ row }) => {
+      const catatan = row.original.catatan;
+      return <div>{catatan ? catatan : "-"}</div>;
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => {
       const letter = row.original as LetterRepo;
