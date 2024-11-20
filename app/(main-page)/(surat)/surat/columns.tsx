@@ -32,6 +32,7 @@ export type Letter = {
   status: {
     status: string;
     persetujuan: string;
+    updatedAt: Date;
   };
   tampilan: {
     pin: boolean;
@@ -188,6 +189,31 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
+    accessorKey: "status.updatedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Diperbarui" />
+    ),
+    cell: ({ row }) => {
+      const date = new Date(row.original.status.updatedAt);
+
+      const options = {
+        weekday: "long" as "long",
+        day: "numeric" as "numeric",
+        month: "long" as "long",
+        year: "numeric" as "numeric",
+        hour: "2-digit" as "2-digit",
+        minute: "2-digit" as "2-digit",
+        second: "2-digit" as "2-digit",
+        hour12: false, // Format 24 jam
+      };
+      const formattedDate = new Intl.DateTimeFormat("id-ID", options).format(
+        date
+      );
+
+      return formattedDate;
+    },
+  },
+  {
     accessorKey: "tanggal",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tanggal Dibuat" />
@@ -251,7 +277,7 @@ export const columns: ColumnDef<Letter>[] = [
     },
   },
   {
-    accessorKey: "catatan",
+    accessorKey: "catatan IKU",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Catatan IKU" />
     ),
